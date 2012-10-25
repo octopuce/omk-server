@@ -1,0 +1,18 @@
+To install the open-mediakit transcoder, you will need the following : 
+
+- a Linux or *Nix install with a webserver, php5 (should work with php 5.1, but 5.3 or better is recommended)
+
+- ffmpeg and imagemagick WITH proprietary codecs if you want to be able to encode to mp4, mp3 etc.
+
+To do this, under debian Linux, use debian-multimedia repository as follow 
+(add this line in /etc/apt/sources.list.d/debian-multimedia.list )
+
+deb http://debian.octopuce.fr/debian-multimedia squeeze main contrib non-free
+
+then launch, as root : 
+
+# aptitude update
+# aptitude install ffmpeg libavcodec52 libavfilter1 libavdevice52 libavutil50 libavformat52 libmp3lame0 libx264-118 libfaac0 libvpx0 imagemagick 
+
+(later, when we will support document parsing, we will need pdfutils, htmltotext, unoconv ...)
+
