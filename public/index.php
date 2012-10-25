@@ -1,6 +1,6 @@
 <?php
 // Configuration
-require_once dirname(__FILE__) . '/../config.inc.php';
+require_once __DIR__ . '/../config.inc.php';
 
 // Some libraries
 require_once LIBS . '/utils.php';

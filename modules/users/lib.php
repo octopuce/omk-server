@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config.inc.php';
 require_once LIBS . '/Db.php';
+/*
 try {
   $db = new Db($db);
 }
@@ -8,6 +9,7 @@ catch (Exception $e) {
   echo _('Connexion à la base de données échouée :') . ' ' . $e->getMessage() . "\n";
   exit;
 }
+*/
 
 class Users {
   public static function auth($_login, $_pass) {

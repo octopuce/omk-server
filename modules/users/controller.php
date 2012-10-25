@@ -1,13 +1,13 @@
 <?php
 
-require_once MODULES . '/servers/lib.php';
+//require_once MODULES . '/servers/lib.php';
 
 class UsersController extends AController {
   static private $contacts_types = array('in_email', 'in_tel', 'out_email', 'out_tel');
 
   /*
-   * Simple utilisateur : redirection vers "Mon compte"
-   * Administrateur : liste des utilisateurs
+   * Users are redirected to "my account"
+   * Administrators are shown the user list.
    */
   public function indexAction() {
     if (!is_admin()) {
@@ -17,10 +17,10 @@ class UsersController extends AController {
     global $db;
 
     $st = $db->q('SELECT uid, login, email, ' .
-		 'IF(enabled, :oui, :non) as enabled, ' .
-		 'IF(admin, :oui, :non) as admin FROM users ' .
+		 'IF(enabled, :yes, :no) as enabled, ' .
+		 'IF(admin, :yes, :no) as admin FROM users ' .
 		 'ORDER BY admin, login',
-		 array('oui' => "X", 'non' => ""));
+		 array('yes' => "X", 'no' => ""));
     $users = array();
     while ($data = $st->fetch()) {
       $users[] = array(
@@ -34,15 +34,15 @@ class UsersController extends AController {
     Hooks::call('users_list_users', $users);
     foreach ($users as $k => $user) {
       $uid = $user['_']->uid;
-      $users[$k]['actions'] = l(_("Modifier"), 'users/edit/' . $uid) .
-	' | ' . l(_("Supprimer"), 'users/delete/' . $uid) .
-	' | ' . l(_("Se connecter"), 'users/impersonate/' . $uid);
+      $users[$k]['actions'] = l(_("Edit"), 'users/edit/' . $uid) .
+	' | ' . l(_("Delete"), 'users/delete/' . $uid) .
+	' | ' . l(_("Connect as"), 'users/impersonate/' . $uid);
     }
 
     $headers = array(
-		     'name' => _('Nom'),
-		     'email' => _('E-mail'),
-		     'enabled' => _('Activé'),
+		     'name' => _('Name'),
+		     'email' => _('Email'),
+		     'enabled' => _('Enabled'),
 		     'admin' => _('Admin.'),
 		     );
     Hooks::call('users_list_headers', $headers);
@@ -53,7 +53,7 @@ class UsersController extends AController {
   }
 
   /*
-   * Voir la fiche d'un utilisateur (pour les administrateurs uniquement)
+   * Show one user account infos (for admins only)
    */
   public function showAction($params) {
     if (!is_admin())
@@ -64,82 +64,82 @@ class UsersController extends AController {
     if (is_numeric($info)) {
       $uid = intval($info);
       $user = $db->qone('SELECT uid, login, email, ' .
-			'IF(enabled, :oui, :non) as enabled, ' .
-			'IF(admin, :oui, :non) as admin ' .
+			'IF(enabled, :yes, :no) as enabled, ' .
+			'IF(admin, :yes, :no) as admin ' .
 			'FROM users WHERE uid = :uid',
-			array('oui' => _("oui"), 'non' => _("non"), 'uid' => $uid));
+			array('yes' => _("yes"), 'no' => _("no"), 'uid' => $uid));
     }
     else {
       $login = $info;
       $user = $db->qone('SELECT uid, login, email, ' .
-			'IF(enabled, :oui, :non) as enabled, ' .
-			'IF(admin, :oui, :non) as admin ' .
+			'IF(enabled, :yes, :no) as enabled, ' .
+			'IF(admin, :yes, :no) as admin ' .
 			'FROM users WHERE login = :login',
-			array('oui' => _("oui"), 'non' => _("non"), 'login' => $login));
+			array('yes' => _("yes"), 'no' => _("no"), 'login' => $login));
     }
     if ($user == false)
       not_found();
 
+    /*
     $contacts = array();
     foreach (self::$contacts_types as $type)
       $contacts[$type] = $db->qlistone('SELECT contact FROM contacts WHERE uid = ? AND type = ?',
                                        array($uid, $type));
 
-    $servers = Servers::getServersByUid($uid, 'listone');
-
+    //    $servers = Servers::getServersByUid($uid, 'listone');
+    
     $this->render('show', array('user' => $user, 'contacts' => $contacts, 'servers' => $servers));
+    */
+    $this->render('show', array('user' => $user));
   }
 
+
+  /* Check a form for the user editor */
   private static function verifyForm($data, $op) {
     $errors = array();
     if ($op != 'meedit') {
       if (empty($data['login']))
-	$errors[] = _("Vous devez indiquer un identifiant.");
+	$errors[] = _("Please set the login name");
     }
 
     switch ($op) {
     case 'add':
       if (empty($data['pass']))
-	$errors[] = _("Vous devez indiquer un mot de passe.");
+	$errors[] = _("Please set a password");
       elseif ($data['pass'] != $data['pass_confirm'])
-	$errors[] = _("Le mot de passe et la confirmation ne correspondent pas.");
+	$errors[] = _("The passwords are different, please check");
       break;
     case 'edit':
     case 'meedit':
       if ($data['pass'] != $data['pass_confirm'])
-	$errors[] = _("Le mot de passe et la confirmation ne correspondent pas.");
+	$errors[] = _("The passwords are different, please check");
       break;
     }
 
     if (empty($data['email']))
-      $errors[] = _("Vous devez indiquer une adresse e-mail.");
+      $errors[] = _("The email address is mandatory");
     return $errors;
   }
 
   /*
-   * Ajouter un utilisateur (pour les administrateurs uniquement).
+   * Add a user (for admins only)
    */
   public function addAction() {
 
-    // Réservé aux administrateurs
     if (!is_admin())
       not_found();
 
-    // Les erreurs lors de la soumission d'un formulaire.
-    $errors = array(); // Par défaut, pas d'erreurs.
+    $errors = array(); // OK if no problem
 
-    // Si le formulaire à été soumis...
     if (!empty($_POST)) {
-      // On vérifie le formulaire pour y trouver d'éventuels erreurs.
-      $errors = self::verifyForm($_POST, 'add');
+      $errors = $this->verifyForm($_POST, 'add');
 
-      // ... Et qu'il n'y a pas d'erreurs : on ajoute l'utilisateur dans la base de données
       if (empty($errors)) {
         global $db;
         $db->q('INSERT INTO `users` (login, pass, email, enabled, admin) VALUES(?, ?, ?, ?, ?)',
                array(
                      $_POST['login'],
-                     crypt($_POST['pass']),
+                     crypt($_POST['pass'],$this->getSalt()),
                      $_POST['email'],
                      ($_POST['enabled'] == 'on') ? 1 : 0,
                      ($_POST['admin'] == 'on') ? 1 : 0,
@@ -156,6 +156,7 @@ class UsersController extends AController {
 		      );
 	Hooks::call('users_add', $args);
 
+	/*
 	$contacts = array();
 	foreach (self::$contacts_types as $type) {
 	  // $db->q('DELETE FROM contacts WHERE uid = ? AND type = ?', array($uid, $type));
@@ -168,13 +169,14 @@ class UsersController extends AController {
 	    }
 	  }
 	}
-
+	*/
 
         // Message + redirection
 	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("Ajout OK..."));
 	exit;
       }
     }
+
 
     /*
      * Valeurs pour pré-remplir le formulaire
@@ -185,48 +187,39 @@ class UsersController extends AController {
      *
      * 2/ On à validé le formulaire, mais il y a une erreur :
      * on pré-rempli le formulaire avec les données de la saisie.
-
      */
     $form_data = (empty($_POST)) ? array() : $_POST; 
 
     $this->render('form', array('op' => 'add', 'data' => $form_data, 'errors' => $errors));
   }
 
+
   /*
-   * Modifier un utilisateur (pour les administrateurs uniquement).
+   * Edit a user (admins only)
    */
   public function editAction($params) {
 
-    // Réservé aux administrateurs
     if (!is_admin())
       not_found();
-
-    // On cherche l'utilisateur à modifier dans la base de données
     global $db;
     $uid = intval($params[0]);
-    $user = $db->qone('SELECT uid, login, email, enabled, admin, compta FROM users WHERE uid = ?', array($uid));
+    $user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($uid));
 
-    // S'il n'existe pas : Page not found.
     if ($user == false)
       not_found();
 
-    // Les erreurs lors de la soumission d'un formulaire.
-    $errors = array(); // Par défaut, pas d'erreurs.
+    $errors = array(); 
 
-    // Si le formulaire à été soumis...
     if (!empty($_POST)) {
-      // On vérifie le formulaire pour y trouver d'éventuels erreurs.
       $errors = self::verifyForm($_POST, 'edit');
 
-      // ... Et qu'il n'y a pas d'erreurs : on modifie l'utilisateur dans la base de données
       if (empty($errors)) {
-        $db->q('UPDATE users SET login = ?, email = ?, enabled = ?, admin = ?, compta = ? WHERE uid = ?',
+        $db->q('UPDATE users SET login = ?, email = ?, enabled = ?, admin = ? WHERE uid = ?',
                array(
                      $_POST['login'],
                      $_POST['email'],
                      ($_POST['enabled'] == 'on') ? 1 : 0,
                      ($_POST['admin'] == 'on') ? 1 : 0,
-                     ($_POST['compta'] == 'on') ? 1 : 0,
 		     $user->uid,
                      )
                );
@@ -244,12 +237,13 @@ class UsersController extends AController {
 	    $this->mail_notify_new_account($user->email, $user->login, $_POST['pass']);
 	  }
 
-	  $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass']), $user->uid));
+	  $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
 
 	  $args = array('uid' => $user->uid, 'login' => $user->login, 'pass' => $_POST['pass']);
 	  Hooks::call('users_edit_pass', $args);
 	}
 
+	/*
 	$contacts = array();
 	foreach (self::$contacts_types as $type) {
 	  // TODO: améliorer ce bouzin foeach... DELETE + INSERT...
@@ -263,6 +257,7 @@ class UsersController extends AController {
 	    }
 	  }
 	}
+	*/
 
         // Message + redirection
 	header('Location: ' . BASE_URL . 'users/show/' . $user->uid . '?msg=' . _("Mise à jour OK..."));
@@ -282,7 +277,6 @@ class UsersController extends AController {
      */
 
     if (empty($_POST)) {
-      // Lors d'une modification, on pré-remplit avec les données de l'utilisateur en question.
       $form_data = get_object_vars($user); // get_object_vars : stdClass -> array
 
       foreach (self::$contacts_types as $type) {
@@ -298,8 +292,9 @@ class UsersController extends AController {
     $this->render('form', array('op' => 'edit', 'login' => $user->login, 'data' => $form_data, 'errors' => $errors));
   }
 
+
   /*
-   * Supprimer un utilisateur (pour les administrateurs uniquement).
+   * Delete a user (admin only)
    */
   public function deleteAction($params) {
     if (!is_admin())
@@ -311,17 +306,17 @@ class UsersController extends AController {
       not_found();
 
     if (!empty($_POST['op'])) {
-      if ($_POST['op'] == _("Oui, supprimer")) {
+      if ($_POST['op'] == _("Yes, Delete")) {
 	$db->q('DELETE FROM users WHERE uid = ?', array($uid));
 	$args = array($user);
 	Hooks::call('users_delete', $args);
         // Message + redirection
-	header('Location: ' . BASE_URL . 'users?msg=' . sprintf(_("Suppression de l'utilisateur %s OK..."), $user->login));
+	header('Location: ' . BASE_URL . 'users?msg=' . sprintf(_("User %s successfully deleted"), $user->login));
 	exit;
       }
       else {
         // Message + redirection
-	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("Suppression annulée..."));
+	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("Nothing has been deleted"));
 	exit;
       }
     }
@@ -329,7 +324,7 @@ class UsersController extends AController {
   }
 
   /*
-   * Imiter un utilisateur (pour les administrateurs uniquement).
+   * Connect as another user (for admins only)
    */
   public function impersonateAction($params) {
     if (!is_admin())
@@ -344,9 +339,9 @@ class UsersController extends AController {
     exit;
   }
 
+
   /*
-   * Arrêter d'imiter un utilisateur (disponible pour tout le monde)
-   * Cette fonction ne fait que supprimer un cookie.
+   * Leave the connect as a user 
    */
   public function stopimpersonateAction() {
     setcookie('impersonate', '0', 1, '/');
@@ -354,8 +349,9 @@ class UsersController extends AController {
     exit;
   }
 
+
   /*
-   * Page "Mon compte"
+   * My Account
    */
   public function meAction($params) {
     global $db;
@@ -373,15 +369,11 @@ class UsersController extends AController {
                                        array($GLOBALS['me']['uid'], $type));
 
     if ($params[0] == 'edit') {
-      // Les erreurs lors de la soumission d'un formulaire.
-      $errors = array(); // Par défaut, pas d'erreurs.
+      $errors = array();
 
-      // Si le formulaire à été soumis...
       if (!empty($_POST)) {
-	// On vérifie le formulaire pour y trouver d'éventuels erreurs.
 	$errors = self::verifyForm($_POST, 'meedit');
 
-	// ... Et qu'il n'y a pas d'erreurs : on modifie l'utilisateur dans la base de données
 	if (empty($errors)) {
 	  $db->q('UPDATE users SET email = ? WHERE uid = ?', array($_POST['email'], $user->uid));
 	  $old_user = $user;
@@ -390,11 +382,12 @@ class UsersController extends AController {
 	  Hooks::call('users_edit', $args);
 
 	  if (!empty($_POST['pass'])) {
-	    $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass']), $user->uid));
+	    $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
 	    $args = array('uid' => $user->uid, 'login' => $user->login, 'pass' => $_POST['pass']);
 	    Hooks::call('users_edit_pass', $args);
 	  }
 
+	  /*
 	  $contacts = array();
 	  foreach (self::$contacts_types as $type) {
 	    // TODO: améliorer ce bouzin foeach... DELETE + INSERT...
@@ -408,6 +401,7 @@ class UsersController extends AController {
 	      }
 	    }
 	  }
+	  */
 
 	  // Message + redirection
 	  header('Location: ' . BASE_URL . 'users/me?msg=' . _("Mise à jour OK..."));
@@ -427,7 +421,6 @@ class UsersController extends AController {
        */
 
       if (empty($_POST)) {
-	// Lors d'une modification, on pré-remplit avec les données de l'utilisateur en question.
 	$form_data = get_object_vars($user); // get_object_vars : stdClass -> array
 
 	foreach (self::$contacts_types as $type) {
@@ -453,6 +446,7 @@ class UsersController extends AController {
     echo 'Logout';
     exit;
   }
+
 
 function mail_notify_new_passwd($email, $login, $pass) {
   $to      = $email;
@@ -508,6 +502,15 @@ L'équipe technique d'Octopuce
     'X-Mailer: PHP/' . phpversion();
 
   mail($to, $subject, $message, $headers);
+}
+
+
+/** Returns a hash for the crypt password hashing function.
+ * as of now, we use php5.3 almost best hashing function: SHA-256 with 1000 rounds and a random 16 chars salt.
+ */
+private function getSalt() {
+  $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 16);
+  return '$5$rounds=1000$'.$salt.'$';
 }
 
 

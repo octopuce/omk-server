@@ -1,8 +1,11 @@
 <?php
+
 require_once __DIR__ . '/libs/htpasswd-utils.php';
+
 class UsersHooks {
+
   /*
-   * Pour ajouter quelques liens dans le menu.
+   * Add menu links
    */
   public function menu(&$menu) {
     if (is_admin()) {

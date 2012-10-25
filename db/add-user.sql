@@ -7,5 +7,5 @@ INSERT INTO `users` (
 `admin`
 )
 VALUES (
-NULL , 'admin', SHA1( 'admin' ) , 'admin@open-mediakit.org', '1', '1'
+NULL , 'admin', ENCRYPT( 'admin','aa' ) , 'admin@open-mediakit.org', '1', '1'
 );

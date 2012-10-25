@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS "users" (
   "email" varchar(255) NOT NULL,
   "enabled" tinyint(1) NOT NULL DEFAULT '0',
   "admin" tinyint(1) NOT NULL DEFAULT '0',
-  "compta" tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY ("uid"),
   UNIQUE KEY "login" ("login")
 );

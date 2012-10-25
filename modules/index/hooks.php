@@ -1,5 +1,6 @@
 <?php
 class IndexHooks {
+
   public function menu(&$menu) {
     $menu[] = array(
 		    'url' => '/',
@@ -10,6 +11,7 @@ class IndexHooks {
   public function ordering_hooks(&$infos) {
     $event = &$infos[0];
     $hooks = &$infos[1];
+    /* FIXME: where shall we manage the menu ? (shall we??)
     if ($event == 'menu') {
       $h_index = $hooks['index'];
       unset($hooks['index']);
@@ -24,5 +26,6 @@ class IndexHooks {
       $hooks['servers'] = $h_servers;
       $hooks = array_merge($hooks, $h);
     }
+    */
   }
 }
