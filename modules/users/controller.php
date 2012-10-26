@@ -476,7 +476,7 @@ private function getSalt() {
  * This key is used by API calls to ask for media jobs
  */
 private function generateApiKey() {
-  return md5(mt_rand().mt_rand().mt_rand()mt_rand());
+  return md5(mt_rand().mt_rand().mt_rand().mt_rand());
 }
 
 

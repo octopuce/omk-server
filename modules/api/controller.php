@@ -1,5 +1,8 @@
 <?php
+require_once(__DIR__."/libs/constants.php");
+
 class ApiController extends AController {
+
 
   /* Array that will contain all the user informations */
   private $me=array(); 
@@ -16,7 +19,7 @@ class ApiController extends AController {
 		     'return' => _('Returned value'),
 		     'documentation' => _('Documentation'),
 		     );
-    $this->render('list', array('functions' => $functions, 'headers' => $headers));
+    $this->render('index', array('functions' => $functions, 'headers' => $headers));
   }
 
   
@@ -27,23 +30,77 @@ class ApiController extends AController {
     $this->_checkCallerIdentity();
     $this->_enforceLimits();
     // for each params, tell its name, and its type and if it is mandatory
-    $this->_filterParams(array("id"=>array("integer",true),
-			       "url"=>array("url",true)
+    $this->_filterParams(array("id" => array("integer",true),
+			       "url" => array("url",true)
 			       ));
     $this->_logApiCall("newmedia");
+    // Do it :) 
+    // first, we create a media
+    $media_id=$this->_mediaAdd(array("status" => MEDIA_REMOTE_AVAILABLE,
+				     "remoteid" => $this->params["id"],
+				     "remoteurl" => $this->params["url"],
+				     "owner" => $this->me["uid"] ) );
+    if (!$media_id) {
+      $this->_apiError(6,_("Cannot create a new media, please retry later."));
+    }
+    // then we queue the download of the media
+    // TODO: check that we don't already have this media in the downlaod queue...
+    return $this->_queueAdd(TASK_DOWNLOAD,$media_id);
+  }
+
+
+
+
+
+
+
+  
+  /** ****************************************
+   * Add a task to the queue 
+   * @param $task integer is the task name
+   * @param $media integer is the associated media (from media table)
+   * @param $format integer is the format (from format table) if the task is a transcode.
+   * @return integer the newly created queue id
+   */ 
+ private function _queueAdd($task,$media,$format=null) {
+    $query = "INSERT INTO queue SET datequeue=NOW(), status=".STATUS_TODO.", locked='', task=?, mediaid=?, format=?;";
+    $db->q($query,array($task,$media,$format));
+    return $db->lastInsertId();    
+  }
+  
+
+  /** ****************************************
+   * Add a media into the media table
+   * $v is an associative array with fields name and value
+   * @return integer the newly created media id 
+   */
+  private function _mediaAdd($v) {
+    $k=array("status","remoteid","remoteurl","owner");
+    $sql=""; $val=array();
+    foreach($k as $key) {
+      if ($v[$key]) { 
+	if ($sql) $sql.=", ";
+	$sql.="$key=?";
+	$val[]=$v[$key];
+      }
+    }
+    if (!$sql) return false; // no information!
+    $query = "INSERT INTO media SET datecreate=NOW(), $sql";
+    $db->q($query,$val);
+    return $db->lastInsertId();
   }
 
 
   /** ********************************************************************
    * Log the API Call to the DB, so that we know who asked for what and when
    */
-  private _logApiCall($call) {
+  private function _logApiCall($api) {
     global $db;
     $parray="";
-    foreach($params as $k=>$v) $parray.=$k."=".$v." | ";
-    $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, call=?, params=?, ip=?;';
-    $rate=$db->q($query,
-		 array($this->me["uid"],$call,$parray,$_SERVER["REMOTE_ADDR"])
+    foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
+    $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, api=?, params=?, ip=?;';
+    $db->q($query,
+		 array($this->me["uid"],$api,$parray,$_SERVER["REMOTE_ADDR"])
 		 );
   }
 
@@ -52,12 +109,12 @@ class ApiController extends AController {
    * Filter the $_REQUEST[] array from unauthorized values. 
    * Fills $this->param with allowed one, and check their type if needed.
    */
-  private _filterParams($allowed) {
+  private function _filterParams($allowed) {
     $this->params=array();
     $error="";
     foreach($allowed as $k=>$v) {
       if (isset($_REQUEST[$k])) {
-	switch ($v[1]) {
+	switch ($v[0]) {
 	case "integer":
 	  $this->params[$k]=intval($_REQUEST[$k]);
 	  break;
@@ -69,7 +126,7 @@ class ApiController extends AController {
 	  $this->params[$k]=$_REQUEST[$k];
 	}
       } elseif ($v[1]) {
-	$error.=sprintf(_("Parameter %s is mandatory"),$k)."\n";
+	$error.=sprintf(_("Parameter %s is mandatory"),$k).", ";
       }
     }
     if ($error) {
@@ -116,7 +173,7 @@ class ApiController extends AController {
     $rate=$db->qonefield($query,array($this->me["uid"]));
     if (isset($this->me["rate"]) && $this->me["rate"]) $myrate=$this->me["rate"]; else $myrate=RATE_DEFAULT;
     if ($rate>=$myrate) {
-      $this->_apiError(4,_("You sent too many queries per minutes, please wait a little bit before sending more..."));
+      $this->_apiError(4,_("You sent too many queries per minute, please wait a little bit before sending more..."));
     }
     return true;
   }
@@ -125,7 +182,7 @@ class ApiController extends AController {
    * Emit a json_encoded api error code and message
    * then exit the page
    */ 
-  private _apiError($code,$msg) {
+  private function _apiError($code,$msg) {
     header("Content-Type: application/json");
     $o=new StdClass();
     $o->code=$code; $o->msg=$msg;
