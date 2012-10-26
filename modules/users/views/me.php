@@ -13,7 +13,7 @@ require VIEWS . '/header.php';
 
 <table class="col"><tr><td><!-- colonne 1 -->
 
-<h2><?php __("General informations"); ?></h2>
+<h2><?php __("General information"); ?></h2>
 <dl>
   <dt><?php __("Login"); ?></dt>
   <dd><?php echo $user->login; ?></dd>
@@ -21,8 +21,6 @@ require VIEWS . '/header.php';
   <dt><?php __("Email address"); ?></dt>
   <dd><?php echo $user->email; ?></dd>
 </dl>
-
-<?php require __DIR__ . '/contacts.php'; ?>
 
 <?php
    $infos = array($user);

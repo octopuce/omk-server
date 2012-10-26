@@ -32,7 +32,7 @@ require VIEWS . '/header.php';
 
 
 <form action="" method="post">
-  <fieldset style="width: 49%; float: left;">
+  <fieldset style="width: 60%;">
     <legend><?php __("Identity"); ?></legend>
     <?php if ($op != 'meedit'): ?>
     <?php input('login', _("Login:"), 'text', $data['login']); ?>
@@ -55,6 +55,7 @@ require VIEWS . '/header.php';
     <?php input('admin', _("Is it an administrator?"), 'checkbox', $data['admin']); ?>
     <?php input('enabled', _("Is it enabled?"), 'checkbox', $data['enabled']); ?>
     <?php endif; ?>
+    <?php input('apikey', _("API Key"), 'text', $data['apikey']); ?>
   </fieldset>
 
   <p class="submit"><input type="submit" value="<?php

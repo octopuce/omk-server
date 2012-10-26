@@ -22,9 +22,4 @@ $infos = array($user);
 Hooks::call('index_indexview');						 
 ?>
 
-
-
-
-
-
 <?php require_once VIEWS . '/footer.php'; ?>

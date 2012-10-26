@@ -65,7 +65,7 @@ class UsersController extends AController {
       $uid = intval($info);
       $user = $db->qone('SELECT uid, login, email, ' .
 			'IF(enabled, :yes, :no) as enabled, ' .
-			'IF(admin, :yes, :no) as admin ' .
+			'IF(admin, :yes, :no) as admin, apikey ' .
 			'FROM users WHERE uid = :uid',
 			array('yes' => _("yes"), 'no' => _("no"), 'uid' => $uid));
     }
@@ -73,23 +73,13 @@ class UsersController extends AController {
       $login = $info;
       $user = $db->qone('SELECT uid, login, email, ' .
 			'IF(enabled, :yes, :no) as enabled, ' .
-			'IF(admin, :yes, :no) as admin ' .
+			'IF(admin, :yes, :no) as admin, apikey ' .
 			'FROM users WHERE login = :login',
 			array('yes' => _("yes"), 'no' => _("no"), 'login' => $login));
     }
     if ($user == false)
       not_found();
 
-    /*
-    $contacts = array();
-    foreach (self::$contacts_types as $type)
-      $contacts[$type] = $db->qlistone('SELECT contact FROM contacts WHERE uid = ? AND type = ?',
-                                       array($uid, $type));
-
-    //    $servers = Servers::getServersByUid($uid, 'listone');
-    
-    $this->render('show', array('user' => $user, 'contacts' => $contacts, 'servers' => $servers));
-    */
     $this->render('show', array('user' => $user));
   }
 
@@ -115,7 +105,6 @@ class UsersController extends AController {
 	$errors[] = _("The passwords are different, please check");
       break;
     }
-
     if (empty($data['email']))
       $errors[] = _("The email address is mandatory");
     return $errors;
@@ -136,13 +125,15 @@ class UsersController extends AController {
 
       if (empty($errors)) {
         global $db;
-        $db->q('INSERT INTO `users` (login, pass, email, enabled, admin) VALUES(?, ?, ?, ?, ?)',
+	$apikey=$this->generateApiKey();
+        $db->q('INSERT INTO `users` (login, pass, email, enabled, admin, apikey) VALUES(?, ?, ?, ?, ?, ?)',
                array(
                      $_POST['login'],
                      crypt($_POST['pass'],$this->getSalt()),
                      $_POST['email'],
                      ($_POST['enabled'] == 'on') ? 1 : 0,
                      ($_POST['admin'] == 'on') ? 1 : 0,
+		     $apikey,
                      )
                );
 	$uid = $db->lastInsertId();
@@ -153,23 +144,9 @@ class UsersController extends AController {
 		      'email' => $_POST['email'],
 		      'enabled' => ($_POST['enabled'] == 'on'),
 		      'admin' => ($_POST['admin'] == 'on'),
+		      'apikey' => $apikey,
 		      );
 	Hooks::call('users_add', $args);
-
-	/*
-	$contacts = array();
-	foreach (self::$contacts_types as $type) {
-	  // $db->q('DELETE FROM contacts WHERE uid = ? AND type = ?', array($uid, $type));
-	  $contacts[$type] = explode("\n", trim($_POST['contacts_' . $type]));
-	  sort($contacts[$type], SORT_STRING);
-	  foreach ($contacts[$type] as $contact) {
-	    if (trim($contact) != '') {
-	      $db->q('INSERT INTO contacts (uid, type, contact) VALUES (?, ?, ?)',
-		     array($uid, $type, $contact));
-	    }
-	  }
-	}
-	*/
 
         // Message + redirection
 	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("Ajout OK..."));
@@ -242,22 +219,6 @@ class UsersController extends AController {
 	  $args = array('uid' => $user->uid, 'login' => $user->login, 'pass' => $_POST['pass']);
 	  Hooks::call('users_edit_pass', $args);
 	}
-
-	/*
-	$contacts = array();
-	foreach (self::$contacts_types as $type) {
-	  // TODO: améliorer ce bouzin foeach... DELETE + INSERT...
-	  $db->q('DELETE FROM contacts WHERE uid = ? AND type = ?', array($user->uid, $type));
-	  $contacts[$type] = explode("\n", trim($_POST['contacts_' . $type]));
-	  sort($contacts[$type], SORT_STRING);
-	  foreach ($contacts[$type] as $contact) {
-	    if (trim($contact) != '') {
-	      $db->q('INSERT INTO contacts (uid, type, contact) VALUES (?, ?, ?)',
-		     array($user->uid, $type, $contact));
-	    }
-	  }
-	}
-	*/
 
         // Message + redirection
 	header('Location: ' . BASE_URL . 'users/show/' . $user->uid . '?msg=' . _("Mise à jour OK..."));
@@ -387,22 +348,6 @@ class UsersController extends AController {
 	    Hooks::call('users_edit_pass', $args);
 	  }
 
-	  /*
-	  $contacts = array();
-	  foreach (self::$contacts_types as $type) {
-	    // TODO: améliorer ce bouzin foeach... DELETE + INSERT...
-	    $db->q('DELETE FROM contacts WHERE uid = ? AND type = ?', array($user->uid, $type));
-	    $contacts[$type] = explode("\n", trim($_POST['contacts_' . $type]));
-	    sort($contacts[$type], SORT_STRING);
-	    foreach ($contacts[$type] as $contact) {
-	      if (trim($contact) != '') {
-		$db->q('INSERT INTO contacts (uid, type, contact) VALUES (?, ?, ?)',
-		       array($uid, $type, $contact));
-	      }
-	    }
-	  }
-	  */
-
 	  // Message + redirection
 	  header('Location: ' . BASE_URL . 'users/me?msg=' . _("Mise à jour OK..."));
 	  exit;
@@ -511,6 +456,13 @@ L'équipe technique d'Octopuce
 private function getSalt() {
   $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 16);
   return '$5$rounds=1000$'.$salt.'$';
+}
+
+/** Generate an API key, an api key is a 32 characters secret shared between the transcoder and the application.
+ * This key is used by API calls to ask for media jobs
+ */
+private function generateApiKey() {
+  return md5(mt_rand().mt_rand().mt_rand()mt_rand());
 }
 
 

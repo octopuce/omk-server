@@ -7,7 +7,7 @@ class indexController extends AController {
   }
 
   function indexAction() {
-    $view["msg"] = _("Welcome in the OpenMediaKit transcoder!");
+    $view["msg"] = _("Welcome to the OpenMediaKit transcoder!");
     $this->render("index", $view);
   }
 }
