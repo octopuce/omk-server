@@ -1,7 +1,7 @@
 <?php
-$title = _('Utilisateurs');
-$breadcrumb = array('' => 'Utilisateurs');
-$sidebar = '<p>→ ' . l(_("Ajouter un utilisateur."), 'users/add') . '</p>';
+$title = _('Users');
+$breadcrumb = array('' => 'Users');
+$sidebar = '<p>→ ' . l(_("Create a user"), 'users/add') . '</p>';
 require VIEWS . '/header.php';
 ?>
 <style>

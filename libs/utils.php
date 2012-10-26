@@ -4,8 +4,8 @@ function format_size($s) {
   if ($s<1024) return $s."B";
   if ($s<1024*1024) return (intval($s/102.4)/10)."KiB";
   if ($s<1024*1024*1024) return (intval($s/102.4/1024)/10)."MiB";
-  if ($s<1024*1024*1024) return (intval($s/102.4/1024/1024)/10)."GiB";
-  if ($s<1024*1024*1024) return (intval($s/102.4/1024/1024/1024)/10)."TiB";
+  if ($s<1024*1024*1024*1024) return (intval($s/102.4/1024/1024)/10)."GiB";
+  if ($s<1024*1024*1024*1024*1024) return (intval($s/102.4/1024/1024/1024)/10)."TiB";
   return "too big to be printed, surely an error...";
 }
 
