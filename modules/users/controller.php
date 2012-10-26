@@ -10,6 +10,8 @@ class UsersController extends AController {
    * Administrators are shown the user list.
    */
   public function indexAction() {
+    check_user_identity();
+
     if (!is_admin()) {
       header('Location: ' . BASE_URL . 'users/me');
       exit;
@@ -56,6 +58,8 @@ class UsersController extends AController {
    * Show one user account infos (for admins only)
    */
   public function showAction($params) {
+    check_user_identity();
+
     if (!is_admin())
       not_found();
     global $db;
@@ -114,6 +118,7 @@ class UsersController extends AController {
    * Add a user (for admins only)
    */
   public function addAction() {
+    check_user_identity();
 
     if (!is_admin())
       not_found();
@@ -175,6 +180,7 @@ class UsersController extends AController {
    * Edit a user (admins only)
    */
   public function editAction($params) {
+    check_user_identity();
 
     if (!is_admin())
       not_found();
@@ -258,6 +264,8 @@ class UsersController extends AController {
    * Delete a user (admin only)
    */
   public function deleteAction($params) {
+    check_user_identity();
+
     if (!is_admin())
       not_found();
     global $db;
@@ -288,6 +296,8 @@ class UsersController extends AController {
    * Connect as another user (for admins only)
    */
   public function impersonateAction($params) {
+    check_user_identity();
+
     if (!is_admin())
       not_found();
     global $db;
@@ -305,6 +315,8 @@ class UsersController extends AController {
    * Leave the connect as a user 
    */
   public function stopimpersonateAction() {
+    check_user_identity();
+
     setcookie('impersonate', '0', 1, '/');
     header('Location: ' . BASE_URL .'users');
     exit;
@@ -316,6 +328,8 @@ class UsersController extends AController {
    */
   public function meAction($params) {
     global $db;
+    check_user_identity();
+
     $uid=$GLOBALS['me']['uid'];
 
     $user = $db->qone('SELECT uid, login, email, enabled, admin ' .
@@ -393,7 +407,7 @@ class UsersController extends AController {
   }
 
 
-function mail_notify_new_passwd($email, $login, $pass) {
+private function mail_notify_new_passwd($email, $login, $pass) {
   $to      = $email;
   $subject = _("Changement de mot de passe sur le Panel Octopuce");
   $message = sprintf(_("
@@ -420,7 +434,7 @@ L'équipe technique d'Octopuce
   mail($to, $subject, $message, $headers);
 }
 
-function mail_notify_new_account($email, $login, $pass) {
+private function mail_notify_new_account($email, $login, $pass) {
   $to      = $email;
   $subject = _("Votre compte sur le Panel Octopuce");
   $message = sprintf(_("

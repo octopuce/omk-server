@@ -21,9 +21,6 @@ catch (Exception $e) {
 }
 
 try {
-  /* TODO: call this for authenticated pages only */
-  check_user_identity();
-
   // Router
   $r = new SimpleRouter();
   $r->route('/', 'index:index'); // Default route
