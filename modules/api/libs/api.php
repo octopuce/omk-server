@@ -16,16 +16,17 @@ class Api {
     global $db;
     $task=intval($task);
     if ($task<TASK_MIN || $task>TASK_MAX) return false;
-    $lockname=getmypid()."-".gethostname();
+    $hostname=gethostname();
+    $pid=getmypid();
     $db->q("LOCK TABLES queue;");
-    $query="SELECT * FROM queue WHERE task=? AND status=? AND locked='' AND datetry<=NOW() ORDER BY retry DESC, datequeue ASC LIMIT 1;";
+    $query="SELECT * FROM queue WHERE task=? AND status=? AND lockhost='' AND datetry<=NOW() ORDER BY retry DESC, datequeue ASC LIMIT 1;";
     $me=$db->qone( $query,array($task,STATUS_TODO),PDO::FETCH_ASSOC );
     if (!$me) {
       $db->q("UNLOCK TABLES queue;");
       return false;
     }
-    $query="UPDATE queue SET status=?, locked=?, datelaunch=NOW() WHERE id=?;";
-    $db->q( $query,array(STATUS_PROCESSING,$lockname,$me["id"]) );
+    $query="UPDATE queue SET status=?, lockhost=?, lockpid=?, datelaunch=NOW() WHERE id=?;";
+    $db->q( $query,array(STATUS_PROCESSING,$hostkname,$pid,$me["id"]) );
     $db->q("UNLOCK TABLES queue;");
     return $me;
   }
@@ -39,7 +40,7 @@ class Api {
   public function setTaskProcessedUnlock($id) {
     global $db;
     $id=intval($id);
-    $query="UPDATE queue SET status=?, locked='', datedone=NOW() WHERE id=?;";
+    $query="UPDATE queue SET status=?, lockhost='', lockpid=0, datedone=NOW() WHERE id=?;";
     $db->q( $query,array(STATUS_DONE,$id) );
     return true;
   }
@@ -60,11 +61,11 @@ class Api {
 
     if ($task["retry"]==1) {
       // failed for real...
-      $db->q( "UPDATE task SET datedone=NOW(), status=?, locked='' WHERE id=?", array(STATUS_ERROR,$id) );
+      $db->q( "UPDATE task SET datedone=NOW(), status=?, lockhost='', lockpid=0 WHERE id=?", array(STATUS_ERROR,$id) );
     } else {
       // retry in 5 min
       $retry=$task["retry"]-1;
-      $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), locked='' WHERE id=?", array(STATUS_TODO,$retry,$id) );
+      $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$id) );
     }
     return true;
   }
@@ -78,9 +79,9 @@ class Api {
    * @param $format integer is the format (from format table) if the task is a transcode.
    * @return integer the newly created queue id
    */ 
-  public function _queueAdd($task,$media,$retry=1,$format=null) {
+  public function queueAdd($task,$media,$retry=1,$format=null) {
     global $db;
-    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, locked='', task=?, mediaid=?, formatid=?;";
+    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, formatid=?;";
     $db->q($query,array($this->me["uid"],$retry,$task,$media,$format));
     return $db->lastInsertId();    
   }
@@ -91,7 +92,7 @@ class Api {
    * $v is an associative array with fields name and value
    * @return integer the newly created media id 
    */
-  public function _mediaAdd($v) {
+  public function mediaAdd($v) {
     global $db;
     $k=array("status","remoteid","remoteurl","owner");
     $sql=""; $val=array();
@@ -110,12 +111,37 @@ class Api {
 
 
   /** ****************************************
+   * Update a media in the media table
+   * @param $id integer The media id
+   * @param $v array An associative array with fields name and value
+   * @return boolean true if the media has been updated
+   */
+  public function mediaUpdate($id,$v) {
+    global $db;
+    $k=array("status","remoteid","remoteurl","owner");
+    $sql=""; $val=array();
+    foreach($k as $key) {
+      if ($v[$key]) { 
+	if ($sql) $sql.=", ";
+	$sql.="$key=?";
+	$val[]=$v[$key];
+      }
+    }
+    if (!$sql) return false; // no information!
+    $val[]=$id;
+    $query = "UPDATE media SET dateupdate=NOW(), $sql WHERE id=?";
+    $db->q($query,$val);
+    return true;
+  }
+
+
+  /** ****************************************
    * Search for one or more media
    * @param $search is an array of key => value to search for 
    * @param$ $operator the AND operator is the default, could be OR
    * @return integer the newly created media id 
    */
-  public function _mediaSearch($search,$operator="AND") {
+  public function mediaSearch($search,$operator="AND") {
     global $db;
     $k=array("id","status","remoteid","remoteurl","owner");
     $sql=""; $val=array();
@@ -135,7 +161,7 @@ class Api {
   /** ********************************************************************
    * Log the API Call to the DB, so that we know who asked for what and when
    */
-  public function _logApiCall($api) {
+  public function logApiCall($api) {
     global $db;
     $parray="";
     foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
@@ -150,7 +176,7 @@ class Api {
    * Filter the $_REQUEST[] array from unauthorized values. 
    * Fills $this->param with allowed one, and check their type if needed.
    */
-  public function _filterParams($allowed) {
+  public function filterParams($allowed) {
     $this->params=array();
     $error="";
     foreach($allowed as $k=>$v) {
@@ -171,7 +197,7 @@ class Api {
       }
     }
     if ($error) {
-      $this->_apiError(5,$error);
+      $this->apiError(5,$error);
     }
   }
 
@@ -180,10 +206,10 @@ class Api {
    * Check the identity of the caller, exit with an error in case of wrong identity
    * or returns $me table with user information.
    */
-  public function _checkCallerIdentity() {
+  public function checkCallerIdentity() {
     global $db;
     if (!isset($_REQUEST["key"]) || !isset($_REQUEST["application"]) || !isset($_REQUEST["version"])) {
-      $this->_apiError(1,_("API key, application name and version number are mandatory."));
+      $this->apiError(1,_("API key, application name and version number are mandatory."));
     }
     // Search for the user api key
     $query = 'SELECT uid, login, email, admin,enabled  '
@@ -191,10 +217,10 @@ class Api {
       . 'WHERE apikey = ?';
     $this->me=$db->qone($query, array($_REQUEST["key"]), PDO::FETCH_ASSOC);
     if (!$this->me) {
-      $this->_apiError(2,_("The specified APIKEY does not exist in this transcoder."));
+      $this->apiError(2,_("The specified APIKEY does not exist in this transcoder."));
     }
     if (!$this->me["enabled"])  {
-      $this->_apiError(3,_("Your account is disabled, please contact the administrator of this transcoder."));
+      $this->apiError(3,_("Your account is disabled, please contact the administrator of this transcoder."));
     }
     // TODO : handle blacklist of application and/or specific version
     return $this->me;
@@ -208,13 +234,13 @@ class Api {
    * the $this->me variable MUST be set and the function call exit if over 
    * limits
    */
-  public function _enforceLimits() {
+  public function enforceLimits() {
     global $db;
     $query = 'SELECT COUNT(*) FROM apicalls WHERE calltime>DATE_SUB(NOW(),INTERVAL 60 SECOND) AND user=?;';
     $rate=$db->qonefield($query,array($this->me["uid"]));
     if (isset($this->me["rate"]) && $this->me["rate"]) $myrate=$this->me["rate"]; else $myrate=RATE_DEFAULT;
     if ($rate>=$myrate) {
-      $this->_apiError(4,_("You sent too many queries per minute, please wait a little bit before sending more..."));
+      $this->apiError(4,_("You sent too many queries per minute, please wait a little bit before sending more..."));
     }
     return true;
   }
@@ -224,7 +250,7 @@ class Api {
    * Emit a json_encoded api error code and message
    * then exit the page
    */ 
-  public function _apiError($code,$msg) {
+  public function apiError($code,$msg) {
     header("Content-Type: application/json");
     $o=new StdClass();
     $o->code=$code; $o->msg=$msg;
@@ -233,5 +259,33 @@ class Api {
   }
 
 
-}
+  public function cleanupQueueLocks() {
+    global $db;
+    $hostname=gethostname();
+    // We cleanup queue locks, unless there has been a cleanup for this hostname less than 5 minutes ago :) 
+    if (file_exists(TMP_PATH."/clenaup-".$hostname) && filemtime(TMP_PATH."/clenaup-".$hostname)+300>time()) {
+      return true; // do nothing
+    }
+    $locked=$db->qlist("SELECT * FROM queue WHERE lockhost=?;",array("%-".$hostname));
+    if (is_array($locked) && count($locked)) {
+      foreach($locked as $l) {
+	if (!is_dir("/proc/".$l["lockpid"])) {
+	  // Free that lock, unlock the task, retry it in 5 min
+	  if ($l["retry"]==1) {
+	    // failed for real...
+	    $db->q( "UPDATE task SET datedone=NOW(), status=? WHERE id=?", array(STATUS_ERROR,$l["id"]) );
+	  } else {
+	    // retry in 5 min
+	    $retry=$l["retry"]-1;
+	    $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$l["id"]) );
+	  }
+	  
+	} // proc exist ? 
+      } // for each locked proc
+    }
+    touch(TMP_PATH."/clenaup-".$hostname);
+  } // cleanupQueueLocks
+
+
+} // Class Api
 

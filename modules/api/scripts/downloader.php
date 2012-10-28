@@ -1,6 +1,13 @@
 #!/usr/bin/env php
 <?php
 
+   /** ************************************************************
+    * Download process, may be launch as many time as needed
+    * on the machine having the physical disks available.
+    * returns as soon as a download is finished
+    * or wait 10 seconds if no download is planned.
+    */
+
 if (!function_exists("curl_init")) {
   error_log("php-curl not installed or not enabled, exit.\n");
   exit(1);
@@ -11,12 +18,12 @@ require_once __DIR__ . '/../libs/api.php';
 
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Download Daemon)";
 
-if (isset($argv[1]) && $argv[1]=="debug") $GLOBALS["DEBUG"]=true;
-
-// Search for a task 
-//$servers_snmp = $db->qassoc("SELECT fqdn, 'snmp' FROM servers_servers s LEFT JOIN accounting_method m ON s.sid=m.sid WHERE m.method = 'snmp'");
 $api=new Api();
 
+// Cleanup daemons from this host
+$api->cleanupQueueLocks();
+
+// Search for a task 
 $task=$api->getQueuedTaskLock(TASK_DOWNLOAD);
 
 if (!$task) { 
@@ -27,7 +34,7 @@ if (!$task) {
   exit(0);
 }
 
-$media=$api->_mediaSearch(array("id"=>$task["mediaid"]));
+$media=$api->mediaSearch(array("id"=>$task["mediaid"]));
 
 if (!$media) {
   error_log("FATAL: got task '".$task["id"]."' but media '".$task["mediaid"]."' not found!!\n");
@@ -44,6 +51,7 @@ curl_setopt($curl,CURLOPT_HEADER,false);
 curl_setopt($curl,CURLOPT_FAILONERROR,true);
 curl_setopt($curl,CURLOPT_FOLLOWLOCATION,true);
 curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
+curl_setopt($curl, CURLOPT_TIMEOUT, 600); // no more than 10 minutes of download... if file is bigger than that, or too slow, we will retry :) so...
 
 curl_setopt($curl,CURLOPT_URL,$media["remoteurl"]);
 
@@ -53,7 +61,8 @@ $filename=STORAGE_PATH."/".$media["id"];
 if (file_exists($filename)) {
   // retry from the end of the file
   $sizebefore=filesize($filename);
-  curl_setopt( $curl,CURLOPT_RESUME_FROM,$sizebefore );
+  curl_setopt( $curl,CURLOPT_RESUME_FROM,$sizebefore ); 
+  // FIXME: what happen if we already have all the content ??!!
   $f=fopen($filename,"ab");
 } else {
   $sizebefore=0;
@@ -70,10 +79,11 @@ fclose($f);
 if ($res) {
   // ok, transfer finished, let's mark it done
   $api->setTaskProcessedUnlock($task["id"]);
+  // and mark the media as "locally downloaded"
+  $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_LOCAL_AVAILABLE ));
+  
   exit(0);
 } else {
-  // failed, did we even get some bytes ?
-  clearstatcache();
   // if we failed, we just mark it as failed, this will retry 5 min from now ...
   $api->setTaskFailedUnlock($task["id"]);
 }

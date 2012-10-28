@@ -36,28 +36,28 @@ class ApiController extends AController {
    * API CALL, Tells the transcoder that a new media must be downloaded asap.
    */
   public function newmediaAction() {
-    $this->me=$this->api->_checkCallerIdentity();
-    $this->api->_enforceLimits();
+    $this->me=$this->api->checkCallerIdentity();
+    $this->api->enforceLimits();
     // for each params, tell its name, and its type and if it is mandatory
-    $this->api->_filterParams(array("id" => array("integer",true),
+    $this->api->filterParams(array("id" => array("integer",true),
 			       "url" => array("url",true)
 			       ));
-    $this->api->_logApiCall("newmedia");
+    $this->api->logApiCall("newmedia");
     // Do it :) 
     // TODO: check that we don't already have this media in the downlaod queue...
-    if ($this->api->_mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
-      $this->api->_apiError(7,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
+    if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
+      $this->api->apiError(7,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
     }
     // first, we create a media
-    $media_id=$this->api->_mediaAdd(array("status" => MEDIA_REMOTE_AVAILABLE,
+    $media_id=$this->api->mediaAdd(array("status" => MEDIA_REMOTE_AVAILABLE,
 				     "remoteid" => $this->params["id"],
 				     "remoteurl" => $this->params["url"],
 				     "owner" => $this->me["uid"] ) );
     if (!$media_id) {
-      $this->api->_apiError(6,_("Cannot create a new media, please retry later."));
+      $this->api->apiError(6,_("Cannot create a new media, please retry later."));
     }
     // then we queue the download of the media
-    return $this->api->_queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY);
+    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY);
   }
 
 
