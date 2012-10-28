@@ -263,27 +263,30 @@ class Api {
     global $db;
     $hostname=gethostname();
     // We cleanup queue locks, unless there has been a cleanup for this hostname less than 5 minutes ago :) 
-    if (file_exists(TMP_PATH."/clenaup-".$hostname) && filemtime(TMP_PATH."/clenaup-".$hostname)+300>time()) {
+    if (file_exists(TMP_PATH."/cleanup-".$hostname) && filemtime(TMP_PATH."/cleanup-".$hostname)+300>time()) {
       return true; // do nothing
     }
-    $locked=$db->qlist("SELECT * FROM queue WHERE lockhost=?;",array("%-".$hostname));
+    $locked=$db->qlist("SELECT * FROM queue WHERE lockhost=?;",array($hostname),PDO::FETCH_ASSOC);
     if (is_array($locked) && count($locked)) {
       foreach($locked as $l) {
 	if (!is_dir("/proc/".$l["lockpid"])) {
 	  // Free that lock, unlock the task, retry it in 5 min
+	  error_log("Task ".$l["id"]." running on ".$hostname." on process ".$l["lockpid"]." but process not found.");
 	  if ($l["retry"]==1) {
 	    // failed for real...
-	    $db->q( "UPDATE task SET datedone=NOW(), status=? WHERE id=?", array(STATUS_ERROR,$l["id"]) );
+	    error_log("Process retry down to 0, canceling");
+	    $db->q( "UPDATE queue SET datedone=NOW(), status=? WHERE id=?", array(STATUS_ERROR,$l["id"]) );
 	  } else {
 	    // retry in 5 min
 	    $retry=$l["retry"]-1;
-	    $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$l["id"]) );
+	    error_log("Process retry down to ".$retry." will retry in 5 minutes.");
+	    $db->q( "UPDATE queue SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$l["id"]) );
 	  }
 	  
 	} // proc exist ? 
       } // for each locked proc
     }
-    touch(TMP_PATH."/clenaup-".$hostname);
+    touch(TMP_PATH."/cleanup-".$hostname);
   } // cleanupQueueLocks
 
 
