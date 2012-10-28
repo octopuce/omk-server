@@ -19,7 +19,7 @@ class Api {
     $lockname=getmypid()."-".gethostname();
     $db->q("LOCK TABLES queue;");
     $query="SELECT * FROM queue WHERE task=? AND status=? AND locked='' AND datetry<=NOW() ORDER BY retry DESC, datequeue ASC LIMIT 1;";
-    $me=$db->qlistone( $query,array($task,STATUS_TODO) );
+    $me=$db->qone( $query,array($task,STATUS_TODO),PDO::FETCH_ASSOC );
     if (!$me) {
       $db->q("UNLOCK TABLES queue;");
       return false;
@@ -128,7 +128,7 @@ class Api {
     }
     if (!$sql) return false; // no information!
     $query = "SELECT * FROM media WHERE $sql";
-    return $db->qlist($query,$val);
+    return $db->qlist($query, $val, PDO::FETCH_ASSOC);
   }
 
 

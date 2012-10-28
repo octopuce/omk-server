@@ -5,3 +5,4 @@ config.inc.sh
 htpasswd.*
 *.mo
 tmp/
+storage/

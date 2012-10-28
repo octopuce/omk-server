@@ -1,32 +1,39 @@
 #!/usr/bin/env php
 <?php
 
+if (!function_exists("curl_init")) {
+  error_log("php-curl not installed or not enabled, exit.\n");
+  exit(1);
+}
+
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/api.php';
 
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Download Daemon)";
 
-if ($argv[1]=="debug") $GLOBALS["DEBUG"]=true;
+if (isset($argv[1]) && $argv[1]=="debug") $GLOBALS["DEBUG"]=true;
 
 // Search for a task 
 //$servers_snmp = $db->qassoc("SELECT fqdn, 'snmp' FROM servers_servers s LEFT JOIN accounting_method m ON s.sid=m.sid WHERE m.method = 'snmp'");
-$api=new ApiController();
+$api=new Api();
 
 $task=$api->getQueuedTaskLock(TASK_DOWNLOAD);
 
 if (!$task) { 
   // we sleep for a little while, thanks to that, we can launch that process as soon as we want: 
   // it will still do *nothing* for a little while when there is nothing to do ;) 
+  echo "nothing, sleeping...\n";
   sleep(10);
   exit(0);
 }
 
-$media=$api->_mediaSearch(array("id"=>$task["media"]));
+$media=$api->_mediaSearch(array("id"=>$task["mediaid"]));
 
 if (!$media) {
-  error_log("FATAL: got task ".$task["id"]." but media ".$task["media"]." not found!!\n");
+  error_log("FATAL: got task '".$task["id"]."' but media '".$task["mediaid"]."' not found!!\n");
   exit(1);
 }
+$media=$media[0];
 
 // ok, we try to download the file, with curl, with timeout and range management
 
@@ -41,7 +48,7 @@ curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
 curl_setopt($curl,CURLOPT_URL,$media["remoteurl"]);
 
 
-$filename=STORAGE."/".$media["id"];
+$filename=STORAGE_PATH."/".$media["id"];
 
 if (file_exists($filename)) {
   // retry from the end of the file
