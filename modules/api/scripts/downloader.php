@@ -5,7 +5,7 @@
     * Download process, may be launch as many time as needed
     * on the machine having the physical disks available.
     * returns as soon as a download is finished
-    * or wait 10 seconds if no download is planned.
+    * or wait 10 seconds if no download is queued.
     */
 
 if (!function_exists("curl_init")) {
@@ -81,7 +81,8 @@ if ($res) {
   $api->setTaskProcessedUnlock($task["id"]);
   // and mark the media as "locally downloaded"
   $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_LOCAL_AVAILABLE ));
-  
+  // and ask for its metadata: 
+  $api->queueAdd(TASK_DO_METADATA,$task["mediaid"],METADATA_RETRY) {
   exit(0);
 } else {
   // if we failed, we just mark it as failed, this will retry 5 min from now ...

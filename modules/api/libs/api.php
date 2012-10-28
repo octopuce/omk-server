@@ -3,6 +3,7 @@
 require_once(__DIR__."/constants.php");
 
 define("DOWNLOAD_RETRY",10); // retry 10 times each download
+define("METADATA_RETRY",4); // retry 4 times each metadata search
 
 class Api {
 

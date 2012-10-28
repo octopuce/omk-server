@@ -42,9 +42,8 @@ class ApiController extends AController {
     $this->api->filterParams(array("id" => array("integer",true),
 			       "url" => array("url",true)
 			       ));
+    
     $this->api->logApiCall("newmedia");
-    // Do it :) 
-    // TODO: check that we don't already have this media in the downlaod queue...
     if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
       $this->api->apiError(7,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
     }
