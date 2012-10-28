@@ -1,4 +1,7 @@
 <?php
+
+define("OMKT_VERSION","1.0");
+
 // Configuration
 require_once __DIR__ . '/../config.inc.php';
 

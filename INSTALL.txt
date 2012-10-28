@@ -1,6 +1,6 @@
 To install the open-mediakit transcoder, you will need the following : 
 
-- a Linux or *Nix install with a webserver, php5 (should work with php 5.1, but 5.3 or better is recommended)
+- a Linux or *Nix install with a webserver and php5 (version 5.3 minimum) and php libraries (php5-curl)
 
 - ffmpeg and imagemagick WITH proprietary codecs if you want to be able to encode to mp4, mp3 etc.
 
