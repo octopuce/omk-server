@@ -1,15 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+require_once __DIR__ . '/../../../common.php';
+require_once __DIR__ . '/../libs/api.php';
+
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Download Daemon)";
 
-require_once __DIR__ . '/../../../config.inc.php';
-require_once LIBS . '/Db.php';
-require_once __DIR__ . '/../controller.php';
-
 if ($argv[1]=="debug") $GLOBALS["DEBUG"]=true;
-
-$db = new Db($db);
 
 // Search for a task 
 //$servers_snmp = $db->qassoc("SELECT fqdn, 'snmp' FROM servers_servers s LEFT JOIN accounting_method m ON s.sid=m.sid WHERE m.method = 'snmp'");
