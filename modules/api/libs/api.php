@@ -259,6 +259,11 @@ class Api {
   }
 
 
+  /** ********************************************************************
+   * For each currently locked process *on the same machine*, we check that
+   * the process still exists, and if not, we unlock the queued task as if 
+   * it failed (retry count -1)
+   */ 
   public function cleanupQueueLocks() {
     global $db;
     $hostname=gethostname();
@@ -282,7 +287,6 @@ class Api {
 	    error_log("Process retry down to ".$retry." will retry in 5 minutes.");
 	    $db->q( "UPDATE queue SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$l["id"]) );
 	  }
-	  
 	} // proc exist ? 
       } // for each locked proc
     }
