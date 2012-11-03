@@ -47,3 +47,6 @@ define("MEDIA_METADATA_OK",3);
 /* The media has been expired and deleted */
 define("MEDIA_EXPIRED",4);
 
+
+/* A file with an undefined duration */
+define("DURATION_UNDEFINED",-1);

@@ -77,12 +77,13 @@ curl_setopt($curl,CURLOPT_FILE,$f);
 $res=curl_exec($curl);
 fclose($f);
 if ($res) {
-  // ok, transfer finished, let's mark it done
-  $api->setTaskProcessedUnlock($task["id"]);
   // and mark the media as "locally downloaded"
   $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_LOCAL_AVAILABLE ));
   // and ask for its metadata: 
   $api->queueAdd(TASK_DO_METADATA,$task["mediaid"],METADATA_RETRY) {
+
+  // ok, transfer finished, let's mark it done
+  $api->setTaskProcessedUnlock($task["id"]);
   exit(0);
 } else {
   // if we failed, we just mark it as failed, this will retry 5 min from now ...

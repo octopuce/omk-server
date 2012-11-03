@@ -43,16 +43,18 @@ if (!file_exists($filename) || filesize($filename)==0 ) {
 }
 
 // ok, now we use ffmpeg to get the metadata of the downloaded media
+// depending on FFMPEG / AVCONV version, we use one parser or the other ...
+$metadata=$api->getFfmpegMetadata($filename);
 
+if ($metadata) {
 
+  // Store the metadata in the media object: 
+  $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_OK, "metadata" => serialize($metadata) ));
 
-
-if ($res) {
   // ok, transfer finished, let's mark it done
   $api->setTaskProcessedUnlock($task["id"]);
-  // and mark the media as "locally downloaded"
-  $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_OK ));
   exit(0);
+
 } else {
   // if we failed, we just mark it as failed, this will retry 5 min from now ...
   $api->setTaskFailedUnlock($task["id"]);

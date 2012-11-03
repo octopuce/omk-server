@@ -119,7 +119,7 @@ class Api {
    */
   public function mediaUpdate($id,$v) {
     global $db;
-    $k=array("status","remoteid","remoteurl","owner");
+    $k=array("status","remoteid","remoteurl","owner","metadata");
     $sql=""; $val=array();
     foreach($k as $key) {
       if ($v[$key]) { 
@@ -137,9 +137,43 @@ class Api {
 
 
   /** ****************************************
+   * Get the metadata of a media using ffmpeg
+   * @param $filename string the filename to parse
+   * @return array a complex array (see the doc)
+   * of associative array with the metadata of each track.
+   */
+  public function getFfmpegMetadata($file) {
+
+    // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
+
+    exec("ffmpeg -i ".escapeshellarg($file)." 2>&1",$out);
+    // now we parse the lines of stdout to know the tracks
+
+    $tracks=array(); // no track to start with
+    $duration=DURATION_UNDEFINED; // undefined duration to start with
+    // Each time we start a new track, we start a $track array 
+    $track=array();
+    foreach($out as $line) {
+      $line=trim($line);
+      if (preg_match("##",$line,$mat)) {
+	// new track
+	if (is_array($track) && count($track)) {
+	  // we had information for the previous track, save it
+	  $tracks[]=$track;
+	}
+	$track=array();
+      }
+    }
+    // The total duration cannot be told for sure without reading the entire file. 
+    // so we do a second (slow) pass to know that.
+
+  }
+
+
+  /** ****************************************
    * Search for one or more media
    * @param $search is an array of key => value to search for 
-   * @param$ $operator the AND operator is the default, could be OR
+   * @param $operator the AND operator is the default, could be OR
    * @return integer the newly created media id 
    */
   public function mediaSearch($search,$operator="AND") {
