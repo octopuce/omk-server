@@ -7,12 +7,13 @@ To install the open-mediakit transcoder, you will need the following :
 To do this, under debian Linux, use debian-multimedia repository as follow 
 (add this line in /etc/apt/sources.list.d/debian-multimedia.list )
 
-deb http://debian.octopuce.fr/debian-multimedia squeeze main contrib non-free
+deb http://debian.octopuce.fr/debian-multimedia squeeze-backports main contrib non-free
+deb http://debian.octopuce.fr/debian squeeze-backports main contrib non-free
 
 then launch, as root : 
 
 # aptitude update
-# aptitude install ffmpeg libavcodec52 libavfilter1 libavdevice52 libavutil50 libavformat52 libmp3lame0 libx264-118 libfaac0 libvpx0 imagemagick 
+# aptitude install -t squeeze-backports ffmpeg libavcodec-extra-53 libavdevice-extra-53 libavfilter-extra-2 libavformat-extra-53 libavutil-extra-51
 
-(later, when we will support document parsing, we will need pdfutils, htmltotext, unoconv ...)
+(later, when we will support document parsing, we may need pdfutils, htmltotext, unoconv ...)
 

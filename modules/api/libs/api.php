@@ -146,24 +146,112 @@ class Api {
 
     // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
 
-    exec("ffmpeg -i ".escapeshellarg($file)." 2>&1",$out);
+    exec("ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -f rawvideo /dev/null 2>&1",$out);
     // now we parse the lines of stdout to know the tracks
 
     $tracks=array(); // no track to start with
     $duration=DURATION_UNDEFINED; // undefined duration to start with
     // Each time we start a new track, we start a $track array 
-    $track=array();
+    /**
+     * we have 3 zones in ffmpeg output : 
+     * input
+     * output 
+     * frame/video parsing: 
+Seems stream 0 codec frame rate differs from container frame rate: 2000.00 (2000/1) -> 25.00 (25/1)
+Input #0, flv, from 'le-vinvinteur--2012-10-14-20h00.flv':
+  Duration: 00:25:48.53, start: 0.000000, bitrate: 1233 kb/s
+    Stream #0.0: Video: h264 (Main), yuv420p, 640x360, 1137 kb/s, 25 tbr, 1k tbn, 2k tbc
+    Stream #0.1: Audio: aac, 44100 Hz, stereo, s16, 96 kb/s
+Output #0, rawvideo, to '/dev/null':
+  Metadata:
+    encoder         : Lavf53.21.0
+    Stream #0.0: Video: libx264, yuv420p, 640x360, q=2-31, 1137 kb/s, 90k tbn, 1k tbc
+    Stream #0.1: Audio: libvo_aacenc, 44100 Hz, stereo, 96 kb/s
+    Stream #0.2: Subtitle: srt
+Stream mapping:
+  Stream #0.0 -> #0.0
+  Stream #0.1 -> #0.1
+Press ctrl-c to stop encoding
+frame=38712 fps=  0 q=-1.0 Lsize=       0kB time=1548.44 bitrate=   0.0kbits/s    
+video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
+    */     
+    $track=array(); // per-track attributes
+    $attribs=array(); // entire file's attributes
     foreach($out as $line) {
       $line=trim($line);
-      if (preg_match("##",$line,$mat)) {
-	// new track
-	if (is_array($track) && count($track)) {
-	  // we had information for the previous track, save it
-	  $tracks[]=$track;
-	}
-	$track=array();
+      if (preg_match("|^Output |",$line,$mat)) {
+	break; // second part = output
       }
-    }
+      if (preg_match("|^Input #0, ([^,]*)|",$line,$mat)) {
+	$attribs["box"]=$mat[1];
+      }
+      if (preg_match("|^Duration: ([^,]*).*bitrate: ([0-9]*) |",$line,$mat)) {
+	$attribs["duration1"]=$mat[1];
+	$attribs["bitrate"]=$mat[2];
+      }
+      if (preg_match("|^Stream [^:]*: ([^:]*): (.*)$|",$line,$mat)) {
+	$track=array();
+	// get the comma-separated parameters of the track
+	$tmp=explode(",",$mat[2]);
+	$params=array();
+	foreach($tmp as $t) {
+	  $params=trim($t);
+	}
+
+	switch ($mat[1]) {
+	case "Audio":
+	  $track["type"]=TRACK_TYPE_AUDIO;
+	  // Parsing an audio-type track
+
+	  break;
+	case "Video":
+	  $track["type"]=TRACK_TYPE_VIDEO;
+	  // Parsing a video-type track
+	  $codec=explode(" ",$params[0]);
+	  $track["codec"]=$codec[0];
+	  unset ($codec[0]);
+	  $track["codec-sub"]=implode(" ",$codec);
+	  $track["pixelfmt"]=$params[1];
+	  if (preg_match("#([(0-9]*)x([0-9]*)#",$params[2],$mat)) {
+	    $track["width"]=$mat[1];
+	    $track["height"]=$mat[2];
+	  }	
+	  if (preg_match("#DAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
+	    $track["DAR1"]=$mat[1];
+	    $track["DAR2"]=$mat[2];
+	  }
+	  if (preg_match("#PAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
+	    $track["PAR1"]=$mat[1];
+	    $track["PAR2"]=$mat[2];
+	  }
+	  foreach($params as $p) {
+	    // Search for fps, tbr and kb/s
+	    if (preg_match("#([0-9\.]*) kb/s#",$p,$mat)) {
+	      $track["bitrate"]=$mat[1];
+	    }
+	    if (preg_match("#([0-9\.]*) fps#",$p,$mat)) {
+	      $track["fps"]=$mat[1];
+	    }
+	    if (preg_match("#([0-9\.]*) tbr#",$p,$mat) && !$track["fps"]) {
+	      $track["fps"]=$mat[1];
+	    }
+	  }
+	  break;
+	case "Subtitle":
+	  $track["type"]=TRACK_TYPE_SUBTITLE;
+	  // Parsing a subtitle track
+	  
+	  break;
+	default:
+	  $track["type"]=TRACK_TYPE_OTHER; // TODO: tell us we found one :) It'd be clearly interesting!
+	  break;
+	}
+	$tracks[]=$track;
+      } // new track
+
+    } // parse lines, first part (input)
+
+
     // The total duration cannot be told for sure without reading the entire file. 
     // so we do a second (slow) pass to know that.
 

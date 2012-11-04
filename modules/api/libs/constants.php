@@ -50,3 +50,8 @@ define("MEDIA_EXPIRED",4);
 
 /* A file with an undefined duration */
 define("DURATION_UNDEFINED",-1);
+
+define("TRACK_TYPE_AUDIO",0);
+define("TRACK_TYPE_VIDEO",1);
+define("TRACK_TYPE_SUBTITLE",2);
+define("TRACK_TYPE_OTHER",3);
