@@ -145,8 +145,11 @@ class Api {
   public function getFfmpegMetadata($file) {
 
     // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
+    $DEBUG=0;
 
-    exec("ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -f rawvideo /dev/null 2>&1",$out);
+    $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -f rawvideo -y /dev/null 2>&1";
+    if ($DEBUG) echo "exec:$exec\n";
+    exec($exec,$out);
     // now we parse the lines of stdout to know the tracks
 
     $tracks=array(); // no track to start with
@@ -177,84 +180,126 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
     */     
     $track=array(); // per-track attributes
     $attribs=array(); // entire file's attributes
+    $mode=1;
+
     foreach($out as $line) {
-      $line=trim($line);
-      if (preg_match("|^Output |",$line,$mat)) {
-	break; // second part = output
-      }
-      if (preg_match("|^Input #0, ([^,]*)|",$line,$mat)) {
-	$attribs["box"]=$mat[1];
-      }
-      if (preg_match("|^Duration: ([^,]*).*bitrate: ([0-9]*) |",$line,$mat)) {
-	$attribs["duration1"]=$mat[1];
-	$attribs["bitrate"]=$mat[2];
-      }
-      if (preg_match("|^Stream [^:]*: ([^:]*): (.*)$|",$line,$mat)) {
-	$track=array();
-	// get the comma-separated parameters of the track
-	$tmp=explode(",",$mat[2]);
-	$params=array();
-	foreach($tmp as $t) {
-	  $params=trim($t);
+      if ($mode==1) {
+	if ($DEBUG) echo "mode1: $line\n";
+	$line=trim($line);
+	if (preg_match("|^Output |",$line,$mat)) {
+	  $mode=2; // second part = output
 	}
-
-	switch ($mat[1]) {
-	case "Audio":
-	  $track["type"]=TRACK_TYPE_AUDIO;
-	  // Parsing an audio-type track
-
-	  break;
-	case "Video":
-	  $track["type"]=TRACK_TYPE_VIDEO;
-	  // Parsing a video-type track
-	  $codec=explode(" ",$params[0]);
-	  $track["codec"]=$codec[0];
-	  unset ($codec[0]);
-	  $track["codec-sub"]=implode(" ",$codec);
-	  $track["pixelfmt"]=$params[1];
-	  if (preg_match("#([(0-9]*)x([0-9]*)#",$params[2],$mat)) {
-	    $track["width"]=$mat[1];
-	    $track["height"]=$mat[2];
-	  }	
-	  if (preg_match("#DAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
-	    $track["DAR1"]=$mat[1];
-	    $track["DAR2"]=$mat[2];
+	if (preg_match("|^Input #0, ([^,]*)|",$line,$mat)) {
+	  $attribs["box"]=$mat[1];
+	}
+	if (preg_match("|^Duration: ([^,]*).*bitrate: ([0-9]*) |",$line,$mat)) {
+	  $attribs["time-estimate"]=$mat[1];
+	  $attribs["bitrate"]=$mat[2];
+	}
+	if (preg_match("|^Stream [^:]*: ([^:]*): (.*)$|",$line,$mat)) {
+	  $track=array();
+	  // get the comma-separated parameters of the track
+	  $tmp=explode(",",$mat[2]);
+	  $params=array();
+	  foreach($tmp as $t) {
+	    $params[]=trim($t);
 	  }
-	  if (preg_match("#PAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
-	    $track["PAR1"]=$mat[1];
-	    $track["PAR2"]=$mat[2];
-	  }
-	  foreach($params as $p) {
-	    // Search for fps, tbr and kb/s
-	    if (preg_match("#([0-9\.]*) kb/s#",$p,$mat)) {
-	      $track["bitrate"]=$mat[1];
-	    }
-	    if (preg_match("#([0-9\.]*) fps#",$p,$mat)) {
-	      $track["fps"]=$mat[1];
-	    }
-	    if (preg_match("#([0-9\.]*) tbr#",$p,$mat) && !$track["fps"]) {
-	      $track["fps"]=$mat[1];
-	    }
-	  }
-	  break;
-	case "Subtitle":
-	  $track["type"]=TRACK_TYPE_SUBTITLE;
-	  // Parsing a subtitle track
 	  
-	  break;
-	default:
-	  $track["type"]=TRACK_TYPE_OTHER; // TODO: tell us we found one :) It'd be clearly interesting!
-	  break;
-	}
-	$tracks[]=$track;
-      } // new track
+	  switch ($mat[1]) {
+	  case "Audio":
+	    $track["type"]=TRACK_TYPE_AUDIO;
+	    // Parsing an audio-type track
+	    $codec=explode(" ",$params[0]);
+	    $track["codec"]=$codec[0];
+	    unset ($codec[0]);
+	    $track["codec-sub"]=implode(" ",$codec);
+	    foreach($params as $p) {
+	      // Search for kb/s and Hz
+	      if (preg_match("#([0-9\.]*) Hz#",$p,$mat)) {
+		$track["samplerate"]=$mat[1];
+	      }
+	      if (preg_match("#([0-9\.]*) kb/s#",$p,$mat)) {
+		$track["bitrate"]=$mat[1];
+	      }
+	      if (trim($p)=="stereo") 
+		$track["channels"]=2;
+	      if (trim($p)=="mono") 
+		$track["channels"]=1;
+	      // TODO: find a 5.1 or other high-end audio file, and see what ffmpeg is telling about it :)
+	    }
+	    break;
+	  case "Video":
+	    $track["type"]=TRACK_TYPE_VIDEO;
+	    // Parsing a video-type track
+	    $codec=explode(" ",$params[0]);
+	    $track["codec"]=$codec[0];
+	    unset ($codec[0]);
+	    $track["codec-sub"]=implode(" ",$codec);
+	    $track["pixelfmt"]=$params[1];
+	    if (preg_match("#([(0-9]*)x([0-9]*)#",$params[2],$mat)) {
+	      $track["width"]=$mat[1];
+	      $track["height"]=$mat[2];
+	    }	
+	    if (preg_match("#DAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
+	      $track["DAR1"]=$mat[1];
+	      $track["DAR2"]=$mat[2];
+	    }
+	    if (preg_match("#PAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
+	      $track["PAR1"]=$mat[1];
+	      $track["PAR2"]=$mat[2];
+	    }
+	    foreach($params as $p) {
+	      // Search for fps, tbr and kb/s
+	      if (preg_match("#([0-9\.]*) kb/s#",$p,$mat)) {
+		$track["bitrate"]=$mat[1];
+	      }
+	      if (preg_match("#([0-9\.]*) fps#",$p,$mat)) {
+		$track["fps"]=$mat[1];
+	      }
+	      if (preg_match("#([0-9\.]*) tbr#",$p,$mat) && !$track["fps"]) {
+		$track["fps"]=$mat[1];
+	      }
+	    }
+	    break;
+	  case "Subtitle":
+	    $track["type"]=TRACK_TYPE_SUBTITLE;
+	    // Parsing a subtitle track
+	    $codec=explode(" ",$params[0]);
+	    $track["codec"]=$codec[0];
+	    unset ($codec[0]);
+	    $track["codec-sub"]=implode(" ",$codec);
+	    // TODO: find a .ass (or .mkv with .ass) subtitle and see what ffmpeg is telling about it :) 
+	    break;
+	  default:
+	    $track["type"]=TRACK_TYPE_OTHER; // TODO: tell us we found one :) It'd be clearly interesting!
+	    break;
+	  }
+	  $tracks[]=$track;
+	} // new track
 
-    } // parse lines, first part (input)
+      }  // mode 1
 
+      // parsing that line : 
+      // frame=13130 fps=12900 q=-1.0 Lsize=       0kB time=438.10 bitrate=   0.0kbits/s
+      if ($mode==2) {
+	if ($DEBUG) echo "mode2: $line\n";
+	if (preg_match("#frame= *([0-9]*).*time= *([0-9\.]*)#",$line)) {
+	  // well, avconv is giving ALL the frame= time= lines into ONE line with ^M to show it the nice way ... let's change that...
+	  $out2=explode(chr(13),$line);
+	  foreach($out2 as $line) {
+	    if (preg_match("#frame= *([0-9]*).*time= *([0-9\.]*)#",$line,$mat)) {
+	      $attribs["frames"]=$mat[1]; 
+	      $attribs["time"]=$mat[2];
+	    }	    
+	  }
+	} // search frame/time 
 
-    // The total duration cannot be told for sure without reading the entire file. 
-    // so we do a second (slow) pass to know that.
+      }  // mode 2
 
+    } // parse lines, 
+
+    $attribs["tracks"]=$tracks;
+    return $attribs;
   }
 
 
