@@ -196,16 +196,21 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	  $attribs["time-estimate"]=$mat[1];
 	  $attribs["bitrate"]=$mat[2];
 	}
-	if (preg_match("|^Stream [^:]*: ([^:]*): (.*)$|",$line,$mat)) {
+	if (preg_match("|^Stream ([^:]*): ([^:]*): (.*)$|",$line,$mat)) {
 	  $track=array();
 	  // get the comma-separated parameters of the track
-	  $tmp=explode(",",$mat[2]);
+	  $tmp=explode(",",$mat[3]);
 	  $params=array();
 	  foreach($tmp as $t) {
 	    $params[]=trim($t);
 	  }
 	  
-	  switch ($mat[1]) {
+	  $lang=$mat[1];
+	  // search for language code, skip "und" for undefined.
+	  if (preg_match("#\(([^\)]*)#",$lang,$lmat) && $lmat[1]!="und") { 
+	    $track["lang"]=$lmat[1];
+	  }
+	  switch ($mat[2]) {
 	  case "Audio":
 	    $track["type"]=TRACK_TYPE_AUDIO;
 	    // Parsing an audio-type track
@@ -256,7 +261,7 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	      if (preg_match("#([0-9\.]*) fps#",$p,$mat)) {
 		$track["fps"]=$mat[1];
 	      }
-	      if (preg_match("#([0-9\.]*) tbr#",$p,$mat) && !$track["fps"]) {
+	      if (preg_match("#([0-9\.]*) tbr#",$p,$mat) && !isset($track["fps"])) {
 		$track["fps"]=$mat[1];
 	      }
 	    }
