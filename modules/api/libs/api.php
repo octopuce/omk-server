@@ -27,7 +27,7 @@ class Api {
       return false;
     }
     $query="UPDATE queue SET status=?, lockhost=?, lockpid=?, datelaunch=NOW() WHERE id=?;";
-    $db->q( $query,array(STATUS_PROCESSING,$hostkname,$pid,$me["id"]) );
+    $db->q( $query,array(STATUS_PROCESSING,$hostname,$pid,$me["id"]) );
     $db->q("UNLOCK TABLES queue;");
     return $me;
   }
@@ -122,7 +122,7 @@ class Api {
     $k=array("status","remoteid","remoteurl","owner","metadata");
     $sql=""; $val=array();
     foreach($k as $key) {
-      if ($v[$key]) { 
+      if (isset($v[$key])) { 
 	if ($sql) $sql.=", ";
 	$sql.="$key=?";
 	$val[]=$v[$key];
