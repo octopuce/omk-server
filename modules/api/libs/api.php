@@ -80,11 +80,12 @@ class Api {
    * @param $format integer is the format (from format table) if the task is a transcode.
    * @return integer the newly created queue id
    */ 
-  public function queueAdd($task,$media,$retry=1,$format=null) {
+  public function queueAdd($task,$media,$retry=1,$params=null) {
     global $db;
-    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, formatid=?;";
-    $db->q($query,array($this->me["uid"],$retry,$task,$media,$format));
-    return $db->lastInsertId();    
+    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, params=?;";
+    if (!is_array($params)) $params=array();
+    $db->q($query,array($this->me["uid"],$retry,$task,$media,serialize($params));
+    return $db->lastInsertId();
   }
   
 
@@ -139,15 +140,21 @@ class Api {
   /** ****************************************
    * Get the metadata of a media using ffmpeg
    * @param $filename string the filename to parse
+   * @param $cropdetect boolean Shall we cropdetect the video file ? (that will be a lot slower!)
    * @return array a complex array (see the doc)
    * of associative array with the metadata of each track.
    */
-  public function getFfmpegMetadata($file) {
+  public function getFfmpegMetadata($file,$cropdetect=false) {
 
     // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
     $DEBUG=0;
 
-    $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -f rawvideo -y /dev/null 2>&1";
+    // If we do a "stream copy" for the video track, we can't do cropdetect ... 
+    if (!$cropdetect) {
+      $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -vf cropdetect -f rawvideo -y /dev/null 2>&1";
+    } else {
+      $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec rawvideo -acodec copy -vf cropdetect -f rawvideo -y /dev/null 2>&1";
+    }
     if ($DEBUG) echo "exec:$exec\n";
     exec($exec,$out);
     // now we parse the lines of stdout to know the tracks
@@ -177,6 +184,10 @@ Stream mapping:
 Press ctrl-c to stop encoding
 frame=38712 fps=  0 q=-1.0 Lsize=       0kB time=1548.44 bitrate=   0.0kbits/s    
 video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
+
+And also the crop black borders: 
+[cropdetect @ 0x8214800] x1:0 x2:1023 y1:0 y2:575 w:1024 h:576 x:0 y:0 pos:0 pts:13947267 t:13.947267 crop=1024:576:0:0
+when using -vf cropdetect
     */     
     $track=array(); // per-track attributes
     $attribs=array(); // entire file's attributes
@@ -187,7 +198,7 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	if ($DEBUG) echo "mode1: $line\n";
 	$line=trim($line);
 	if (preg_match("|^Output |",$line,$mat)) {
-	  $mode=2; // second part = output
+	  $mode=2; // second part = output & cropdetect
 	}
 	if (preg_match("|^Input #0, ([^,]*)|",$line,$mat)) {
 	  $attribs["box"]=$mat[1];
@@ -296,6 +307,12 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	      $attribs["frames"]=$mat[1]; 
 	      $attribs["time"]=$mat[2];
 	    }	    
+	    if ($cropdetect && preg_match("#crop=([0-9]*):([0-9]*):([0-9]*):([0-9]*)#",$line,$mat)) {
+	      $attribs["cropw"]=$mat[1]; 
+	      $attribs["croph"]=$mat[2];
+	      $attribs["cropx"]=$mat[3]; 
+	      $attribs["cropy"]=$mat[4];
+	    }
 	  }
 	} // search frame/time 
 
@@ -336,11 +353,19 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
    */
   public function logApiCall($api) {
     global $db;
-    $parray="";
-    foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
-    $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, api=?, params=?, ip=?;';
+    //    foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
+    $parray=serialize($this->params);
+    if (!empty($_REQUEST["application"]) && !empty($_REQUEST["version"])) {
+      $appversion=$db->qone("SELECT id FROM appversions WHERE application=? AND version=?",array($_REQUEST["application"],$_REQUEST["version"]));
+      if (!$appversion) {
+	$db->q("INSERT INTO appversions SET application=?, version=?",array($_REQUEST["application"],$_REQUEST["version"]));
+	$appversion=$db->qone("SELECT LAST_INSERT_ID() AS id;");
+      }
+    } else $appversion=0;
+
+    $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, api=?, params=?, ip=?, appversion=?;';
     $db->q($query,
-		 array($this->me["uid"],$api,$parray,$_SERVER["REMOTE_ADDR"])
+	   array($this->me["uid"],$api,$parray,$_SERVER["REMOTE_ADDR"],$appversion->id)
 		 );
   }
 
@@ -348,6 +373,8 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
   /** ********************************************************************
    * Filter the $_REQUEST[] array from unauthorized values. 
    * Fills $this->param with allowed one, and check their type if needed.
+   * allowed is an array of arrays. Each sub-array has 3 parameters : 
+   * - the field name - a boolean telling if this field is mandatory - the default value for not-set parameters
    */
   public function filterParams($allowed) {
     $this->params=array();
@@ -358,6 +385,9 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	case "integer":
 	  $this->params[$k]=intval($_REQUEST[$k]);
 	  break;
+	case "boolean":
+	  $this->params[$k]=(($_REQUEST[$k])?true:false);
+	  break;
 	case "string":
 	case "url": // FIXME: check url format
 	  $this->params[$k]=trim($_REQUEST[$k]);
@@ -365,8 +395,12 @@ video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
 	default:
 	  $this->params[$k]=$_REQUEST[$k];
 	}
-      } elseif ($v[1]) {
-	$error.=sprintf(_("Parameter %s is mandatory"),$k).", ";
+      } else {
+	if ($v[1]) {
+	  $error.=sprintf(_("Parameter %s is mandatory"),$k).", ";
+	} else {
+	  $this->params[$k]=$v[2];
+	}
       }
     }
     if ($error) {

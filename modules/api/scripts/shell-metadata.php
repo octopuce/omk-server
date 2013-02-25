@@ -2,10 +2,8 @@
 <?php
 
    /** ************************************************************
-    * Metadata maker process, may be launch as many time as needed
-    * on the machine having a proper ffmpeg installed.
-    * returns as soon as a metadata has been computer
-    * or wait 10 seconds if no do_metadata task is queued.
+    * Metadata maker process for a single file
+    * Use this to test the metadata processor
     */
 
 if (!isset($argv[1])) {

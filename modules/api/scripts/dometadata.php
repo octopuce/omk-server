@@ -27,6 +27,9 @@ if (!$task) {
   exit(0);
 }
 
+// Get the task's parameters */
+$params=unserialize($task["params"]);
+
 $media=$api->mediaSearch(array("id"=>$task["mediaid"]));
 
 if (!$media) {
@@ -44,7 +47,7 @@ if (!file_exists($filename) || filesize($filename)==0 ) {
 
 // ok, now we use ffmpeg to get the metadata of the downloaded media
 // depending on FFMPEG / AVCONV version, we use one parser or the other ...
-$metadata=$api->getFfmpegMetadata($filename);
+$metadata=$api->getFfmpegMetadata($filename,$params["cropdetect"]);
 
 if ($metadata) {
 

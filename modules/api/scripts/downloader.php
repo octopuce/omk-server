@@ -34,6 +34,9 @@ if (!$task) {
   exit(0);
 }
 
+// Get its parameters
+$params=unserialize($task["params"]);
+
 $media=$api->mediaSearch(array("id"=>$task["mediaid"]));
 
 if (!$media) {
@@ -53,8 +56,7 @@ curl_setopt($curl,CURLOPT_FOLLOWLOCATION,true);
 curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
 curl_setopt($curl, CURLOPT_TIMEOUT, 600); // no more than 10 minutes of download... if file is bigger than that, or too slow, we will retry :) so...
 
-curl_setopt($curl,CURLOPT_URL,$media["remoteurl"]);
-
+curl_setopt($curl,CURLOPT_URL,$params["url"]);
 
 $filename=STORAGE_PATH."/".$media["id"];
 
@@ -79,9 +81,11 @@ fclose($f);
 if ($res) {
   // and mark the media as "locally downloaded"
   $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_LOCAL_AVAILABLE ));
-  // and ask for its metadata: 
-  $api->queueAdd(TASK_DO_METADATA,$task["mediaid"],METADATA_RETRY) {
-
+  // and ask for its metadata if requested to: 
+  if ($params["dometadata"]) {
+    $api->queueAdd(TASK_DO_METADATA,$task["mediaid"],METADATA_RETRY,array("cropdetect"=>$params["cropdetect"]));
+  }
+  
   // ok, transfer finished, let's mark it done
   $api->setTaskProcessedUnlock($task["id"]);
   exit(0);

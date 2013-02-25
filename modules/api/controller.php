@@ -34,13 +34,19 @@ class ApiController extends AController {
   
   /** ********************************************************************
    * API CALL, Tells the transcoder that a new media must be downloaded asap.
+   * We can also add parameters to ask for a recognition as soon as it has been downloaded
+   * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side) 
+   * Params for METADATA TASK : dometadata (default true) cropdetect (default false)
    */
   public function newmediaAction() {
     $this->me=$this->api->checkCallerIdentity();
     $this->api->enforceLimits();
     // for each params, tell its name, and its type and if it is mandatory
-    $this->api->filterParams(array("id" => array("integer",true),
-			       "url" => array("url",true)
+    $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
+				   "id" => array("integer",true),
+				   "url" => array("url",true),
+				   "dometadata" => array("boolean",false,true),
+				   "cropdetect" => array("boolean",false,false),
 			       ));
     
     $this->api->logApiCall("newmedia");
@@ -49,14 +55,13 @@ class ApiController extends AController {
     }
     // first, we create a media
     $media_id=$this->api->mediaAdd(array("status" => MEDIA_REMOTE_AVAILABLE,
-				     "remoteid" => $this->params["id"],
-				     "remoteurl" => $this->params["url"],
-				     "owner" => $this->me["uid"] ) );
+					 "remoteid" => $this->params["id"],
+					 "owner" => $this->me["uid"] ) );
     if (!$media_id) {
       $this->api->apiError(6,_("Cannot create a new media, please retry later."));
     }
     // then we queue the download of the media
-    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY);
+    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,array("url" => $this->params["url"], "dometadata" => $this->params["dometadata"], "cropdetect" => $this->params["cropdetect"]) );
   }
 
 
