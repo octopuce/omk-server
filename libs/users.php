@@ -1,9 +1,9 @@
 <?php
 
-function check_user_identity() {
+function check_user_identity($required=true) {
   $realm = 'OpenMediakit Transcoder';
 
-  if (!isset($_SERVER['PHP_AUTH_USER'])) {
+  if ($required && !isset($_SERVER['PHP_AUTH_USER'])) {
     header('WWW-Authenticate: Basic realm="' . $realm . '"');
     header('HTTP/1.0 401 Unauthorized');
     echo 'Please authenticate';
@@ -17,7 +17,7 @@ function check_user_identity() {
   require_once __DIR__ . '/../modules/users/lib.php';
   $GLOBALS["me"] = Users::auth($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
 
-  if (!$GLOBALS["me"]) {
+  if ($required && !$GLOBALS["me"]) {
     header('WWW-Authenticate: Basic realm="' . $realm . '"');
     header('HTTP/1.0 401 Unauthorized');
     echo 'Login or password incorrect, or account disabled';

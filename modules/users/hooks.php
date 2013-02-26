@@ -14,12 +14,19 @@ class UsersHooks {
                       'name' => _("User Management"),
                       );
     }
-    $menu[] = array(
-                    'url' => '/users/me',
-                    'name' => _("My Account"),
-                    );
+    if ($_SERVER['REQUEST_URI']=="/") {
+      $menu[] = array(
+		      'url' => '/users',
+		      'name' => _("Login"),
+		      );
+    } else {
+      $menu[] = array(
+		      'url' => '/users/me',
+		      'name' => _("My Account"),
+		      );
+    }
   }
-
+  
   /*
    * Fonctionnalité d'"imitation".
    */
