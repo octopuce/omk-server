@@ -39,3 +39,11 @@ $db->path = ROOT . '/octomanager.db';
  */
 define('BASE_URL', '/');
 define('STATIC_URL', '/static/');
+
+
+/** Is it a PUBLIC transcoder (as a result, anybody can use it to transcode videos) ? 
+ * If you want to advertise your public transcoder, please subscribe to the discussion list
+ * of public transcoders managers at transcoder-subscribe@open-mediakit.org 
+ * and announce your transcoder availability
+ */
+define('PUBLIC_TRANSCODER',1);

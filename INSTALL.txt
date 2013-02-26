@@ -56,5 +56,7 @@ Launch install.php to initialize the database (this program will also UPGRADE th
 
 # /var/www/omkt/install
 
-Finally, launch the conversion / metadata / thumbnailer processes anytime you want, either by cron, or by using some init script 
-(FIXME: to be done)
+**FIXME**: to be done: Finally, launch the conversion / metadata / thumbnailer processes anytime you want, either by cron, or by using some init script  (Each cron / daemon must have its own deployment technique)
+
+
+

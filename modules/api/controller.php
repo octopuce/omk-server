@@ -16,6 +16,7 @@ class ApiController extends AController {
 
 
   public function ApiController() {
+    // Instance of our lib/api.php
     $this->api=new Api();
   }
 
@@ -33,10 +34,11 @@ class ApiController extends AController {
 
   
   /** ********************************************************************
-   * API CALL, Tells the transcoder that a new media must be downloaded asap.
-   * We can also add parameters to ask for a recognition as soon as it has been downloaded
+   * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
+   * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
    * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side) 
-   * Params for METADATA TASK : dometadata (default true) cropdetect (default false)
+   * Params for METADATA TASK : dometadata (default true) [cropdetect (default false)]
+   * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
    */
   public function newmediaAction() {
     $this->me=$this->api->checkCallerIdentity();
@@ -44,9 +46,9 @@ class ApiController extends AController {
     // for each params, tell its name, and its type and if it is mandatory
     $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
 				   "id" => array("integer",true),
-				   "url" => array("url",true),
+				   "url" => array("string",true),
 				   "dometadata" => array("boolean",false,true),
-				   "cropdetect" => array("boolean",false,false),
+				   // "cropdetect" => array("boolean",false,false),
 			       ));
     
     $this->api->logApiCall("newmedia");
@@ -60,8 +62,13 @@ class ApiController extends AController {
     if (!$media_id) {
       $this->api->apiError(6,_("Cannot create a new media, please retry later."));
     }
+
     // then we queue the download of the media
-    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,array("url" => $this->params["url"], "dometadata" => $this->params["dometadata"], "cropdetect" => $this->params["cropdetect"]) );
+    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
+				array("url" => $this->params["url"], 
+				      "dometadata" => $this->params["dometadata"], 
+				      //"cropdetect" => $this->params["cropdetect"]
+				      ) );
   }
 
 
