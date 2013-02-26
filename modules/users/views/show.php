@@ -29,6 +29,12 @@ require VIEWS . '/header.php';
   <dt><?php __("Enabled?"); ?></dt>
   <dd><?php echo $user->enabled; ?></dd>
 
+  <dt><?php __("Application URL"); ?></dt>
+  <dd><?php echo $user->url; ?></dd>
+
+  <dt><?php __("API Key"); ?></dt>
+  <dd><?php echo $user->apikey; ?></dd>
+
   <dt><?php __("Administrator?"); ?></dt>
   <dd><?php echo $user->admin; ?></dd>
 </dl>

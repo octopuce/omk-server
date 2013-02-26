@@ -17,19 +17,19 @@ class UsersController extends AController {
     }
     global $db;
 
-    $st = $db->q('SELECT uid, login, email, ' .
+    $st = $db->q('SELECT uid, email, ' .
 		 'IF(enabled, :yes, :no) as enabled, ' .
-		 'IF(admin, :yes, :no) as admin FROM users ' .
-		 'ORDER BY admin, login',
+		 'IF(admin, :yes, :no) as admin, url FROM users ' .
+		 'ORDER BY admin DESC, email',
 		 array('yes' => "X", 'no' => ""));
     $users = array();
     while ($data = $st->fetch()) {
       $users[] = array(
 		       '_' => $data,
-		       'name' => l($data->login, 'users/show/' . $data->uid),
-		       'email' => $data->email,
+		       'email' => l($data->email, 'users/show/' . $data->uid),
 		       'enabled' => $data->enabled,
 		       'admin' => $data->admin,
+		       'url' => $data->url,
 		       );
     }
     Hooks::call('users_list_users', $users);
@@ -41,10 +41,10 @@ class UsersController extends AController {
     }
 
     $headers = array(
-		     'name' => _('Name'),
 		     'email' => _('Email'),
 		     'enabled' => _('Enabled'),
 		     'admin' => _('Admin.'),
+		     'url' => _('Application URL'),
 		     );
     Hooks::call('users_list_headers', $headers);
     $headers['actions'] = _('Actions');
@@ -64,22 +64,12 @@ class UsersController extends AController {
     global $db;
 
     $info = trim($params[0]);
-    if (is_numeric($info)) {
-      $uid = intval($info);
-      $user = $db->qone('SELECT uid, login, email, ' .
-			'IF(enabled, :yes, :no) as enabled, ' .
-			'IF(admin, :yes, :no) as admin, apikey ' .
-			'FROM users WHERE uid = :uid',
-			array('yes' => _("yes"), 'no' => _("no"), 'uid' => $uid));
-    }
-    else {
-      $login = $info;
-      $user = $db->qone('SELECT uid, login, email, ' .
-			'IF(enabled, :yes, :no) as enabled, ' .
-			'IF(admin, :yes, :no) as admin, apikey ' .
-			'FROM users WHERE login = :login',
-			array('yes' => _("yes"), 'no' => _("no"), 'login' => $login));
-    }
+    $uid = intval($info);
+    $user = $db->qone('SELECT uid, email, ' .
+		      'IF(enabled, :yes, :no) as enabled, ' .
+		      'IF(admin, :yes, :no) as admin, url, apikey ' .
+		      'FROM users WHERE uid = :uid',
+		      array('yes' => _("yes"), 'no' => _("no"), 'uid' => $uid));
     if ($user == false)
       not_found();
 
@@ -90,29 +80,18 @@ class UsersController extends AController {
   /* Check a form for the user editor */
   private static function verifyForm($data, $op) {
     $errors = array();
-    if ($op != 'meedit') {
-      if (empty($data['login']))
-	$errors[] = _("Please set the login name");
-    }
-
-    switch ($op) {
-    case 'add':
-      if (empty($data['pass']))
-	$errors[] = _("Please set a password");
-      elseif ($data['pass'] != $data['pass_confirm'])
-	$errors[] = _("The passwords are different, please check");
-      break;
-    case 'edit':
-    case 'meedit':
-      if ($data['pass'] != $data['pass_confirm'])
-	$errors[] = _("The passwords are different, please check");
-      break;
-    }
-    if (empty($data['email']))
+    if (empty($data['email'])) {
       $errors[] = _("The email address is mandatory");
+    }
+    if ($data['pass'] != $data['pass_confirm']) {
+      $errors[] = _("The passwords are different, please check");  
+    }
+    if ($op=="add" && empty($data['pass'])) {
+      $errors[] = _("Please set a password");
+    }
     return $errors;
   }
-
+    
   /*
    * Add a user (for admins only)
    */
@@ -130,30 +109,30 @@ class UsersController extends AController {
       if (empty($errors)) {
         global $db;
 	$apikey=$this->generateApiKey();
-        $db->q('INSERT INTO `users` (login, pass, email, enabled, admin, apikey) VALUES(?, ?, ?, ?, ?, ?)',
+        $db->q('INSERT INTO `users` (pass, email, enabled, admin, url, apikey) VALUES(?, ?, ?, ?, ?, ?)',
                array(
-                     $_POST['login'],
                      crypt($_POST['pass'],$this->getSalt()),
                      $_POST['email'],
                      ($_POST['enabled'] == 'on') ? 1 : 0,
                      ($_POST['admin'] == 'on') ? 1 : 0,
+                     $_POST['url'],
 		     $apikey,
                      )
                );
 	$uid = $db->lastInsertId();
 	$args = array(
 		      'uid' => $uid,
-		      'login' => $_POST['login'],
 		      'pass' => $_POST['pass'],
 		      'email' => $_POST['email'],
 		      'enabled' => ($_POST['enabled'] == 'on'),
 		      'admin' => ($_POST['admin'] == 'on'),
+		      'url' => $_POST['url'],
 		      'apikey' => $apikey,
 		      );
 	Hooks::call('users_add', $args);
 
         // Message + redirection
-	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("Ajout OK..."));
+	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("User added..."));
 	exit;
       }
     }
@@ -171,6 +150,8 @@ class UsersController extends AController {
      */
     $form_data = (empty($_POST)) ? array() : $_POST; 
 
+    $form_data['enabled']=1; // enabled by default
+
     $this->render('form', array('op' => 'add', 'data' => $form_data, 'errors' => $errors));
   }
 
@@ -185,7 +166,7 @@ class UsersController extends AController {
       not_found();
     global $db;
     $uid = intval($params[0]);
-    $user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($uid));
+    $user = $db->qone('SELECT uid, email, enabled, admin, url, apikey FROM users WHERE uid = ?', array($uid));
 
     if ($user == false)
       not_found();
@@ -196,18 +177,18 @@ class UsersController extends AController {
       $errors = self::verifyForm($_POST, 'edit');
 
       if (empty($errors)) {
-        $db->q('UPDATE users SET login = ?, email = ?, enabled = ?, admin = ? WHERE uid = ?',
+        $db->q('UPDATE users SET email=?, enabled=?, admin=?, url=? WHERE uid=?',
                array(
-                     $_POST['login'],
                      $_POST['email'],
                      ($_POST['enabled'] == 'on') ? 1 : 0,
                      ($_POST['admin'] == 'on') ? 1 : 0,
+                     $_POST['url'],
 		     $user->uid,
                      )
                );
 
 	$old_user = $user;
-	$user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($user->uid));
+	$user = $db->qone('SELECT uid, email, enabled, admin, url FROM users WHERE uid=?', array($user->uid));
 	$args = array('old_user' => $old_user, 'new_user' => $user);
 	Hooks::call('users_edit', $args);
 
@@ -219,14 +200,14 @@ class UsersController extends AController {
 	    $this->mail_notify_new_account($user->email, $user->login, $_POST['pass']);
 	  }
 
-	  $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
+	  $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
 
-	  $args = array('uid' => $user->uid, 'login' => $user->login, 'pass' => $_POST['pass']);
+	  $args = array('uid' => $user->uid, 'email' => $user->email, 'pass' => $_POST['pass']);
 	  Hooks::call('users_edit_pass', $args);
 	}
 
         // Message + redirection
-	header('Location: ' . BASE_URL . 'users/show/' . $user->uid . '?msg=' . _("Mise à jour OK..."));
+	header('Location: ' . BASE_URL . 'users/show/' . $user->uid . '?msg=' . _("User changed..."));
 	exit;
       }
     }
@@ -249,7 +230,7 @@ class UsersController extends AController {
       $form_data = $_POST;
     }
 
-    $this->render('form', array('op' => 'edit', 'login' => $user->login, 'data' => $form_data, 'errors' => $errors));
+    $this->render('form', array('op' => 'edit', 'data' => $form_data, 'errors' => $errors));
   }
 
 
@@ -263,7 +244,7 @@ class UsersController extends AController {
       not_found();
     global $db;
     $uid = intval($params[0]);
-    $user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($uid));
+    $user = $db->qone('SELECT uid, email, enabled, admin, url FROM users WHERE uid = ?', array($uid));
     if ($user == false)
       not_found();
 
@@ -295,7 +276,7 @@ class UsersController extends AController {
       not_found();
     global $db;
     $uid = intval($params[0]);
-    $user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($uid));
+    $user = $db->qone('SELECT uid, email, enabled, admin FROM users WHERE uid=?', array($uid));
     if ($user == false)
       not_found();
     setcookie('impersonate', $user->uid, 0, '/');
@@ -325,7 +306,7 @@ class UsersController extends AController {
 
     $uid=$GLOBALS['me']['uid'];
 
-    $user = $db->qone('SELECT uid, login, email, enabled, admin ' .
+    $user = $db->qone('SELECT uid, email, enabled, admin, url ' .
                       'FROM users WHERE uid = :uid',
                       array('uid' => $GLOBALS['me']['uid']));
     if ($user == false)
@@ -338,20 +319,20 @@ class UsersController extends AController {
 	$errors = self::verifyForm($_POST, 'meedit');
 
 	if (empty($errors)) {
-	  $db->q('UPDATE users SET email = ? WHERE uid = ?', array($_POST['email'], $user->uid));
+	  $db->q('UPDATE users SET email=? WHERE uid=?', array($_POST['email'], $user->uid));
 	  $old_user = $user;
-	  $user = $db->qone('SELECT uid, login, email, enabled, admin FROM users WHERE uid = ?', array($user->uid));
+	  $user = $db->qone('SELECT uid, email, enabled, admin FROM users WHERE uid = ?', array($user->uid));
 	  $args = array('old_user' => $old_user, 'new_user' => $user);
 	  Hooks::call('users_edit', $args);
 
 	  if (!empty($_POST['pass'])) {
-	    $db->q('UPDATE users SET pass = ? WHERE uid = ?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
-	    $args = array('uid' => $user->uid, 'login' => $user->login, 'pass' => $_POST['pass']);
+	    $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
+	    $args = array('uid' => $user->uid, 'email' => $user->email, 'pass' => $_POST['pass']);
 	    Hooks::call('users_edit_pass', $args);
 	  }
 
 	  // Message + redirection
-	  header('Location: ' . BASE_URL . 'users/me?msg=' . _("Mise à jour OK..."));
+	  header('Location: ' . BASE_URL . 'users/me?msg=' . _("User account changed..."));
 	  exit;
 	}
       }
@@ -405,7 +386,7 @@ Votre mot de passe est : %s
 Cordialement,
 
 L'équipe technique d'Octopuce
-"),FULL_URL,$login,$pass);
+"),FULL_URL,$email,$pass);
 
   $headers = 'From: '.MAIL_FROMNAME.' <'.MAIL_FROM.'>'. "\r\n" .
     'Reply-To: '.MAIL_FROM. "\r\n" .
@@ -434,7 +415,7 @@ Nous vous invitons à le modifier en cliquant sur 'Mon compte' puis 'Modifier'
 Cordialement,
 
 L'équipe technique d'Octopuce
-"),FULL_URL,$login,$pass);
+"),FULL_URL,$email,$pass);
 
   $headers = 'From: '.MAIL_FROMNAME.' <'.MAIL_FROM.'>'. "\r\n" .
     'Reply-To: '.MAIL_FROM. "\r\n" .

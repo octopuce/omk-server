@@ -1,7 +1,7 @@
 <?php
 if ($op == 'edit') {
-  $title = $login;
-  $breadcrumb = array('users' => 'Users', 'users/show/' . $login => $login, '' => _("Modifier"));
+  $title = $data['email'];
+  $breadcrumb = array('users' => 'Users', 'users/show/' . $data['uid'] => $data['email'], '' => _("Edit"));
 }
 elseif ($op == 'meedit') {
   $title = _("Edit my account");
@@ -11,7 +11,6 @@ else {
   $title = _("Create a user");
   $breadcrumb = array('users' => 'Users', '' => _("Add"));
 }
-
 
 require VIEWS . '/header.php';
 ?>
@@ -30,12 +29,11 @@ require VIEWS . '/header.php';
 </div>
 <?php endif; ?>
 
-
 <form action="" method="post">
   <fieldset style="width: 60%;">
     <legend><?php __("Identity"); ?></legend>
     <?php if ($op != 'meedit'): ?>
-    <?php input('login', _("Login:"), 'text', $data['login']); ?>
+    <?php input('email', _("Email address"), 'text', $data['email']); ?>
     <?php endif; ?>
 
     <?php if ($op == 'edit' || $op == 'meedit'): ?>
@@ -50,12 +48,18 @@ require VIEWS . '/header.php';
     <?php endif; ?>
     <br />
 
-    <?php input('email', _("Email address"), 'text', $data['email']); ?>
     <?php if ($op != 'meedit'): ?>
     <?php input('admin', _("Is it an administrator?"), 'checkbox', $data['admin']); ?>
     <?php input('enabled', _("Is it enabled?"), 'checkbox', $data['enabled']); ?>
     <?php endif; ?>
-    <?php input('apikey', _("API Key"), 'text', $data['apikey']); ?>
+    <?php input('url', _("Application API URL"), 'text', $data['url']); ?>
+<?php
+    if ($op == 'add') {
+      echo '<label class="associate" for="apikey">API Key</label>'._('Will be created automatically').'</br />';
+    } else {
+      echo '<label class="associate" for="apikey">API Key</label>'.$data['apikey'].'</br />';     
+    }
+?>
   </fieldset>
 
   <p class="submit"><input type="submit" value="<?php

@@ -26,7 +26,7 @@ class UsersHooks {
   public function post_check_user_identity(&$me) {
     if (is_admin() && !empty($_COOKIE['impersonate'])) {
       global $db;
-      $query = 'SELECT uid, login, email, admin '
+      $query = 'SELECT uid, email, admin '
         . 'FROM users '
         . 'WHERE uid = ?';
       $user = $db->qone($query, array(intval($_COOKIE['impersonate'])), PDO::FETCH_ASSOC);
@@ -48,8 +48,8 @@ class UsersHooks {
   public function content_top(&$html) {
     if (!empty($GLOBALS['me']['impersonator'])) {
       $msg = sprintf(_("En vrai, vous êtes %s et vous vous faites passer pour %s."),
-                     $GLOBALS['me']['impersonator']['login'],
-                     $GLOBALS['me']['login']) . ' ' .
+                     $GLOBALS['me']['impersonator']['email'],
+                     $GLOBALS['me']['email']) . ' ' .
         '<a href="' . BASE_URL . 'users/stopimpersonate">' . _("Arrêter l'usurpation d'identité.") . '</a>';
       $html[] = '<p>' . $msg . '</p>';
     }
@@ -59,26 +59,26 @@ class UsersHooks {
    * Mise à jour d'un .htaccess
    */
   public function users_add($user) {
-    htpasswd_add(__DIR__ . '/htpasswd.users', $user['login'], crypt($user['pass']));
+    htpasswd_add(__DIR__ . '/htpasswd.users', $user['email'], crypt($user['pass']));
   }
 
   public function users_edit($args) {
-    if ($args['old_user']->login != $args['new_user']->login) {
+    if ($args['old_user']->email != $args['new_user']->email) {
       htpasswd_updatelogin(__DIR__ . '/htpasswd.users',
-			   $args['old_user']->login,
-			   $args['new_user']->login);
+			   $args['old_user']->email,
+			   $args['new_user']->email);
     }
   }
 
   public function users_edit_pass($args) {
     htpasswd_updatepasswd(__DIR__ . '/htpasswd.users',
-			  $args['login'],
+			  $args['email'],
 			  crypt($args['pass']));
   }
 
   public function users_delete($args) {
     $user = $args[0];
     htpasswd_delete(__DIR__ . '/htpasswd.users',
-		    $user->login);
+		    $user->email);
   }
 }
