@@ -3,7 +3,6 @@
 //require_once MODULES . '/servers/lib.php';
 
 class UsersController extends AController {
-  static private $contacts_types = array('in_email', 'in_tel', 'out_email', 'out_tel');
 
   /*
    * Users are redirected to "my account"
@@ -245,12 +244,6 @@ class UsersController extends AController {
 
     if (empty($_POST)) {
       $form_data = get_object_vars($user); // get_object_vars : stdClass -> array
-
-      foreach (self::$contacts_types as $type) {
-	$contacts = $db->qlistone('SELECT contact FROM contacts WHERE uid = ? AND type = ? ORDER BY contact',
-				  array($uid, $type));
-        $form_data['contacts_' . $type] = implode("\n", $contacts);
-      }
     }
     else {
       $form_data = $_POST;
@@ -338,11 +331,6 @@ class UsersController extends AController {
     if ($user == false)
       not_found();
 
-    $contacts = array();
-    foreach (self::$contacts_types as $type)
-      $contacts[$type] = $db->qlistone('SELECT contact FROM contacts WHERE uid = ? AND type = ?',
-                                       array($GLOBALS['me']['uid'], $type));
-
     if ($params[0] == 'edit') {
       $errors = array();
 
@@ -372,23 +360,16 @@ class UsersController extends AController {
        * Valeurs pour pré-remplir le formulaire
        *
        * Deux cas possibles...
-       * 1/ On vient d'arriver sur la page ( empty($_POST) ) :
+       * 1/ On vient d'arriver sur la page ( empty($_POST) ):
        * on pré-rempli le formulaire avec les données de l'utilisateur
        *
-       * 2/ On à validé le formulaire, mais il y a une erreur :
+       * 2/ On à validé le formulaire, mais il y a une erreur:
        * on pré-rempli le formulaire avec les données de la saisie.
        */
 
       if (empty($_POST)) {
 	$form_data = get_object_vars($user); // get_object_vars : stdClass -> array
-
-	foreach (self::$contacts_types as $type) {
-	  $contacts = $db->qlistone('SELECT contact FROM contacts WHERE uid = ? AND type = ? ORDER BY contact',
-				    array($uid, $type));
-	  $form_data['contacts_' . $type] = implode("\n", $contacts);
-	}
-      }
-      else {
+      } else {
 	$form_data = $_POST;
       }
 
