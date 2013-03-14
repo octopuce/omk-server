@@ -11,7 +11,7 @@ function check_user_identity($required=true) {
   } 
 
   /*
-   * Autre exemple de hook possible :
+   * Autre exemple de hook possible:
    * Hooks::call('pre_check_user_identity', array($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']));
    */
   require_once __DIR__ . '/../modules/users/libs/users.php';
@@ -37,6 +37,6 @@ function check_user_identity($required=true) {
 /** Returns TRUE if the current user is an administrator
  */
 function is_admin() {
-  return ($GLOBALS["me"]["admin"] != 0);
+  return (isset($GLOBALS["me"]["admin"]) && $GLOBALS["me"]["admin"]!= 0);
 }
 

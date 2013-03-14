@@ -24,7 +24,7 @@ if (empty($title))
 		     Hooks::call('content_top', $html);
 		     echo implode($html, "\n");
 		     ?>
-<p class="login"><?php printf(_("Connected as %s"),"<strong>".$GLOBALS["me"]["login"]."</strong>"); ?></p>
+<p class="login"><?php if (isset($GLOBALS["me"])) { ?>printf(_("Connected as %s"),"<strong>".$GLOBALS["me"]["login"]."</strong>"); ?><?php } ?></p>
 		</div>
 		<h1>OpenMediaKit Transcoder<?php if (!empty($title)): ?> - <?php print $title; ?><?php endif; ?></h1>
                 <div id="menu"><?php require VIEWS . '/menu.php'; ?></div>

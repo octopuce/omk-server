@@ -111,7 +111,7 @@ class ApiController extends AController {
     $this->params['admin']=1;
     $uid=$user-addUser($this->params);
     if (!$uid) {
-      $this->api
+      $this->api->apiError(10,_("An error happened when creating the account. Please retry later."));
     } 
     // Send a validation email to the user
     $user->sendValidationEmail($uid);

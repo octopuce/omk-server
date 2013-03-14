@@ -85,7 +85,7 @@ class Api {
     global $db;
     $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, params=?;";
     if (!is_array($params)) $params=array();
-    $db->q($query,array($this->me["uid"],$retry,$task,$media,serialize($params));
+    $db->q($query,array($this->me["uid"],$retry,$task,$media,serialize($params)));
     return $db->lastInsertId();
   }
   
