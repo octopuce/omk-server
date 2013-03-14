@@ -243,7 +243,7 @@ class Api {
     if (!$this->me["enabled"])  {
       $this->apiError(3,_("Your account is disabled, please contact the administrator of this transcoder."));
     }
-    // TODO : handle blacklist of application and/or specific version
+    $this->allowApplication($_REQUEST["application"], $_REQUEST["version"]);
     return $this->me;
   }
 
@@ -257,8 +257,14 @@ class Api {
    */
   public function enforceLimits() {
     global $db;
-    $query = 'SELECT COUNT(*) FROM apicalls WHERE calltime>DATE_SUB(NOW(),INTERVAL 60 SECOND) AND user=?;';
-    $rate=$db->qonefield($query,array($this->me["uid"]));
+    if ($this->me['uid']) {
+      $query = 'SELECT COUNT(*) FROM apicalls WHERE calltime>DATE_SUB(NOW(),INTERVAL 60 SECOND) AND user=?;';
+      $rate=$db->qonefield($query,array($this->me["uid"]));
+    } else {
+      // unidentified api calls have an allowed rate of half the identified one
+      $query = 'SELECT COUNT(*) FROM apicalls WHERE calltime>DATE_SUB(NOW(),INTERVAL 120 SECOND) AND ip=?;';
+      $rate=$db->qonefield($query,array($_SERVER["REMOTE_ADDR"]));      
+    }
     if (isset($this->me["rate"]) && $this->me["rate"]) $myrate=$this->me["rate"]; else $myrate=RATE_DEFAULT;
     if ($rate>=$myrate) {
       $this->apiError(4,_("You sent too many queries per minute, please wait a little bit before sending more..."));
@@ -314,6 +320,12 @@ class Api {
     touch(TMP_PATH."/cleanup-".$hostname);
   } // cleanupQueueLocks
 
+
+  function allowApplication($application, $version) {
+    // TODO : allow a list of blacklisted Application or Application/Version to trigger an error
+    // if (!$allowed) $this->apiError(9,_("This application is not allowed, you may ask the transcoder owner why or try to use another public transcoder"));
+    return true;
+  }
 
 } // Class Api
 

@@ -14,8 +14,12 @@ function check_user_identity($required=true) {
    * Autre exemple de hook possible :
    * Hooks::call('pre_check_user_identity', array($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']));
    */
-  require_once __DIR__ . '/../modules/users/lib.php';
-  $GLOBALS["me"] = Users::auth($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+  require_once __DIR__ . '/../modules/users/libs/users.php';
+  if ($required && isset($_SERVER['PHP_AUTH_USER'])) {
+    $GLOBALS["me"] = Users::auth($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+  } else {
+    $GLOBALS["me"]=array();
+  }
 
   if ($required && !$GLOBALS["me"]) {
     header('WWW-Authenticate: Basic realm="' . $realm . '"');

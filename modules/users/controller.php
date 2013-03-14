@@ -1,8 +1,13 @@
 <?php
 
-//require_once MODULES . '/servers/lib.php';
+require_once MODULES . '/users/libs/users.php';
 
 class UsersController extends AController {
+
+
+  function UsersController() {
+    $this->user=new Users();
+  }
 
   /*
    * Users are redirected to "my account"
@@ -91,6 +96,7 @@ class UsersController extends AController {
     }
     return $errors;
   }
+
     
   /*
    * Add a user (for admins only)
@@ -107,53 +113,34 @@ class UsersController extends AController {
       $errors = $this->verifyForm($_POST, 'add');
 
       if (empty($errors)) {
-        global $db;
-	$apikey=$this->generateApiKey();
-        $db->q('INSERT INTO `users` (pass, email, enabled, admin, url, apikey) VALUES(?, ?, ?, ?, ?, ?)',
-               array(
-                     crypt($_POST['pass'],$this->getSalt()),
-                     $_POST['email'],
-                     ($_POST['enabled'] == 'on') ? 1 : 0,
-                     ($_POST['admin'] == 'on') ? 1 : 0,
-                     $_POST['url'],
-		     $apikey,
-                     )
-               );
-	$uid = $db->lastInsertId();
-	$args = array(
-		      'uid' => $uid,
-		      'pass' => $_POST['pass'],
-		      'email' => $_POST['email'],
-		      'enabled' => ($_POST['enabled'] == 'on'),
-		      'admin' => ($_POST['admin'] == 'on'),
-		      'url' => $_POST['url'],
-		      'apikey' => $apikey,
-		      );
-	Hooks::call('users_add', $args);
-
-        // Message + redirection
-	header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("User added..."));
+	$_POST["apikey"]=$this->generateApiKey();
+	$uid=$this->user->addUser($_POST);
+	if ($uid) {
+	  $args = array(
+			'uid' => $uid,
+			'pass' => $_POST['pass'],
+			'email' => $_POST['email'],
+			'enabled' => ($_POST['enabled'] == 'on'),
+			'admin' => ($_POST['admin'] == 'on'),
+			'url' => $_POST['url'],
+			'apikey' => $apikey,
+			);
+	  Hooks::call('users_add', $args);
+	  // Message + redirection
+	  header('Location: ' . BASE_URL . 'users/show/' . $uid . '?msg=' . _("User successfully added."));
+	} else {
+	  // Message + redirection
+	  header('Location: ' . BASE_URL . 'users?msg=' . _("An error occurred when adding the user."));
+	}
 	exit;
       }
     }
 
-
-    /*
-     * Valeurs pour pré-remplir le formulaire
-     *
-     * Deux cas possibles...
-     * 1/ On vient d'arriver sur la page ( empty($_POST) ) :
-     * on pré-rempli le formulaire avec... rien (nouvel utilisateur)
-     *
-     * 2/ On à validé le formulaire, mais il y a une erreur :
-     * on pré-rempli le formulaire avec les données de la saisie.
-     */
     $form_data = (empty($_POST)) ? array() : $_POST; 
-
     $form_data['enabled']=1; // enabled by default
-
     $this->render('form', array('op' => 'add', 'data' => $form_data, 'errors' => $errors));
-  }
+  } // addAction
+
 
 
   /*

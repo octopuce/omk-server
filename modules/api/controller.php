@@ -44,12 +44,12 @@ class ApiController extends AController {
     $this->me=$this->api->checkCallerIdentity();
     $this->api->enforceLimits();
     // for each params, tell its name, and its type and if it is mandatory
-    $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
-				   "id" => array("integer",true),
-				   "url" => array("string",true),
-				   "dometadata" => array("boolean",false,true),
-				   // "cropdetect" => array("boolean",false,false),
-			       ));
+    $this->params=$this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
+						 "id" => array("integer",true),
+						 "url" => array("string",true),
+						 "dometadata" => array("boolean",false,true),
+						 // "cropdetect" => array("boolean",false,false),
+						 ));
     
     $this->api->logApiCall("newmedia");
     if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
@@ -72,4 +72,50 @@ class ApiController extends AController {
   }
 
 
-}
+  /** ********************************************************************
+   * When a new client is searching for a public transcoder, it can call 
+   * http://discovery.open-mediakit.org/public?application=<application>&version=<version>
+   * to obtain a json-list of the currently active public transcoders.
+   * then it choose one of them and call the subscribe api call
+   * on this transcoder to subscribe to it and get an account there.
+   * the parameters are : 
+   * email: the email address of the subscriber (*it will be verified by sending an email*)
+   * url: url of the api root of the client. will be used to call 
+   * application: client application that request an account
+   * version: version of the client application
+   * non-mandatory parameters:
+   * lang: language of the client, default to en_US (for discussion & email verification text)
+   */
+  public function subscribeAction() {
+    if (!defined("PUBLIC_TRANSCODER") || !PUBLIC_TRANSCODER) {
+      $this->api->apiError(8,_("This server is not a public transcoder, please use another one"));
+    }
+    // anonymous api call   $this->me=$this->api->checkCallerIdentity();
+    $this->api->enforceLimits();
+    // for each params, tell its name, and its type and if it is mandatory
+    $this->params = $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
+						   "email" => array("string",true),
+						   "url" => array("string",true),
+						   "application" => array("string",true),
+						   "version" => array("string",true),
+						   "lang" => array("string",false,"en_US"),
+						   ));
+    
+    $this->api->logApiCall("subscribe");
+    // Check for application / version blacklist
+    $this->api->allowApplication($this->params['application'], $this->params['version']);
+    // Create an account 
+    $this->params['pass']=$user->randomPass();
+    $this->params['enabled']=1;
+    $this->params['validated']=0;
+    $this->params['admin']=1;
+    $uid=$user-addUser($this->params);
+    if (!$uid) {
+      $this->api
+    } 
+    // Send a validation email to the user
+    $user->sendValidationEmail($uid);
+  }
+  
+
+} /* APIController */
