@@ -22,6 +22,13 @@ class ApiController extends AController {
 
 
   public function indexAction() {
+    if (!empty($_REQUEST["action"])) {
+      $call=$_REQUEST["action"]."Action";
+      if (method_exists($this,$call)) {
+	return $this->$call();
+      }
+    }
+
     // TODO Show the API Documentation ;)     
     $headers = array(
 		     'name' => _('Name'),
@@ -40,7 +47,7 @@ class ApiController extends AController {
    * Params for METADATA TASK : dometadata (default true) [cropdetect (default false)]
    * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
    */
-  public function newmediaAction() {
+  public function app_new_mediaAction() {
     $this->me=$this->api->checkCallerIdentity();
     $this->api->enforceLimits();
     // for each params, tell its name, and its type and if it is mandatory
