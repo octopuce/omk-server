@@ -168,6 +168,7 @@ class Api {
   public function logApiCall($api) {
     global $db;
     //    foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
+    if (empty($this->me["uid"])) $me=0; else $me=$this->me["uid"];
     $parray=serialize($this->params);
     if (!empty($_REQUEST["application"]) && !empty($_REQUEST["version"])) {
       $appversion=$db->qone("SELECT id FROM appversions WHERE application=? AND version=?",array($_REQUEST["application"],$_REQUEST["version"]));
@@ -179,7 +180,7 @@ class Api {
 
     $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, api=?, params=?, ip=?, appversion=?;';
     $db->q($query,
-	   array($this->me["uid"],$api,$parray,$_SERVER["REMOTE_ADDR"],$appversion->id)
+	   array($me,$api,$parray,$_SERVER["REMOTE_ADDR"],$appversion->id)
 		 );
   }
 
@@ -220,6 +221,7 @@ class Api {
     if ($error) {
       $this->apiError(5,$error);
     }
+    return $this->params;
   }
 
 
@@ -257,7 +259,7 @@ class Api {
    */
   public function enforceLimits() {
     global $db;
-    if ($this->me['uid']) {
+    if (!empty($this->me['uid'])) {
       $query = 'SELECT COUNT(*) FROM apicalls WHERE calltime>DATE_SUB(NOW(),INTERVAL 60 SECOND) AND user=?;';
       $rate=$db->qonefield($query,array($this->me["uid"]));
     } else {

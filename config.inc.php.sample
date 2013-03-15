@@ -39,6 +39,11 @@ $db->path = ROOT . '/octomanager.db';
  */
 define('BASE_URL', '/');
 define('STATIC_URL', '/static/');
+define('FULL_URL', 'http://omk.local/'); // the root url of the application, ending by /
+
+// Sender and sender's name of all outgoing emails: (PLEASE CHANGE THIS)
+define('MAIL_FROM', 'test@openmediakit.org');
+define('MAIL_FROMNAME', 'unconfigured openmediakit transcoder');
 
 
 /** Is it a PUBLIC transcoder (as a result, anybody can use it to transcode videos) ? 
@@ -47,3 +52,5 @@ define('STATIC_URL', '/static/');
  * and announce your transcoder availability
  */
 define('PUBLIC_TRANSCODER',1);
+
+define('RANDOM_SALT','vook0Hea3Quou0fohX'); // CHANGE THIS TOO, any random string will be fine

@@ -100,21 +100,21 @@ class ApiController extends AController {
 						   "version" => array("string",true),
 						   "lang" => array("string",false,"en_US"),
 						   ));
-    
+    require_once(MODULES."/users/libs/users.php");
     $this->api->logApiCall("subscribe");
     // Check for application / version blacklist
     $this->api->allowApplication($this->params['application'], $this->params['version']);
     // Create an account 
-    $this->params['pass']=$user->randomPass();
+    $this->params['pass']=Users::randomPass();
     $this->params['enabled']=1;
     $this->params['validated']=0;
-    $this->params['admin']=1;
-    $uid=$user-addUser($this->params);
+    $this->params['admin']=0;
+    $uid=Users::addUser($this->params);
     if (!$uid) {
       $this->api->apiError(10,_("An error happened when creating the account. Please retry later."));
     } 
     // Send a validation email to the user
-    $user->sendValidationEmail($uid);
+    Users::sendValidationEmail($uid);
   }
   
 

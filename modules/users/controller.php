@@ -9,6 +9,7 @@ class UsersController extends AController {
     $this->user=new Users();
   }
 
+
   /*
    * Users are redirected to "my account"
    * Administrators are shown the user list.
@@ -113,7 +114,7 @@ class UsersController extends AController {
       $errors = $this->verifyForm($_POST, 'add');
 
       if (empty($errors)) {
-	$_POST["apikey"]=$this->generateApiKey();
+	$_POST["apikey"]=Users::generateApiKey();
 	$uid=$this->user->addUser($_POST);
 	if ($uid) {
 	  $args = array(
@@ -187,7 +188,7 @@ class UsersController extends AController {
 	    $this->mail_notify_new_account($user->email, $user->login, $_POST['pass']);
 	  }
 
-	  $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
+	  $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],Users::getSalt()), $user->uid));
 
 	  $args = array('uid' => $user->uid, 'email' => $user->email, 'pass' => $_POST['pass']);
 	  Hooks::call('users_edit_pass', $args);
@@ -203,10 +204,10 @@ class UsersController extends AController {
      * Valeurs pour pré-remplir le formulaire
      *
      * Deux cas possibles...
-     * 1/ On vient d'arriver sur la page ( empty($_POST) ) :
+     * 1/ On vient d'arriver sur la page ( empty($_POST) ) :
      * on pré-rempli le formulaire avec les données de l'utilisateur
      *
-     * 2/ On à validé le formulaire, mais il y a une erreur :
+     * 2/ On à validé le formulaire, mais il y a une erreur :
      * on pré-rempli le formulaire avec les données de la saisie.
      */
 
@@ -285,6 +286,34 @@ class UsersController extends AController {
 
 
   /*
+   * Validate a user's email
+   */
+  public function validateAction($params) {
+    global $db;
+    $uid = intval($params[0]);
+    $key = $params[1];
+    if (!$uid || !preg_match('#^[0-9a-fA-F]{5}$#',$key)) {
+      $errors[]=_("The address you entered is incorrect, please check the mail you received");
+      $this->render('index', array('errors' => $errors));
+      exit();
+    }
+    $user = Users::get($uid);
+
+    if ($user==false || $key!=substr(md5(RANDOM_SALT . "_" .$user["email"]),0,5)) {
+      $errors[]=_("The address you entered is incorrect, please check the mail you received");
+      $this->render('index', array('errors' => $errors));
+      exit();
+    }
+
+    $db->q('UPDATE users SET validate=1 WHERE uid=?',array($uid));
+
+    $errors[]=_("Your account has been validated, you can now use the OpenMediakit Transcoder service");
+    $this->render('index', array('errors' => $errors));
+  }
+
+
+
+  /*
    * My Account
    */
   public function meAction($params) {
@@ -313,7 +342,7 @@ class UsersController extends AController {
 	  Hooks::call('users_edit', $args);
 
 	  if (!empty($_POST['pass'])) {
-	    $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],$this->getSalt()), $user->uid));
+	    $db->q('UPDATE users SET pass=? WHERE uid=?', array(crypt($_POST['pass'],Users::getSalt()), $user->uid));
 	    $args = array('uid' => $user->uid, 'email' => $user->email, 'pass' => $_POST['pass']);
 	    Hooks::call('users_edit_pass', $args);
 	  }
@@ -346,6 +375,7 @@ class UsersController extends AController {
     else
       $this->render('me', array('user' => $user, 'contacts' => $contacts));
   }
+
 
   public function logoutAction() {
     $realm = 'OpenMediaKit Transcoder';
@@ -413,20 +443,6 @@ L'équipe technique d'Octopuce
 }
 
 
-/** Returns a hash for the crypt password hashing function.
- * as of now, we use php5.3 almost best hashing function: SHA-256 with 1000 rounds and a random 16 chars salt.
- */
-private function getSalt() {
-  $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 16);
-  return '$5$rounds=1000$'.$salt.'$';
-}
 
-/** Generate an API key, an api key is a 32 characters secret shared between the transcoder and the application.
- * This key is used by API calls to ask for media jobs
- */
-private function generateApiKey() {
-  return md5(mt_rand().mt_rand().mt_rand().mt_rand());
-}
+} // UsersController 
 
-
-}
