@@ -334,7 +334,7 @@ class Api {
   /** Return the list of cron tasks to launch.
    * The parameters are as follow : 
    */
-  function cronTaskList() {
+  function cronTasksList() {
     global $db;
     // We cronifie only enabled and validated users with proper API url
 
@@ -343,16 +343,16 @@ class Api {
 
     // We also cronifie every 1 hours, each users whose last activity is more than one month ago, 
     // and whose last successfull cron is less than a month ago.
-    return $db->qlist("SELECT uid, api FROM users WHERE 
+    return $db->qlist("SELECT uid, url FROM users WHERE 
     enabled=1 AND validated=1 AND url!='' AND 
     (
-      ( lastactivity > DATE_SUB(NOW(), INTERVAL 31 DAYS) 
-      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 7 DAYS) 
-      AND  lastcron < DATE_SUB(NOW(), INTERVAL 5 MINUTES)  ) 
+      ( lastactivity > DATE_SUB(NOW(), INTERVAL 31 DAY) 
+      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 7 DAY) 
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 5 MINUTE)  ) 
     OR 
-      ( lastactivity <= DATE_SUB(NOW(), INTERVAL 31 DAYS) 
-      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 31 DAYS)  
-      AND  lastcron < DATE_SUB(NOW(), INTERVAL 1 HOURS) ) 
+      ( lastactivity <= DATE_SUB(NOW(), INTERVAL 31 DAY) 
+      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 31 DAY)  
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 1 HOUR) ) 
     )
     ",NULL, PDO::FETCH_ASSOC);    
   }
@@ -380,7 +380,7 @@ class Api {
     // TODO: delete the old original videos (kept for more than MAX_KEEP_ORIGINAL_DAYS days) after having no job to do with them? 
 
     // We disable (enabled=0) (and tell it by mail) daily, any user account whose last activity is more than 2 month ago AND last successfull cron is more than a month ago
-    $disables=$db->qlist("SELECT * FROM users WHERE enabled=1 AND validated=1 AND lastactivity < DATE_SUB(NOW(), INTERVAL 62 DAYS) AND lastcronsuccess < DATE_SUB(NOW(), INTERVAL 31 DAYS);", NULL, PDO::FETCH_ASSOC);
+    $disables=$db->qlist("SELECT * FROM users WHERE enabled=1 AND validated=1 AND lastactivity < DATE_SUB(NOW(), INTERVAL 62 DAY) AND lastcronsuccess < DATE_SUB(NOW(), INTERVAL 31 DAY);", NULL, PDO::FETCH_ASSOC);
     foreach($disables as $disable) {
       $db->q("UPDATE users SET enabled=0 WHERE uid='".$disable["uid"]."';");
 
@@ -444,7 +444,7 @@ The OpenMediakit Transcoder public instance at
 			 CURLOPT_FOLLOWLOCATION => true,
 			 CURLOPT_CONNECTTIMEOUT => 5,
 			 CURLOPT_TIMEOUT => 240, // 4 minutes
-			 CURLOPT_USERAGENT => "OpenMediaKit-Transcoder/".OMKT_VERSION." (Cron Daemon)"
+			 CURLOPT_USERAGENT => "OpenMediaKit-Transcoder/".OMKT_VERSION." (Cron Daemon)",
 			 CURLOPT_MAXREDIRS => 5);
 
     if ($GLOBALS["DEBUG"]) $std_options[CURLOPT_VERBOSE]=true;

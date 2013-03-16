@@ -47,7 +47,7 @@ class Users {
     $url = (empty($informations['url'])) ? '' :  trim((string)$informations['url']);
     $apikey=Users::generateApiKey();
 
-    $db->q('INSERT INTO `users` (uid, pass, email, enabled, validated, admin, url, apikey) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)',
+    $db->q('INSERT INTO `users` (uid, pass, email, enabled, validated, admin, url, apikey, lastactiviyy) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, NOW())',
 	   array(
 		 $pass,
 		 $email,
