@@ -1,0 +1,14 @@
+<?php
+
+define("RANDOM_SALT","iqu1xooM1eil");
+define("MAIL_FROMNAME","OpenMediaKit Team");
+define("MAIL_FROM","team@open-mediakit.org");
+define("FULL_URL","http://discovery.open-mediakit.org/");
+
+mysql_connect("localhost","login","password");
+mysql_select_db("discovery");
+
+$allowsettings=array("country","settings");
+
+require_once("functions.php");
+

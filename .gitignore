@@ -6,3 +6,4 @@ htpasswd.*
 *.mo
 tmp/
 storage/
+discovery/config.php
