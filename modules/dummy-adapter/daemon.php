@@ -24,7 +24,7 @@ $api=new Api();
 $api->cleanupQueueLocks();
 
 // Search for a task 
-$task=$api->getQueuedTaskLock(TASK_DOWNLOAD,"http");
+$task=$api->getQueuedTaskLock(TASK_DOWNLOAD,"dummy");
 
 if (!$task) { 
   // we sleep for a little while, thanks to that, we can launch that process as soon as we want: 
