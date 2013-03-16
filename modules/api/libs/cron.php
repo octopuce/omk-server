@@ -62,11 +62,20 @@ class Cron {
     if (defined('PUBLIC_TRANSCODER') && PUBLIC_TRANSCODER &&
 	defined('TRANSCODER_NAME') && TRANSCODER_NAME!='' &&
 	defined('TRANSCODER_ADMIN_EMAIL') && TRANSCODER_ADMIN_EMAIL!='') {
-      $f=@fopen("http://discovery.open-mediakit.org/?action=transcoder_is_available&name=".urlencode(TRANSCODER_NAME)."&email=".urlencode(TRANSCODER_ADMIN_EMAIL)."","rb");
+      $f=@fopen("http://discovery.open-mediakit.org/?action=transcoder_is_available&name=".urlencode(TRANSCODER_NAME)."&email=".urlencode(TRANSCODER_ADMIN_EMAIL)."&url=".urlencode(FULL_URL."api")."","rb");
       if ($f) {
-	while ($s=fgets($f,1024)) { }
+	$js="";
+	while ($s=fgets($f,1024)) { $js.=$s; }
 	fclose($f);
-	$api->log(LOG_INFO, "Announced ourself as a Public Transcoder service at discovery.open-mediakit.org");
+	$result=@json_decode($js);
+	if (isset($result->code)) {
+	  if ($result->code==0) 
+	    $api->log(LOG_INFO, "Successfully announced ourself as a Public Transcoder service at discovery.open-mediakit.org");
+	  else 
+	    $api->log(LOG_INFO, "Something special happened when announcing ourself as a Public Transcoder service at discovery.open-mediakit.org. The message was : '".$result->message."'");   
+	} else {
+	  $api->log(LOG_INFO, "An error was received when announcing ourself as a Public Transcoder service at discovery.open-mediakit.org. No error message reported");
+	}
       }
     }
 
