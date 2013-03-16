@@ -40,15 +40,20 @@ if (!empty($_REQUEST["action"])) {
       // New transcoder : 
       $settings=filterSettings($_REQUEST["settings"]);
       mysql_query("INSERT INTO transcoder SET url='".addslashes($_REQUEST["url"])."', name='".addslashes($_REQUEST["name"])."', email='".addslashes($_REQUEST["email"])."', settings='".addslashes(serialize($settings))."', ip='".$_SERVER["REMOTE_ADDR"]."', enabled=0, emailvalid=NULL, lastseen=NOW();");
-      validate($id,$_REQUEST["email"]);
-      fail(0,"Your transcoder has been registered, please validate your email, clicking the link we just sent you");
+      $id=mysql_insert_id();
+      if ($id) {
+	validate($id,$_REQUEST["email"]);
+	fail(0,"Your transcoder has been registered, please validate your email, clicking the link we just sent you");
+      } else {
+	fail(3,"Your transcoder has not been registered. Please try later or check your config.inc.php settings");
+      }
     }
     
   } // transcoder_is_available
 
   if ($_REQUEST["action"]=="validate") {
     // Validate an email address
-    if (empty($_REQUEST["id"]) || empty($_REQUEST["key"]) || strlen($_REQUEST["key"]!=10) || !intval($_REQUEST["id"]) ) {
+    if (empty($_REQUEST["id"]) || empty($_REQUEST["key"]) || strlen($_REQUEST["key"])!=10 || !intval($_REQUEST["id"]) ) {
       fail_human(2,"The link you clicked is invalid, please check");
     }
     $id=intval($_REQUEST["id"]);
@@ -78,4 +83,6 @@ if (!empty($_REQUEST["action"])) {
   }
   header("Content-Type: application/json");
   echo json_encode($res);
+
+// TODO : periodically CHECK and PING the transcoder and keep only those who answer properly to the PING api !
 

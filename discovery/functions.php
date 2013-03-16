@@ -4,9 +4,11 @@
 function filterSettings($s) {
   global $allowsettings;
   $res=array();
-  foreach($s as $k=>$v) {
-    if (in_array($k,$allowsettings)) {
-      $res[$k]=$v;
+  if (is_array($s) && count($s)) {
+    foreach($s as $k=>$v) {
+      if (in_array($k,$allowsettings)) {
+	$res[$k]=$v;
+      }
     }
   }
   ksort($res);
