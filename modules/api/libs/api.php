@@ -329,5 +329,83 @@ class Api {
     return true;
   }
 
+
+  /* ------------------------------------------------------------ */
+  /** Return the list of cron tasks to launch.
+   * The parameters are as follow : 
+   */
+  function cronTaskList() {
+    global $db;
+    // We cronifie only enabled and validated users with proper API url
+
+    // We cronifie every 5 minutes each users whose last activity is less than one month ago
+    // and whose last successfull cron is less than one week ago
+
+    // We also cronifie every 1 hours, each users whose last activity is more than one month ago, 
+    // and whose last successfull cron is less than a month ago.
+    return $db->qlist("SELECT uid, api FROM users WHERE 
+    enabled=1 AND validated=1 AND url!='' AND 
+    (
+      ( lastactivity > DATE_SUB(NOW(), INTERVAL 31 DAYS) 
+      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 7 DAYS) 
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 5 MINUTES)  ) 
+    OR 
+      ( lastactivity <= DATE_SUB(NOW(), INTERVAL 31 DAYS) 
+      AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 31 DAYS)  
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 1 HOURS) ) 
+    )
+    ",NULL, PDO::FETCH_ASSOC);
+
+    
+  }
+
+  
+  function cronDaily() {
+    global $db;
+    // This function is launched once a day.
+
+    // TODO: delete the old transcodes (kept for more than MAX_KEEP_TRANSCODE_DAYS days)
+    // TODO: delete the old original videos (kept for more than MAX_KEEP_ORIGINAL_DAYS days) after having no job to do with them? 
+
+    // We disable (enabled=0) (and tell it by mail) daily, any user account whose last activity is more than 2 month ago AND last successfull cron is more than a month ago
+    $disables=$db->qlist("SELECT * FROM users WHERE enabled=1 AND validated=1 AND lastactivity < DATE_SUB(NOW(), INTERVAL 62 DAYS) AND lastcronsuccess < DATE_SUB(NOW(), INTERVAL 31 DAYS);", NULL, PDO::FETCH_ASSOC);
+    foreach($disables as $disable) {
+      $db->q("UPDATE users SET enabled=0 WHERE uid='".$disable["uid"]."';");
+
+      $to      = $disable["email"];
+      $subject = _("Account disabled in the public OpenMediakit Transcoder");
+      $message = sprintf(_("
+Hi,
+
+Days ago, you subscribed to a public transcoder service.
+
+Since then, your account has not used our service for more than 2 months, and your website seems down since more than 1 month.
+
+As a result, we just disabled your account for the application using our transcoding service.  
+
+For your records, your website was located at %s.
+
+Feel free to resubscribe if you need to use this service later again,
+
+--
+Regards,
+
+The OpenMediakit Transcoder public instance at
+%s
+"),$disable["url"],FULL_URL);
+      
+      $headers = 'From: '.MAIL_FROMNAME.' <'.MAIL_FROM.'>'. "\r\n" .
+	'Reply-To: '.MAIL_FROM. "\r\n" .
+	'Content-type: text/plain; charset=utf-8' . "\r\n" .
+	'X-Mailer: PHP/' . phpversion();
+      
+      mail($to, $subject, $message, $headers);          
+    } // for each disabled account
+
+
+
+  }
+  
+
 } // Class Api
 

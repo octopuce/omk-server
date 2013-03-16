@@ -52,5 +52,9 @@ define('MAIL_FROMNAME', 'unconfigured openmediakit transcoder');
  * and announce your transcoder availability
  */
 define('PUBLIC_TRANSCODER',1);
+// How many days we keep the transcoded files after we made them?
+define('MAX_KEEP_TRANSCODE_DAYS',3);
+// How many days we keep the original video files after having no job to do with them?
+define('MAX_KEEP_ORIGINAL_DAYS',7);
 
 define('RANDOM_SALT','vook0Hea3Quou0fohX'); // CHANGE THIS TOO, any random string will be fine

@@ -13,7 +13,7 @@ require_once("zz_config.php");
    */
 $result=call("subscribe",array(
 		       "email" => "benjamin@localhost",
-		       "url" => "http://omkc.local/api",
+		       "url" => CLIENT_ROOT."/zz_api.php",
 		       "application" => "OMK Transcoder Test Client",
 		       "version" => "1.0"
 		       ));
