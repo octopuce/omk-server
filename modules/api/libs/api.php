@@ -1,6 +1,6 @@
 <?php
 
-require_once(MODULES."api/libs/constants.php");
+require_once(MODULES."/api/libs/constants.php");
 
 define("DOWNLOAD_RETRY",10); // retry 10 times each download
 define("METADATA_RETRY",4); // retry 4 times each metadata search
@@ -19,7 +19,7 @@ class Api {
     if ($task<TASK_MIN || $task>TASK_MAX) return false;
     $hostname=gethostname();
     $pid=getmypid();
-    $params=array($task,STATUS_TODO)
+    $params=array($task,STATUS_TODO);
     if ($adapter!='') {
       $adapterfilter=" AND adapter=? ";
       $params[]=$adapter;
@@ -36,6 +36,7 @@ class Api {
     $query="UPDATE queue SET status=?, lockhost=?, lockpid=?, datelaunch=NOW() WHERE id=?;";
     $db->q( $query,array(STATUS_PROCESSING,$hostname,$pid,$me["id"]) );
     $db->q("UNLOCK TABLES queue;");
+    $p=@unserialize($me["params"]); if (!empty($p)) $me["params"]=$p; // We unserialize the parameters of the task.
     return $me;
   }
 
@@ -57,7 +58,7 @@ class Api {
   /** ****************************************
    * When a task failed, decrease its retry count
    * and if 0, mark it failed
-   * if the retry is not 0, set the datetry to NOW()+5 minutes.
+   * if the retry is not 0, set the datetry to NOW()+10 minutes.
    * @param $id is the task number
    * @return boolean TRUE if the task has been marked as failed
    */ 
@@ -73,7 +74,7 @@ class Api {
     } else {
       // retry in 5 min
       $retry=$task["retry"]-1;
-      $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 5 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$id) );
+      $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 10 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$id) );
     }
     // TODO: return the remaining number of retries : will allow the caller to tell the client if a task has failed for too long ...
     return true;
@@ -174,7 +175,6 @@ class Api {
    */
   public function logApiCall($api) {
     global $db;
-    //    foreach($this->params as $k=>$v) $parray.=$k."=".$v." | ";
     if (empty($this->me["uid"])) $me=0; else $me=$this->me["uid"];
     $parray=serialize($this->params);
     if (!empty($_REQUEST["application"]) && !empty($_REQUEST["version"])) {
@@ -337,7 +337,42 @@ class Api {
   }
 
 
+  /* ------------------------------------------------------------ */
+  /** Log a message into the system log
+   * @param integer $priority The priority, see below $aprio for available values
+   * @param string $message the Message to log
+   */
+  function log($priority, $message) {
+    static $logopened=false;
+    if (!defined("LOGGER")) define("LOGGER","nowhere");
+    if (!defined("LOG_CALLER")) $caller="unknown process"; else $caller=LOG_CALLER;
+
+    if (LOGGER=="syslog") {
+      if (!$logopened) {
+	$logopened=true; 
+	if (!empty($_SERVER["HTTP_HOST"])) {
+	  openlog("OpenMediaKit-Transcoder", LOG_NDELAY, LOG_DAEMON);
+	} else {
+	  openlog("OpenMediaKit-Transcoder", LOG_NDELAY | LOG_PID, LOG_DAEMON);
+	}
+      }
+      syslog($priority,"(".$caller.") ".$message);
+    } 
+    if (LOGGER=="file") {
+      $f=@fopen(LOGGER_FILE,"ab");
+      if ($f) {
+	fputs($f,"[".date("Y-m-d H:i:s")."] (".$caller.") ".$this->aprio[$priority].": ".str_replace("\n"," ",$message)."\n");
+	fclose($f);
+      }
+    }
+  } // log
   
+  private $aprio=array(LOG_CRIT => "Critical",
+		       LOG_ERR => "Error",
+		       LOG_WARNING  => "Warning",
+		       LOG_INFO => "Info",
+		       LOG_DEBUG => "Debug",
+		       );
 
 } // Class Api
 

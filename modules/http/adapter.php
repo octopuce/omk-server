@@ -1,12 +1,8 @@
 <?php
 
-require_once(MODULES."api/libs/constants.php");
+require_once(MODULES."/api/libs/constants.php");
 
-// This class may define constants. In that case, prefix them by the adapter name
-define("DUMMY_ADAPTER_PATH","/tmp/dummy");
-
-
-class DummyAdapter {
+class HttpAdapter {
 
   
   /* ------------------------------------------------------------ */
@@ -21,8 +17,7 @@ class DummyAdapter {
    * @return ADAPTER_NEW_MEDIA_* CONSTANT (see modules/api/libs/constants.php )
    */
   public function addNewMedia($url) {
-    if (substr($url,0,8)=="dummy://") {
-      // you could check it a more thoroughly though
+    if (substr($url,0,7)=="http://" || substr($url,0,8)=="https://") {
       return ADAPTER_NEW_MEDIA_DOWNLOAD;
     }
     return ADAPTER_NEW_MEDIA_INVALID;
@@ -35,7 +30,7 @@ class DummyAdapter {
    * @return $filepath The filepath where ffmpeg will find this media
    */
   function filePathMetadata($media) {
-    return DUMMY_ADAPTER_PATH."/".$media["id"];
+    return STORAGE_PATH."/original/".$media["id"];
   }
 
   
@@ -49,9 +44,13 @@ class DummyAdapter {
    *  in that case, $destination must be an empty (but existing) folder.
    */
   function filePathTranscode($media,$settings) {
+    @mkdir(STORAGE_PATH."/transcoded/");
+    if ($settings["type"]=="thumbnails") {
+      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]);      
+    }
     return array(
-		 DUMMY_ADAPTER_PATH."/".$media["id"],
-		 DUMMY_ADAPTER_PATH."/transcoded/".$media["id"]."-".$settings["id"]
+		 STORAGE_PATH."/original/".$media["id"],
+		 STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]
 		 );
   }
 
@@ -67,7 +66,9 @@ class DummyAdapter {
    *  (who knows that Adapter) to understand where it will find all the files.
    */
   function transcodedURL($media,$settings) {
-    return "dummy://".$media["id"]."/".$settings["id"];
+    // the thumbnails-type files will be served by this controller/action/ method
+    // by adding ?id=0-99 to those urls
+    return FULL_URL."http/download/".susbtr(md5(RANDOM_SALT."_".$media["owner"]),0,5)."/".$media["id"]."/".$settings["id"];
   }
   
 

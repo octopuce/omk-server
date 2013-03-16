@@ -35,6 +35,17 @@ define('FULL_URL', 'http://omk.local/'); // the root url of the application, end
 define('MAIL_FROM', 'test@openmediakit.org');
 define('MAIL_FROMNAME', 'unconfigured openmediakit transcoder');
 
+/* The default number of api call per minute allowed for each user: */
+define('RATE_DEFAULT',100); 
+/* The path where we store the downloaded files for adapters who need it ... */
+define('STORAGE_PATH',ROOT.'/storage');
+/* The (shared among encoders) TMP directory where we can write */
+define('TMP_PATH',ROOT.'/tmp');
+/* Which logger shall we use ? File ? Syslog ? */
+define('LOGGER','syslog');
+/* If logging to a file, put it here (must be writable by the web server Unix user) */
+define('LOGGER_FILE','/var/log/omk/transcoder.log');
+
 
 /** Is it a PUBLIC transcoder (as a result, anybody can use it to transcode videos) ? 
  * If you want to advertise your public transcoder, please subscribe to the discussion list
@@ -48,6 +59,6 @@ define('MAX_KEEP_TRANSCODE_DAYS',3);
 define('MAX_KEEP_ORIGINAL_DAYS',7);
 
 // How many CURL http sockets to launch in parallel for CRON daemon in the api
-define('MAX_SOCKETS',200); // 200 is a good ballpark... we advise you to change it only if you know what you do.
+define('MAX_SOCKETS',100); // 100 is a good ballpark... we advise you to change it only if you know what you do. (like having the official public transcoder of wordpress.com ;) ) 
 
 define('RANDOM_SALT','vook0Hea3Quou0fohX'); // CHANGE THIS TOO, any random string will be fine

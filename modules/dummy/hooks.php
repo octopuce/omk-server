@@ -1,6 +1,6 @@
 <?php
 
-class DummyadapterHooks extends AHooks {
+class DummyHooks extends AHooks {
  
   public function adapterList() {
     return "dummy";
