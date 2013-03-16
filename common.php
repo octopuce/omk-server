@@ -5,6 +5,17 @@
 
 define("OMKT_VERSION","1.0");
 
+/**
+ * Definition of some constants for directories
+ *
+ * The directories did not end with a "/".
+ */
+define('ROOT', dirname(__FILE__));
+define('MODULES', ROOT . '/modules');
+define('LIBS', ROOT . '/libs');
+define('LOCALES', ROOT . '/locales');
+define('VIEWS', ROOT . '/views');
+
 // Configuration
 require_once __DIR__ . '/config.inc.php';
 
