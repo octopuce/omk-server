@@ -1,6 +1,7 @@
 <?php
 
 define("API_ROOT","http://omk.local/api");
+// url (ending by /) where this test/ folder is pointed at
 define("CLIENT_ROOT","http://omk-client.local/");
 
 

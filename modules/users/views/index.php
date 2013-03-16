@@ -1,6 +1,6 @@
 <?php
 $title = $user->login;
-$breadcrumb = array('users' => 'Users', '' => $user->login);
+$breadcrumb = array('users' => 'Users');
 
 require VIEWS . '/header.php';
 

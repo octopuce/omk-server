@@ -293,19 +293,19 @@ class UsersController extends AController {
     $uid = intval($params[0]);
     $key = $params[1];
     if (!$uid || !preg_match('#^[0-9a-fA-F]{5}$#',$key)) {
-      $errors[]=_("The address you entered is incorrect, please check the mail you received");
+      $errors[]=_("The address you entered is incorrect, please check the mail you received (1)");
       $this->render('index', array('errors' => $errors));
       exit();
     }
     $user = Users::get($uid);
 
     if ($user==false || $key!=substr(md5(RANDOM_SALT . "_" .$user["email"]),0,5)) {
-      $errors[]=_("The address you entered is incorrect, please check the mail you received");
+      $errors[]=_("The address you entered is incorrect, please check the mail you received (2)");
       $this->render('index', array('errors' => $errors));
       exit();
     }
 
-    $db->q('UPDATE users SET validate=1 WHERE uid=?',array($uid));
+    $db->q('UPDATE users SET validated=1 WHERE uid=?',array($uid));
 
     $errors[]=_("Your account has been validated, you can now use the OpenMediakit Transcoder service");
     $this->render('index', array('errors' => $errors));
