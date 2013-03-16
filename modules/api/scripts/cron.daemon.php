@@ -18,59 +18,45 @@ if (!function_exists("curl_init")) {
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/api.php';
 
-$useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Cron Daemon)";
-
 $api=new Api();
 
-// We search for the list of crontasks to launch
-$list=$api->cronTasksList();
+while (true) {
 
+  // We search for the list of crontasks to launch (date/time selector is done there)
+  $list=$api->cronTasksList();
 
-$curl=curl_init();
-//curl_setopt($curl,CURLOPT_COOKIE,"session=".$session);
-curl_setopt($curl,CURLOPT_USERAGENT,$useragent);
-curl_setopt($curl,CURLOPT_HEADER,false);
-curl_setopt($curl,CURLOPT_FAILONERROR,true);
-curl_setopt($curl,CURLOPT_FOLLOWLOCATION,true);
-curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
-curl_setopt($curl, CURLOPT_TIMEOUT, 600); // no more than 10 minutes of download... if file is bigger than that, or too slow, we will retry :) so...
+  $urllist=array();
+  foreach($list as $onecron) {
+    if (substr($onecron["url"],0,7)=="http://" || substr($onecron["url"],0,8)=="https://") {
+      if (strpos($onecron["url"],"?")!==false) {
+	$onecron["url"].="&action=cron";
+      } else {
+	$onecron["url"].="?action=cron";	
+      }
+      $urllist[]=array("url" => $onecron["url"], "uid" => $onecron["uid"]);
+    }
+  }
 
-curl_setopt($curl,CURLOPT_URL,$params["url"]);
-
-$filename=STORAGE_PATH."/".$media["id"];
-
-if (file_exists($filename)) {
-  // retry from the end of the file
-  $sizebefore=filesize($filename);
-  curl_setopt( $curl,CURLOPT_RESUME_FROM,$sizebefore ); 
-  // FIXME: what happen if we already have all the content ??!!
-  $f=fopen($filename,"ab");
-} else {
-  $sizebefore=0;
-  $f=fopen($filename,"wb");
-}
-
-if (!$f) { 
-  error_log("FATAL: cannot write to ".$filename."\n"); 
-  exit(1); 
-}
-curl_setopt($curl,CURLOPT_FILE,$f);
-$res=curl_exec($curl);
-fclose($f);
-if ($res) {
-  // and mark the media as "locally downloaded"
-  $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_LOCAL_AVAILABLE ));
-  // and ask for its metadata if requested to: 
-  if ($params["dometadata"]) {
-    $api->queueAdd(TASK_DO_METADATA,$task["mediaid"],METADATA_RETRY,array("cropdetect"=>$params["cropdetect"]));
+  if (empty($urllist)) { // nothing to do : 
+    sleep(60); // Let's try again in a minute
+    continue;
   }
   
-  // ok, transfer finished, let's mark it done
-  $api->setTaskProcessedUnlock($task["id"]);
-  exit(0);
-} else {
-  // if we failed, we just mark it as failed, this will retry 5 min from now ...
-  $api->setTaskFailedUnlock($task["id"]);
-}
+  // cron_callback($url, $content, $curlobj) will be called at the end of each http call.
+  $api->rolling_curl($urllist, "cron_callback");
 
+} // while true
+
+
+function cron_callback($url,$content,$curl) {
+  global $api;
+
+  if (empty($url["uid"])) return; // not normal...
+
+  if ($curl["http_code"]==200) {
+    $api->cronCallOk($url["uid"]);
+  } else {
+    $api->cronCallFailed($url["uid"]);
+  }
+}
 

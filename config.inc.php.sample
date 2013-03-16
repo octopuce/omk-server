@@ -57,4 +57,7 @@ define('MAX_KEEP_TRANSCODE_DAYS',3);
 // How many days we keep the original video files after having no job to do with them?
 define('MAX_KEEP_ORIGINAL_DAYS',7);
 
+// How many CURL http sockets to launch in parallel for CRON daemon in the api
+define('MAX_SOCKETS',200); // 200 is a good ballpark... we advise you to change it only if you know what you do.
+
 define('RANDOM_SALT','vook0Hea3Quou0fohX'); // CHANGE THIS TOO, any random string will be fine
