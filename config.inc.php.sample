@@ -1,30 +1,16 @@
 <?php
 
 /**
- * Configuration of the database
+ * Configuration of the MySQL database
  */
-
-// Example with MySQL
 $db->type = 'mysql';
 $db->host = '127.0.0.1';
 $db->user = 'omkt';
 $db->pass = 'ieGh8AVa';
 $db->name = 'omkt';
 
-// Example with PostgreSQL
-$db->type = 'pgsql';
-$db->host = '127.0.0.1';
-$db->user = 'omkt';
-$db->pass = 'ieGh8AVa';
-$db->name = 'omkt';
-
-// Example with SQLite
-$db->type = 'sqlite';
-$db->path = ROOT . '/octomanager.db';
-
 /**
  * Definition of some constants for the URLs
- *
  * The directories end with a "/".
  */
 define('BASE_URL', '/');
@@ -46,13 +32,6 @@ define('LOGGER','syslog');
 /* If logging to a file, put it here (must be writable by the web server Unix user) */
 define('LOGGER_FILE','/var/log/omk/transcoder.log');
 
-
-/** Is it a PUBLIC transcoder (as a result, anybody can use it to transcode videos) ? 
- * If you want to advertise your public transcoder, please subscribe to the discussion list
- * of public transcoders managers at transcoder-subscribe@open-mediakit.org 
- * and announce your transcoder availability
- */
-define('PUBLIC_TRANSCODER',1);
 // How many days we keep the transcoded files after we made them?
 define('MAX_KEEP_TRANSCODE_DAYS',3);
 // How many days we keep the original video files after having no job to do with them?
@@ -62,3 +41,20 @@ define('MAX_KEEP_ORIGINAL_DAYS',7);
 define('MAX_SOCKETS',100); // 100 is a good ballpark... we advise you to change it only if you know what you do. (like having the official public transcoder of wordpress.com ;) ) 
 
 define('RANDOM_SALT','vook0Hea3Quou0fohX'); // CHANGE THIS TOO, any random string will be fine
+
+
+/* ------------------------------------------------------------ */
+/** Is it a PUBLIC transcoder? 
+ * (as a result, ANYBODY WILL BE ALLOWED TO USE YOUR SERVER TO TRANSCODE VIDEOS !)
+ * To do so, set PUBLIC_TRANSCODER to true, and fill your transcoder NAME and your EMAIL ADDRESS below. 
+ * When all those 3 settings will be filled, and your cron.daily launched, your transcoder will start to 
+ * become available to anybody. Your email will need to be confirmed by clicking a link that the open-mediakit.org
+ * discovery service will sent to you.
+ * 
+ * If you want to ensure the best possible service, please subscribe to the discussion list
+ * of public transcoders managers at transcoder-subscribe@open-mediakit.org 
+ * and announce your transcoder name and capacity.
+ */
+define('PUBLIC_TRANSCODER',false);
+define('TRANSCODER_NAME','');
+define('TRANSCODER_ADMIN_EMAIL','');

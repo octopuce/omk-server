@@ -336,16 +336,16 @@ class Api {
     return true;
   }
 
+  public $log_caller="unknown process";
 
   /* ------------------------------------------------------------ */
   /** Log a message into the system log
    * @param integer $priority The priority, see below $aprio for available values
    * @param string $message the Message to log
    */
-  function log($priority, $message) {
+  public function log($priority, $message) {
     static $logopened=false;
     if (!defined("LOGGER")) define("LOGGER","nowhere");
-    if (!defined("LOG_CALLER")) $caller="unknown process"; else $caller=LOG_CALLER;
 
     if (LOGGER=="syslog") {
       if (!$logopened) {
@@ -356,12 +356,12 @@ class Api {
 	  openlog("OpenMediaKit-Transcoder", LOG_NDELAY | LOG_PID, LOG_DAEMON);
 	}
       }
-      syslog($priority,"(".$caller.") ".$message);
+      syslog($priority,"(".$this->log_caller.") ".$message);
     } 
     if (LOGGER=="file") {
       $f=@fopen(LOGGER_FILE,"ab");
       if ($f) {
-	fputs($f,"[".date("Y-m-d H:i:s")."] (".$caller.") ".$this->aprio[$priority].": ".str_replace("\n"," ",$message)."\n");
+	fputs($f,"[".date("Y-m-d H:i:s")."] (".$this->log_caller.") ".$this->aprio[$priority].": ".str_replace("\n"," ",$message)."\n");
 	fclose($f);
       }
     }

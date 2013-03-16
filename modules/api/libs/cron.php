@@ -1,6 +1,7 @@
 <?php
 
 require_once(__DIR__."/constants.php");
+require_once(MODULES."/api/libs/api.php");
 
 class Cron {
 
@@ -45,19 +46,35 @@ class Cron {
   }
 
 
+
   /* ------------------------------------------------------------ */
   /** Function launched daily to do some kind of cleanup...
    */  
   function cronDaily() {
     global $db;
+    $api=new Api();
+    $api->log_caller="cron-daily"; 
 
     // TODO: delete the old transcodes (kept for more than MAX_KEEP_TRANSCODE_DAYS days)
     // TODO: delete the old original videos (kept for more than MAX_KEEP_ORIGINAL_DAYS days) after having no job to do with them? 
+
+    // Announce the public transcoder to the discovery service : 
+    if (defined('PUBLIC_TRANSCODER') && PUBLIC_TRANSCODER &&
+	defined('TRANSCODER_NAME') && TRANSCODER_NAME!='' &&
+	defined('TRANSCODER_ADMIN_EMAIL') && TRANSCODER_ADMIN_EMAIL!='') {
+      $f=@fopen("http://discovery.open-mediakit.org/?action=transcoder_is_available&name=".urlencode(TRANSCODER_NAME)."&email=".urlencode(TRANSCODER_ADMIN_EMAIL)."","rb");
+      if ($f) {
+	while ($s=fgets($f,1024)) { }
+	fclose($f);
+	$api->log(LOG_INFO, "Announced ourself as a Public Transcoder service at discovery.open-mediakit.org");
+      }
+    }
 
     // We disable (enabled=0) (and tell it by mail) daily, any user account whose last activity is more than 2 month ago AND last successfull cron is more than a month ago
     $disables=$db->qlist("SELECT * FROM users WHERE enabled=1 AND validated=1 AND lastactivity < DATE_SUB(NOW(), INTERVAL 62 DAY) AND lastcronsuccess < DATE_SUB(NOW(), INTERVAL 31 DAY);", NULL, PDO::FETCH_ASSOC);
     foreach($disables as $disable) {
       $db->q("UPDATE users SET enabled=0 WHERE uid='".$disable["uid"]."';");
+      $api->log(LOG_INFO, "disabled user ".$disable["uid"]." (url was ".$disable["url"].") as being inactive and in error for too long.");
 
       $to      = $disable["email"];
       $subject = _("Account disabled in the public OpenMediakit Transcoder");

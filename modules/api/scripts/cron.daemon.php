@@ -17,8 +17,11 @@ if (!function_exists("curl_init")) {
 
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/cron.php';
+require_once __DIR__ . '/../libs/api.php';
 
 $cron=new Cron();
+$api=new Api();
+$api->log_caller="cron-calling-daemon"; 
 
 while (true) {
 
@@ -42,6 +45,7 @@ while (true) {
     continue;
   }
   
+  $api->log(LOG_INFO, "Launching ".count($urllist)." cron calls");
   // cron_callback($url, $content, $curlobj) will be called at the end of each http call.
   $cron->rolling_curl($urllist, "cron_callback");
 
@@ -49,7 +53,9 @@ while (true) {
 
 
 function cron_callback($url,$content,$curl) {
-  global $cron;
+  global $cron,$api;
+  
+  //  $api->log(LOG_DEBUG, "return from cron call for url ".$url." has http_code ".$curl["http_code"]);
 
   if (empty($url["uid"])) return; // not normal...
 

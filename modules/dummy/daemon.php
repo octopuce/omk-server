@@ -8,8 +8,6 @@
     * or wait 10 seconds if no download is queued.
     */
 
-define("LOG_CALLER","dummy-download-daemon");
-
 if (!function_exists("curl_init")) {
   error_log("php-curl not installed or not enabled, exit.\n");
   exit(1);
@@ -21,6 +19,7 @@ require_once MODULES . '/api/libs/api.php';
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Download Daemon)";
 
 $api=new Api();
+$api->log_caller="dummy-download-daemon"; 
 
 while (true) {
 
