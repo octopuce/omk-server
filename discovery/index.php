@@ -34,9 +34,6 @@ if (!empty($_REQUEST["action"])) {
 	fail(0,"Your transcoder has been updated, please validate your new email, clicking the link we just sent you");
       } else {
 	// mail unchanged, just renew it
-	if ($already["emailvalid"]) {
-	  $sql.=", enabled=1";
-	}
 	mysql_query("UPDATE transcoder SET lastseen=NOW() ".$sql." WHERE id='".$already["id"]."';");
 	fail(0,"Your transcoder has been updated");
       }
@@ -65,9 +62,21 @@ if (!empty($_REQUEST["action"])) {
       fail_human(4,"The link you clicked is invalid, please check");
     }
     mysql_query("UPDATE transcoder SET enabled=1, emailvalid=NOW() WHERE id='$id';");
-    fail_human(0,"Your email has been validated, your public OpenMediakit Transcoder instance will now be used by new users.");
-    
+    fail_human(0,"Your email has been validated, your public OpenMediakit Transcoder instance will now be used by new users."); 
   }
+
+  // ok, no action, let's show the application/json of all currently available public transcoders : 
+  $r=mysql_query("SELECT id, name, url FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=1 ORDER BY RAND();");
+  $list=array();
+  while ($c=mysql_fetch_array($r)) {
+    $t=new StdClass();
+    $t->id=$c["id"];
+    $t->name=$c["name"];
+    $t->url=$c["url"];
+    $res[]=$t;
+  }
+  header("Content-Type: application/json");
+  echo json_encode($res);
 
 } 
 
