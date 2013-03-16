@@ -9,7 +9,7 @@ if (empty($_REQUEST["action"])) {
 }
 
 switch ($_REQUEST["action"]) {
-case "cron":
+case "transcoder_cron":
   //  header("HTTP/1.1 404 Not Found"); // uncomment this to test the "when the cron is failing"
   echo "OK";
   exit();
