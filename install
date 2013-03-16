@@ -22,7 +22,7 @@ try {
   exit(2);
 }
 
-$sql_file = file_get_contents('db/users.sql');
+$sql_file = file_get_contents('db/dump.sql');
 $sql_queries = explode(';', $sql_file);
 foreach ($sql_queries as $sql) {
   $sql = trim($sql);

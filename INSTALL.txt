@@ -58,5 +58,14 @@ Launch install.php to initialize the database (this program will also UPGRADE th
 
 **FIXME**: to be done: Finally, launch the conversion / metadata / thumbnailer processes anytime you want, either by cron, or by using some init script  (Each cron / daemon must have its own deployment technique)
 
+The current process to run are : 
+
+- the "crontab" file installed in a user crontab (the same user as the web server one) with proper path!!
+- modules/api/scripts/cron.daemon.php must be launched as a daemon, it calls the cron action of each valid client every 5 minutes or 1 hour
+- modules/api/scripts/downloader.php must be launched as a daemon on any number of machines you want (as long as they share the same NFS and MySQL access) We recommend launching it on the NFS server though (faster download)
+- modules/api/scripts/dometadata.php must be launched as a daemon on any number of machines you want (as long as they share the	same NFS and MySQL access) 
+- 
+
+
 
 
