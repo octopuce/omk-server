@@ -2,7 +2,6 @@
 
 require_once("config.php");
 
-
 if (!empty($_REQUEST["action"])) {
   if ($_REQUEST["action"]=="transcoder_is_available") {
     // A transcoder is telling us it is available ... Let's believe him :) 
@@ -65,9 +64,11 @@ if (!empty($_REQUEST["action"])) {
     fail_human(0,"Your email has been validated, your public OpenMediakit Transcoder instance will now be used by new users."); 
   }
 
+} 
+
   // ok, no action, let's show the application/json of all currently available public transcoders : 
   $r=mysql_query("SELECT id, name, url FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=1 ORDER BY RAND();");
-  $list=array();
+  $res=array();
   while ($c=mysql_fetch_array($r)) {
     $t=new StdClass();
     $t->id=$c["id"];
@@ -77,7 +78,4 @@ if (!empty($_REQUEST["action"])) {
   }
   header("Content-Type: application/json");
   echo json_encode($res);
-
-} 
-
 
