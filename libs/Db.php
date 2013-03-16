@@ -95,9 +95,8 @@ class Db extends PDO {
     if (is_null($fetch_mode)) $fetch_mode = $this->fetch_mode;
     try {
       $statement = $this->prepare($query);
-    }
-    catch (Exception $e) {
-      echo _('Erreur base de données PDO prepare :') . ' ' . $e->getMessage() . "\n";
+    } catch (Exception $e) {
+      echo _('Error during PDO Prepare:') . ' ' . $e->getMessage() . "\n";
       exit;
     }
     $statement->setFetchMode($fetch_mode);
