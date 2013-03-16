@@ -13,10 +13,11 @@ if (!isset($argv[1])) {
 
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/api.php';
+require_once __DIR__ . '/../libs/ffmpeg.php';
 
-$api=new Api();
+$ffmpeg=new Ffmpeg();
 
-$m=$api->getFfmpegMetadata($argv[1]);
+$m=$ffmpeg->getFfmpegMetadata($argv[1]);
 
 print_r($m);
 
