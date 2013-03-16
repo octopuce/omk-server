@@ -6,9 +6,9 @@
     */
 
 require_once __DIR__ . '/../../../common.php';
-require_once __DIR__ . '/../libs/api.php';
+require_once __DIR__ . '/../libs/cron.php';
 
-$api=new Api();
+$cron=new Cron();
 
-$api->cronDaily();
+$cron->cronDaily();
 

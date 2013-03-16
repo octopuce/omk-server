@@ -16,22 +16,22 @@ if (!function_exists("curl_init")) {
 }
 
 require_once __DIR__ . '/../../../common.php';
-require_once __DIR__ . '/../libs/api.php';
+require_once __DIR__ . '/../libs/cron.php';
 
-$api=new Api();
+$cron=new Cron();
 
 while (true) {
 
   // We search for the list of crontasks to launch (date/time selector is done there)
-  $list=$api->cronTasksList();
+  $list=$cron->cronTasksList();
 
   $urllist=array();
   foreach($list as $onecron) {
     if (substr($onecron["url"],0,7)=="http://" || substr($onecron["url"],0,8)=="https://") {
       if (strpos($onecron["url"],"?")!==false) {
-	$onecron["url"].="&action=cron";
+	$onecron["url"].="&action=transcoder_cron";
       } else {
-	$onecron["url"].="?action=cron";	
+	$onecron["url"].="?action=transcoder_cron";	
       }
       $urllist[]=array("url" => $onecron["url"], "uid" => $onecron["uid"]);
     }
@@ -43,20 +43,20 @@ while (true) {
   }
   
   // cron_callback($url, $content, $curlobj) will be called at the end of each http call.
-  $api->rolling_curl($urllist, "cron_callback");
+  $cron->rolling_curl($urllist, "cron_callback");
 
 } // while true
 
 
 function cron_callback($url,$content,$curl) {
-  global $api;
+  global $cron;
 
   if (empty($url["uid"])) return; // not normal...
 
   if ($curl["http_code"]==200) {
-    $api->cronCallOk($url["uid"]);
+    $cron->cronCallOk($url["uid"]);
   } else {
-    $api->cronCallFailed($url["uid"]);
+    $cron->cronCallFailed($url["uid"]);
   }
 }
 
