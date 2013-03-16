@@ -44,7 +44,7 @@ class ApiController extends AController {
    * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
    * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
    * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side) 
-   * Params for METADATA TASK : dometadata (default true) [cropdetect (default false)]
+   * Params for METADATA TASK : dometadata (default true)
    * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
    */
   public function app_new_mediaAction() {
