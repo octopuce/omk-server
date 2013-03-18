@@ -1,0 +1,35 @@
+ID,Type,Slug,Name,Technical,Extension,Recommend
+1,video,video_240p_flv,Video at very low definition and flash sorenson format,"flv container, sorenson video at 280kb/s, mp3 audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",flv,1
+2,video,video_360p_flv,Video at low definition and flash sorenson format,"flv container, sorenson video at 440kb/s, mp3 audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",flv,1
+3,video,video_480p_flv,Video at low definition and flash sorenson format,"flv container, sorenson video at 440kb/s, mp3 audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 25fps",flv,0
+11,video,video_240p_mp4,Video at very low definition and portable mp4 format,"mp4 container, h264 video at 280kb/s, aac audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",mp4,0
+12,video,video_360p_mp4,Video at low definition and portable mp4 format,"mp4 container, h264 video at 440kb/s, aac audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",mp4,0
+13,video,video_480p_mp4,Video at standard definition and portable mp4 format,"mp4 container, h264 video at 680kb/s, aac audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",mp4,1
+14,video,video_720p_mp4,Video at high definition and portable mp4 format,"mp4 container, h264 video at 1650kb/s, aac audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",mp4,1
+15,video,video_1080p_mp4,Video at full-hd definition and portable mp4 format,"mp4 container, h264 video at 4000kb/s, aac audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",mp4,1
+21,video,video_240p_webm,Video at very low definition and webm opensource format,"webm container, vp8 video at 280kb/s, vorbis audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",webm,0
+22,video,video_360p_webm,Video at low definition and webm opensource format,"webm container, vp8 video at 440kb/s, vorbis audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",webm,0
+23,video,video_480p_webm,Video at standard definition webm opensource format,"webm container, vp8 video at 680kb/s, vorbis audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",webm,1
+24,video,video_720p_webm,Video at high definition and webm opensource format,"webm container, vp8 video at 1650kb/s, vorbis audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",webm,1
+25,video,video_1080p_webm,Video at full-hd definition and webm opensource format,"webm container, vp8 video at 4000kb/s, vorbis audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",webm,1
+31,video,video_240p_mpeg,Video at very low definition and mpeg broadcast format,"mpeg container, mpeg2 video at 280kb/s, mpeg2 audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",mpg,0
+32,video,video_360p_mpeg,Video at low definition and mpeg broadcast format,"mpeg container, mpeg2 video at 440kb/s, mpeg2 audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",mpg,0
+33,video,video_480p_mpeg,Video at standard definition mpeg broadcast format,"mpeg container, mpeg2 video at 680kb/s, mpeg2 audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",mpg,0
+34,video,video_720p_mpeg,Video at high definition and mpeg broadcast format,"mpeg container, mpeg2 video at 1650kb/s, mpeg2 audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",mpg,0
+35,video,video_1080p_mpeg,Video at full-hd definition and mpeg broadcast format,"mpeg container, mpeg2 video at 4000kb/s, mpeg2 audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",mpg,0
+51,audio,audio_64k_mp3,"Audio track only, with low quality","mp3 container, mp3 audio track at 64Kb/s and 22KHz, stereo",mp3,0
+52,audio,audio_128k_mp3,"Audio track only, with standard quality","mp3 container, mp3 audio track at 128Kb/s and 44KHz, stereo",mp3,1
+53,audio,audio_v0_mp3,"Audio track only, with highest mp3 quality","mp3 container, mp3 audio track at V0 quality and 44KHz, stereo",mp3,1
+61,audio,audio_64k_vorbis,"Audio track only, with low quality and opensource vorbis codec","ogg container, vorbis audio track at 64Kb/s and 22KHz, stereo",ogg,0
+62,audio,audio_128k_vorbis,"Audio track only, with standard quality and opensource vorbis codec","ogg container, vorbis audio track at 128Kb/s and 44KHz, stereo",ogg,0
+63,audio,audio_v0_vorbis,"Audio track only, with highest quality and opensource vorbis codec","ogg container, vorbis audio track at V0 quality and 44KHz, stereo",ogg,0
+71,audio,audio_64k_aac,"Audio track only, with low quality and aac codec","mp4 container, aac audio track at 64kb/s quality and 22KHz, stereo",m4a,0
+72,audio,audio_128k_aac,"Audio track only, with standard quality and aac codec","mp4 container, aac audio track at 128kb/s quality and 44KHz, stereo",m4a,0
+73,audio,audio_192k_aac,"Audio track only, with highest quality and aac codec","mp4 container, aac audio track at 192kb/s quality and 44KHz, stereo",m4a,0
+101,thumbnails,100_240p_thumbs_jpg,100 thumbnails at 240p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 426x240",jpg,0
+102,thumbnails,100_360p_thumbs_jpg,100 thumbnails at 360p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 640x360",jpg,0
+103,thumbnails,100_480p_thumbs_jpg,100 thumbnails at 480p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 854x480",jpg,1
+104,thumbnails,100_720p_thumbs_jpg,100 thumbnails at 720p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1280x720",jpg,0
+105,thumbnails,100_1080p_thumbs_jpg,100 thumbnails at 1080p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1920x1080",jpg,0
+110,thumbnails,100_small_thumbs_jpg,100 small thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 100x60 (width guaranteed)",jpg,1
+111,thumbnails,100_medium_thumbs_jpg,100 medium thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 200x120 (width guaranteed)",jpg,0
