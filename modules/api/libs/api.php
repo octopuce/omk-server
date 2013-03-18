@@ -105,7 +105,7 @@ class Api {
    */
   public function mediaAdd($v) {
     global $db;
-    $k=array("status","remoteid","remoteurl","owner");
+    $k=array( "status", "remoteid", "remoteurl", "owner", "adapter" );
     $sql=""; $val=array();
     foreach($k as $key) {
       if ($v[$key]) { 
@@ -254,6 +254,48 @@ class Api {
     }
     $this->allowApplication($_REQUEST["application"], $_REQUEST["version"]);
     return $this->me;
+  }
+
+
+  /* ------------------------------------------------------------ */
+  /** Check that the user is allowed to use that adapter. 
+   * Trigger apiError() if not (therefore quit) 
+   * @param $user array the user data
+   * @param $adapter string the adapter 
+   * @return true
+   */
+  public function checkAllowedAdapter($user,$adapter) {
+    if (!empty($user["allowedadapter"])) {
+      $list=explode(",",$user["allowedadapter"]);
+      if (in_array($list,$adapter)) {
+	return true;
+      }
+    }
+    $this->apiError(11,_("Adapter not allowed"));
+  }
+
+  
+  /* ------------------------------------------------------------ */
+  /** Returns an instance of the specified Adapter class object.
+   * @param $adapter string the adapter to search for using Hooks
+   * @param $user array the user data, if set, will check that this user 
+   *  is allowed to use this adapter. If not, triggers an apiError.
+   * @return AdapterObject
+   */
+  public function getAdapter($adapter,$user=NULL) {
+    // Use the adapter to validate the URL and save the media : 
+    $adapter=strtolower(trim($adapter));
+    $adapterClass=array();
+    Hooks::call('adapterList',$adapterClass);
+    if (!in_array($adapterClass, $adapter)) {
+      $this->apiError(12,_("The requested adapter is not supported on this Transcoder"));
+    }
+    if (!empty($user)) {
+      $this->checkAllowedAdapter($user,$adapter);
+    }
+    require_once(MODULES."/".$adapter."/adapter.php");
+    $adapter=strtoupper(substr($adapter,0,1)).substr($adapter,1)."Adapter";
+    return new $adapter();
   }
 
 

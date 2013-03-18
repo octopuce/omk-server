@@ -43,7 +43,7 @@ class ApiController extends AController {
   /** ********************************************************************
    * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
    * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
-   * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side) 
+   * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side)
    * Params for METADATA TASK : dometadata (default true)
    * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
    */
@@ -54,29 +54,58 @@ class ApiController extends AController {
     $this->params=$this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
 						 "id" => array("integer",true),
 						 "url" => array("string",true),
+						 "adapter" => array("string",false,"http"),
 						 "dometadata" => array("boolean",false,true),
-						 // "cropdetect" => array("boolean",false,false),
 						 ));
     
     $this->api->logApiCall("newmedia");
     if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
       $this->api->apiError(7,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
     }
+    $adapterObject=$this->api->getAdapter($this->params["adapter"],$this->me);
+
+    // We check the validity of the url : 
+    $state=$adapterObject->addNewMedia($this->params["url"]);
+    if ($state==ADAPTER_NEW_MEDIA_INVALID) {
+      $this->api->apiError(13,_("The remote url is incorrect for this adapter. Please check your code"));
+    }
+    if ($state==ADAPTER_NEW_MEDIA_DOWNLOAD) {
+      $status=MEDIA_REMOTE_AVAILABLE;
+    } elseif ($state==ADAPTER_NEW_MEDIA_NODOWNLOAD) {
+      $status=MEDIA_LOCAL_AVAILABLE;
+    } else {
+      $this->api->apiError(14,_("BAD IMPLEMENTATION of AdapterClass in ".$this->params["adapter"].", read the docs!"));
+    }
+
     // first, we create a media
-    $media_id=$this->api->mediaAdd(array("status" => MEDIA_REMOTE_AVAILABLE,
+    $media_id=$this->api->mediaAdd(array(
+					 "owner" => $this->me["uid"],
 					 "remoteid" => $this->params["id"],
-					 "owner" => $this->me["uid"] ) );
+					 "adapter" => $this->params["adapter"] 
+					 "remoteurl" => $this->params["url"],
+					 "status" => $status,
+					 ) );
     if (!$media_id) {
       $this->api->apiError(6,_("Cannot create a new media, please retry later."));
     }
+    if ($status==MEDIA_REMOTE_AVAILABLE) {
+      // then we queue the download of the media
+      return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
+				  array("url" => $this->params["url"], 
+					"dometadata" => $this->params["dometadata"], 
+					//"cropdetect" => $this->params["cropdetect"]
+					) );
+    } else {
+      // already locally available? let's queue the metadata search:
+      return $this->api->queueAdd(TASK_METADATA,$media_id,DOWNLOAD_RETRY,
+				  array("url" => $this->params["url"], 
+					"dometadata" => $this->params["dometadata"], 
+					//"cropdetect" => $this->params["cropdetect"]
+					) );
+      
+    }
 
-    // then we queue the download of the media
-    return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
-				array("url" => $this->params["url"], 
-				      "dometadata" => $this->params["dometadata"], 
-				      //"cropdetect" => $this->params["cropdetect"]
-				      ) );
-  }
+  } // app_new_mediaAction
 
 
   /** ********************************************************************

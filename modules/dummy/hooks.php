@@ -2,8 +2,8 @@
 
 class DummyHooks extends AHooks {
  
-  public function adapterList() {
-    return "dummy";
+  public function adapterList(&$list) {
+    $list[]="dummy";
   }
 
 }

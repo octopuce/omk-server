@@ -2,8 +2,8 @@
 
 class HttpHooks extends AHooks {
  
-  public function adapterList() {
-    return "http";
+  public function adapterList(&$list) {
+    $list[]="http";
   }
 
 }
