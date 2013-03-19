@@ -60,21 +60,21 @@ class ApiController extends AController {
     
     $this->api->logApiCall("newmedia");
     if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
-      $this->api->apiError(7,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
+      $this->api->apiError(API_ERROR_ALREADY,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
     }
     $adapterObject=$this->api->getAdapter($this->params["adapter"],$this->me);
 
     // We check the validity of the url : 
     $state=$adapterObject->addNewMedia($this->params["url"]);
     if ($state==ADAPTER_NEW_MEDIA_INVALID) {
-      $this->api->apiError(13,_("The remote url is incorrect for this adapter. Please check your code"));
+      $this->api->apiError(API_ERROR_BADURL,_("The remote url is incorrect for this adapter. Please check your code"));
     }
     if ($state==ADAPTER_NEW_MEDIA_DOWNLOAD) {
       $status=MEDIA_REMOTE_AVAILABLE;
     } elseif ($state==ADAPTER_NEW_MEDIA_NODOWNLOAD) {
       $status=MEDIA_LOCAL_AVAILABLE;
     } else {
-      $this->api->apiError(14,_("BAD IMPLEMENTATION of AdapterClass in ".$this->params["adapter"].", read the docs!"));
+      $this->api->apiError(API_ERROR_CODEERROR,_("BAD IMPLEMENTATION of AdapterClass in ".$this->params["adapter"].", read the docs!"));
     }
 
     // first, we create a media
@@ -86,7 +86,7 @@ class ApiController extends AController {
 					 "status" => $status,
 					 ) );
     if (!$media_id) {
-      $this->api->apiError(6,_("Cannot create a new media, please retry later."));
+      $this->api->apiError(API_ERROR_CREATEMEDIA,_("Cannot create a new media, please retry later."));
     }
     if ($status==MEDIA_REMOTE_AVAILABLE) {
       // then we queue the download of the media
@@ -109,6 +109,30 @@ class ApiController extends AController {
 
 
   /** ********************************************************************
+   * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
+   * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
+   * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side)
+   * Params for METADATA TASK : dometadata (default true)
+   * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
+   */
+  public function app_get_settingsAction() {
+    $this->me=$this->api->checkCallerIdentity();
+    $this->api->enforceLimits();
+    $this->api->logApiCall("app_get_settings");
+    // Return the settings available on this transcoder: 
+    // First trigger the hooks which adds settings ...
+    $settings_all=array();
+    Hooks::call('settingsList',$settings_all);
+    if (is_file(__DIR__."/libs/settings.php")) {
+      include(__DIR__."/libs/settings.php");
+      $settings_all=$settings_all + $settings;
+    }
+    // Return ALL the settings available in this transcoder
+    return $settings_all;
+  }
+
+
+  /** ********************************************************************
    * When a new client is searching for a public transcoder, it can call 
    * http://discovery.open-mediakit.org/public?application=<application>&version=<version>
    * to obtain a json-list of the currently active public transcoders.
@@ -124,7 +148,7 @@ class ApiController extends AController {
    */
   public function subscribeAction() {
     if (!defined("PUBLIC_TRANSCODER") || !PUBLIC_TRANSCODER) {
-      $this->api->apiError(8,_("This server is not a public transcoder, please use another one"));
+      $this->api->apiError(API_ERROR_NOTPUBLIC,_("This server is not a public transcoder, please use another one"));
     }
     // anonymous api call   $this->me=$this->api->checkCallerIdentity();
     $this->api->enforceLimits();
@@ -147,10 +171,11 @@ class ApiController extends AController {
     $this->params['admin']=0;
     $uid=Users::addUser($this->params);
     if (!$uid) {
-      $this->api->apiError(10,_("An error happened when creating the account. Please retry later."));
+      $this->api->apiError(API_ERROR_CREATEACCOUNT,_("An error happened when creating the account. Please retry later."));
     } 
     // Send a validation email to the user
     Users::sendValidationEmail($uid);
+    $this->api->apiError(API_ERROR_OK,_("Your account has been created, please validate it by clicking the link in the email you just received"));
   }
   
 

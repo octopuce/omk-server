@@ -65,3 +65,21 @@ define("ADAPTER_NEW_MEDIA_INVALID",0);
 define("ADAPTER_NEW_MEDIA_NODOWNLOAD",1);
 /* The provided url is valid and requires a download task. The adapter's downloader will treat the associated tasks */
 define("ADAPTER_NEW_MEDIA_DOWNLOAD",2);
+
+/* All the API Errors */
+define("API_ERROR_OK",0);
+define("API_ERROR_MANDATORY",1);
+define("API_ERROR_NOKEY",2);
+define("API_ERROR_DISABLED",3);
+define("API_ERROR_RATELIMIT",4);
+define("API_ERROR_BADPARAM",5);
+define("API_ERROR_CREATEMEDIA",6);
+define("API_ERROR_ALREADY",7);
+define("API_ERROR_NOTPUBLIC",8);
+define("API_ERROR_APPNOTALLOWED",9);
+define("API_ERROR_CREATEACCOUNT",10);
+define("API_ERROR_ADAPTERNOTALLOWED",11);
+define("API_ERROR_ADAPTERNOTSUPPORTED",12);
+define("API_ERROR_BADURL",13);
+define("API_ERROR_CODEERROR",14);
+//define("API_ERROR_",);

@@ -226,7 +226,7 @@ class Api {
       }
     }
     if ($error) {
-      $this->apiError(5,$error);
+      $this->apiError(API_ERROR_BADPARAM,$error);
     }
     return $this->params;
   }
@@ -239,7 +239,7 @@ class Api {
   public function checkCallerIdentity() {
     global $db;
     if (!isset($_REQUEST["key"]) || !isset($_REQUEST["application"]) || !isset($_REQUEST["version"])) {
-      $this->apiError(1,_("API key, application name and version number are mandatory."));
+      $this->apiError(API_ERROR_MANDATORY,_("API key, application name and version number are mandatory."));
     }
     // Search for the user api key
     $query = 'SELECT uid, login, email, admin,enabled  '
@@ -247,10 +247,10 @@ class Api {
       . 'WHERE apikey = ?';
     $this->me=$db->qone($query, array($_REQUEST["key"]), PDO::FETCH_ASSOC);
     if (!$this->me) {
-      $this->apiError(2,_("The specified APIKEY does not exist in this transcoder."));
+      $this->apiError(API_ERROR_NOKEY,_("The specified APIKEY does not exist in this transcoder."));
     }
     if (!$this->me["enabled"])  {
-      $this->apiError(3,_("Your account is disabled, please contact the administrator of this transcoder."));
+      $this->apiError(API_ERROR_DISABLED,_("Your account is disabled, please contact the administrator of this transcoder."));
     }
     $this->allowApplication($_REQUEST["application"], $_REQUEST["version"]);
     return $this->me;
@@ -271,7 +271,7 @@ class Api {
 	return true;
       }
     }
-    $this->apiError(11,_("Adapter not allowed"));
+    $this->apiError(API_ERROR_ADAPTERNOTALLOWED,_("Adapter not allowed"));
   }
 
   
@@ -288,7 +288,7 @@ class Api {
     $adapterClass=array();
     Hooks::call('adapterList',$adapterClass);
     if (!in_array($adapterClass, $adapter)) {
-      $this->apiError(12,_("The requested adapter is not supported on this Transcoder"));
+      $this->apiError(API_ERROR_ADAPTERNOTSUPPORTED,_("The requested adapter is not supported on this Transcoder"));
     }
     if (!empty($user)) {
       $this->checkAllowedAdapter($user,$adapter);
@@ -318,7 +318,7 @@ class Api {
     }
     if (isset($this->me["rate"]) && $this->me["rate"]) $myrate=$this->me["rate"]; else $myrate=RATE_DEFAULT;
     if ($rate>=$myrate) {
-      $this->apiError(4,_("You sent too many queries per minute, please wait a little bit before sending more..."));
+      $this->apiError(API_ERROR_RATELIMIT,_("You sent too many queries per minute, please wait a little bit before sending more..."));
     }
     return true;
   }
@@ -374,7 +374,7 @@ class Api {
 
   function allowApplication($application, $version) {
     // TODO : allow a list of blacklisted Application or Application/Version to trigger an error
-    // if (!$allowed) $this->apiError(9,_("This application is not allowed, you may ask the transcoder owner why or try to use another public transcoder"));
+    // if (!$allowed) $this->apiError(API_ERROR_APPNOTALLOWED,_("This application is not allowed, you may ask the transcoder owner why or try to use another public transcoder"));
     return true;
   }
 
