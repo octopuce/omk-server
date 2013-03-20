@@ -264,9 +264,7 @@ class Api {
       $this->apiError(API_ERROR_MANDATORY,_("API key, application name and version number are mandatory."));
     }
     // Search for the user api key
-    $query = 'SELECT uid, email, admin,enabled, validated  '
-      . 'FROM users '
-      . 'WHERE apikey = ?';
+    $query = 'SELECT * FROM users WHERE apikey = ?';
     $this->me=$db->qone($query, array($_REQUEST["key"]), PDO::FETCH_ASSOC);
     if (!$this->me) {
       $this->apiError(API_ERROR_NOKEY,_("The specified APIKEY does not exist in this transcoder."));
@@ -287,9 +285,9 @@ class Api {
    * @return true
    */
   public function checkAllowedAdapter($user,$adapter) {
-    if (!empty($user["allowedadapter"])) {
-      $list=explode(",",$user["allowedadapter"]);
-      if (in_array($list,$adapter)) {
+    if (!empty($user["allowedadapters"])) {
+      $list=explode(",",$user["allowedadapters"]);
+      if (in_array($adapter,$list)) {
 	return true;
       }
     }
@@ -309,7 +307,8 @@ class Api {
     $adapter=strtolower(trim($adapter));
     $adapterClass=array();
     Hooks::call('adapterList',$adapterClass);
-    if (!in_array($adapterClass, $adapter)) {
+    //    error_log(implode(' ',$user));
+    if (!in_array($adapter,$adapterClass)) {
       $this->apiError(API_ERROR_ADAPTERNOTSUPPORTED,_("The requested adapter is not supported on this Transcoder"));
     }
     if (!empty($user)) {
