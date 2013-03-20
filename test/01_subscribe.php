@@ -18,7 +18,7 @@ $result=call("app_subscribe",array(
 		       "version" => "1.0"
 		       ));
 
-file_put_contents("/tmp/apikey",$result["apikey"]);
+file_put_contents(__DIR__"/apikey",$result["apikey"]);
 print_r($result);
 
 

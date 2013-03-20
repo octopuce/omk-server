@@ -7,3 +7,4 @@ htpasswd.*
 tmp/
 storage/
 discovery/config.php
+test/apikey
