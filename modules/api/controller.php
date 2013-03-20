@@ -64,8 +64,9 @@ class ApiController extends AController {
     }
     $adapterObject=$this->api->getAdapter($this->params["adapter"],$this->me);
 
-    // We check the validity of the url : 
+    // We check the validity of the url and ask for download or not? : 
     $state=$adapterObject->addNewMedia($this->params["url"]);
+
     if ($state==ADAPTER_NEW_MEDIA_INVALID) {
       $this->api->apiError(API_ERROR_BADURL,_("The remote url is incorrect for this adapter. Please check your code"));
     }
@@ -77,7 +78,7 @@ class ApiController extends AController {
       $this->api->apiError(API_ERROR_CODEERROR,_("BAD IMPLEMENTATION of AdapterClass in ".$this->params["adapter"].", read the docs!"));
     }
 
-    // first, we create a media
+    // We create a media
     $media_id=$this->api->mediaAdd(array(
 					 "owner" => $this->me["uid"],
 					 "remoteid" => $this->params["id"],
@@ -93,16 +94,10 @@ class ApiController extends AController {
       return $this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
 				  array("url" => $this->params["url"], 
 					"dometadata" => $this->params["dometadata"], 
-					//"cropdetect" => $this->params["cropdetect"]
 					) );
     } else {
       // already locally available? let's queue the metadata search:
-      return $this->api->queueAdd(TASK_METADATA,$media_id,DOWNLOAD_RETRY,
-				  array("url" => $this->params["url"], 
-					"dometadata" => $this->params["dometadata"], 
-					//"cropdetect" => $this->params["cropdetect"]
-					) );
-      
+      return $this->api->queueAdd(TASK_DO_METADATA,$media_id,METADATA_RETRY);
     }
 
   } // app_new_mediaAction
@@ -121,14 +116,7 @@ class ApiController extends AController {
     $this->api->logApiCall("app_get_settings");
     // Return the settings available on this transcoder: 
     // First trigger the hooks which adds settings ...
-    $settings_all=array();
-    Hooks::call('settingsList',$settings_all);
-    if (is_file(__DIR__."/libs/settings.php")) {
-      include(__DIR__."/libs/settings.php");
-      $settings_all=$settings_all + $settings;
-    }
-    // Return ALL the settings available in this transcoder
-    return $settings_all;
+    return $this->api->getAllSettings();
   }
 
 

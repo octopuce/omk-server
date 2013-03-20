@@ -8,7 +8,8 @@ define("METADATA_RETRY",4); // retry 4 times each metadata search
 class Api {
 
 
-  /** ****************************************
+  /* ------------------------------------------------------------ */
+  /** 
    * Get a task and lock it for processing.
    * @param $task integer is the task type
    * @return array the locked task, or false if no task has been found
@@ -129,7 +130,7 @@ class Api {
    */
   public function mediaUpdate($id,$v) {
     global $db;
-    $k=array("status","remoteid","remoteurl","owner","metadata");
+    $k=array("status","remoteid","remoteurl","owner","metadata","adapter");
     $sql=""; $val=array();
     foreach($k as $key) {
       if (isset($v[$key])) { 
@@ -170,7 +171,23 @@ class Api {
   }
 
 
-  /** ********************************************************************
+  /* ------------------------------------------------------------ */
+  /** 
+   * return the list of all settings availables on this Transcoder
+   */
+  public function getAllSettings() {
+    $settings_all=array();
+    Hooks::call('settingsList',$settings_all);
+    if (is_file(__DIR__."/libs/settings.php")) {
+      include(__DIR__."/libs/settings.php");
+      $settings_all=$settings_all + $settings;
+    }
+    return $settings_all;
+  }
+
+
+  /* ------------------------------------------------------------ */
+  /** 
    * Log the API Call to the DB, so that we know who asked for what and when
    */
   public function logApiCall($api) {
