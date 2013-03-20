@@ -11,13 +11,14 @@ require_once("zz_config.php");
    * non-mandatory parameters:
    * lang: language of the client, default to en_US (for discussion & email verification text)
    */
-$result=call("subscribe",array(
+$result=call("app_subscribe",array(
 		       "email" => "benjamin@localhost",
 		       "url" => CLIENT_ROOT."zz_api.php",
 		       "application" => "OMK Transcoder Test Client",
 		       "version" => "1.0"
 		       ));
 
+file_put_contents("/tmp/apikey",$result["apikey"]);
 print_r($result);
 
 

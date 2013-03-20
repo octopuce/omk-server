@@ -1,6 +1,9 @@
 <?php
 
 define("API_ROOT","http://omk.local/api");
+define("API_KEY",file_get_contents("/tmp/apikey"));
+define("APPLICATION_NAME","OMK Transcoder Test Client");
+define("APPLICATION_VERSION","1.0");
 // url (ending by /) where this test/ folder is pointed at
 define("CLIENT_ROOT","http://omk-client.local/");
 
@@ -10,11 +13,13 @@ define("CLIENT_ROOT","http://omk-client.local/");
  * Call a simple $method with key=>value $params 
  * returns the returned text, undecrypted. 
  */
-function call($method,$params) {
+function call($method,$params=null) {
   $url="";
-  foreach($params as $k=>$v) {
-    $url.="&";
-    $url.=urlencode($k)."=".urlencode($v);
+  if (is_array($params) && count($params)) {
+    foreach($params as $k=>$v) {
+      $url.="&";
+      $url.=urlencode($k)."=".urlencode($v);
+    }
   }
   $f=fopen(API_ROOT."/?action=".$method.$url,"rb");
   if (!$f) return false;
@@ -23,8 +28,11 @@ function call($method,$params) {
     $content.=$s;
   }
   fclose($f);
-  return $content;
+  return json_decode($content);
 }
 
+function myhash($str) {
+  return substr(md5(CLIENT_ROOT."_".$str),0,10);
+}
 
 ?>

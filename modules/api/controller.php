@@ -82,7 +82,7 @@ class ApiController extends AController {
     $media_id=$this->api->mediaAdd(array(
 					 "owner" => $this->me["uid"],
 					 "remoteid" => $this->params["id"],
-					 "adapter" => $this->params["adapter"] 
+					 "adapter" => $this->params["adapter"],
 					 "remoteurl" => $this->params["url"],
 					 "status" => $status,
 					 ) );
@@ -116,7 +116,7 @@ class ApiController extends AController {
     $this->api->logApiCall("app_get_settings");
     // Return the settings available on this transcoder: 
     // First trigger the hooks which adds settings ...
-    return $this->api->getAllSettings();
+    $this->api->returnValue($this->api->getAllSettings());
   }
 
 
@@ -133,8 +133,9 @@ class ApiController extends AController {
    * version: version of the client application
    * non-mandatory parameters:
    * lang: language of the client, default to en_US (for discussion & email verification text)
+   * @return array the list of available settings on this transcoder. if the subscription was successfull.
    */
-  public function subscribeAction() {
+  public function app_subscribeAction() {
     if (!defined("PUBLIC_TRANSCODER") || !PUBLIC_TRANSCODER) {
       $this->api->apiError(API_ERROR_NOTPUBLIC,_("This server is not a public transcoder, please use another one"));
     }
@@ -161,9 +162,14 @@ class ApiController extends AController {
     if (!$uid) {
       $this->api->apiError(API_ERROR_CREATEACCOUNT,_("An error happened when creating the account. Please retry later."));
     } 
+    $me=Users::get($uid);
     // Send a validation email to the user
     Users::sendValidationEmail($uid);
-    $this->api->apiError(API_ERROR_OK,_("Your account has been created, please validate it by clicking the link in the email you just received"));
+
+    $this->api->returnValue(
+			    array("apikey" => $me["apikey"],
+				  "settings" =>$this->api->getAllSettings()
+				  ));
   }
   
 

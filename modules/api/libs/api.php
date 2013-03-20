@@ -176,10 +176,11 @@ class Api {
    * return the list of all settings availables on this Transcoder
    */
   public function getAllSettings() {
+    global $settings;
     $settings_all=array();
     Hooks::call('settingsList',$settings_all);
-    if (is_file(__DIR__."/libs/settings.php")) {
-      include(__DIR__."/libs/settings.php");
+    if (is_file(__DIR__."/../libs/settings.php")) {
+      include(__DIR__."/../libs/settings.php");
       $settings_all=$settings_all + $settings;
     }
     return $settings_all;
@@ -193,7 +194,11 @@ class Api {
   public function logApiCall($api) {
     global $db;
     if (empty($this->me["uid"])) $me=0; else $me=$this->me["uid"];
-    $parray=serialize($this->params);
+    if (isset($this->params)) {
+      $parray=serialize($this->params);
+    } else {
+      $parray=serialize(NULL);
+    }
     if (!empty($_REQUEST["application"]) && !empty($_REQUEST["version"])) {
       $appversion=$db->qone("SELECT id FROM appversions WHERE application=? AND version=?",array($_REQUEST["application"],$_REQUEST["version"]));
       if (!$appversion) {
@@ -259,7 +264,7 @@ class Api {
       $this->apiError(API_ERROR_MANDATORY,_("API key, application name and version number are mandatory."));
     }
     // Search for the user api key
-    $query = 'SELECT uid, login, email, admin,enabled  '
+    $query = 'SELECT uid, email, admin,enabled, validated  '
       . 'FROM users '
       . 'WHERE apikey = ?';
     $this->me=$db->qone($query, array($_REQUEST["key"]), PDO::FETCH_ASSOC);
@@ -350,6 +355,17 @@ class Api {
     $o=new StdClass();
     $o->code=$code; $o->msg=$msg;
     echo json_encode($o);
+    exit(); // FATAL
+  }
+
+
+  /** ********************************************************************
+   * Emit a json_encoded api response
+   * then EXIT THE PAGE
+   */ 
+  public function returnValue($val) {
+    header("Content-Type: application/json");
+    echo json_encode($val);
     exit(); // FATAL
   }
 
