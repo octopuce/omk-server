@@ -90,11 +90,11 @@ class Api {
    * @param $format integer is the format (from format table) if the task is a transcode.
    * @return integer the newly created queue id
    */ 
-  public function queueAdd($task,$media,$retry=1,$params=null) {
+  public function queueAdd($task,$media,$retry=1,$params=null,$adapter="") {
     global $db;
-    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, params=?;";
+    $query = "INSERT INTO queue SET datequeue=NOW(), datetry=NOW(), user=?, status=".STATUS_TODO.", retry=?, lockhost='', lockpid=0,  task=?, mediaid=?, params=?, adapter=?;";
     if (!is_array($params)) $params=array();
-    $db->q($query,array($this->me["uid"],$retry,$task,$media,serialize($params)));
+    $db->q($query,array($this->me["uid"],$retry,$task,$media,serialize($params),$adapter));
     return $db->lastInsertId();
   }
   

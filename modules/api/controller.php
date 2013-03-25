@@ -94,14 +94,14 @@ class ApiController extends AController {
       if ($this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
 				  array("url" => $this->params["url"], 
 					"dometadata" => $this->params["dometadata"], 
-					) )) {
+					),$this->params["adapter"]) ) {
 	$this->api->apiError(API_ERROR_OK,_("OK, Download task queued"));
       } else {
 	$this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
       }
     } else {
       // already locally available? let's queue the metadata search:
-      if ( $this->api->queueAdd(TASK_DO_METADATA,$media_id,METADATA_RETRY)) {
+      if ( $this->api->queueAdd(TASK_DO_METADATA,$media_id,METADATA_RETRY,null,$this->params["adapter"])) {
 	$this->api->apiError(API_ERROR_OK,_("OK, Metadata task queued"));
       } else {
 	$this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
