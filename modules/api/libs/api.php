@@ -352,7 +352,7 @@ class Api {
   public function apiError($code,$msg) {
     header("Content-Type: application/json");
     $o=new StdClass();
-    $o->code=$code; $o->msg=$msg;
+    $o->code=$code; $o->message=$msg;
     echo json_encode($o);
     exit(); // FATAL
   }
