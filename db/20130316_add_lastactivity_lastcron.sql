@@ -17,3 +17,7 @@ ALTER TABLE `queue`
       ADD `adapter` VARCHAR( 64 ) NOT NULL ,
       ADD INDEX ( `adapter` );
 
+ALTER TABLE `media` 
+      ADD `adapter` VARCHAR( 64 ) NOT NULL ,
+      ADD INDEX ( `adapter` );
+
