@@ -9,7 +9,7 @@ if (empty($_REQUEST["action"])) {
   exit();
 }
 
-if (empty($_REQUEST["key"]) || $_REQUEST["key"]!=CLIENT_KEY) {
+if (empty($_REQUEST["app_key"]) || $_REQUEST["app_key"]!=CLIENT_KEY) {
   header("HTTP/1.1 403 Not Authorized");
   exit();
 }

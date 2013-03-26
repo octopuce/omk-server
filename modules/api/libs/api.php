@@ -260,7 +260,7 @@ class Api {
    */
   public function checkCallerIdentity() {
     global $db;
-    if (!isset($_REQUEST["key"]) || !isset($_REQUEST["application"]) || !isset($_REQUEST["version"])) {
+    if (!isset($_REQUEST["transcoder_key"]) || !isset($_REQUEST["application"]) || !isset($_REQUEST["version"])) {
       $this->apiError(API_ERROR_MANDATORY,_("API key, application name and version number are mandatory."));
     }
     // Search for the user api key

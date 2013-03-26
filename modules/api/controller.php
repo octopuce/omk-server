@@ -154,7 +154,7 @@ class ApiController extends AController {
     $this->params = $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
 						   "email" => array("string",true),
 						   "url" => array("string",true),
-						   "key" => array("string",true),
+						   "app_key" => array("string",true),
 						   "application" => array("string",true),
 						   "version" => array("string",true),
 						   "lang" => array("string",false,"en_US"),
@@ -168,7 +168,7 @@ class ApiController extends AController {
     $this->params['enabled']=1;
     $this->params['validated']=0;
     $this->params['admin']=0;
-    $this->params['clientkey']=$this->params['key']; unset($this->params['key']);
+    $this->params['clientkey']=$this->params['app_key']; unset($this->params['app_key']);
     $uid=Users::addUser($this->params);
     if (!$uid) {
       $this->api->apiError(API_ERROR_CREATEACCOUNT,_("An error happened when creating the account. Please retry later."));

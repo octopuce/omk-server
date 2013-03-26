@@ -32,9 +32,9 @@ while (true) {
   foreach($list as $onecron) {
     if (substr($onecron["url"],0,7)=="http://" || substr($onecron["url"],0,8)=="https://") {
       if (strpos($onecron["url"],"?")!==false) {
-	$onecron["url"].="&action=transcoder_cron&key=".$onecron['clientkey'];
+	$onecron["url"].="&action=transcoder_cron&app_key=".$onecron['clientkey'];
       } else {
-	$onecron["url"].="?action=transcoder_cron&key=".$onecron['clientkey'];	
+	$onecron["url"].="?action=transcoder_cron&app_key=".$onecron['clientkey'];	
       }
       $urllist[]=array("url" => $onecron["url"], "uid" => $onecron["uid"]);
     }

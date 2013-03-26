@@ -62,7 +62,7 @@ class Cron {
     if (defined('PUBLIC_TRANSCODER') && PUBLIC_TRANSCODER &&
 	defined('TRANSCODER_NAME') && TRANSCODER_NAME!='' &&
 	defined('TRANSCODER_ADMIN_EMAIL') && TRANSCODER_ADMIN_EMAIL!='') {
-      $f=@fopen("http://discovery.open-mediakit.org/?action=transcoder_is_available&name=".urlencode(TRANSCODER_NAME)."&email=".urlencode(TRANSCODER_ADMIN_EMAIL)."&url=".urlencode(FULL_URL."api")."","rb");
+      $f=@fopen("http://discovery.open-mediakit.org/?action=transcoder_is_available&name=".urlencode(TRANSCODER_NAME)."&email=".urlencode(TRANSCODER_ADMIN_EMAIL)."&url=".urlencode(FULL_URL."api")."&version=".OMKT_VERSION."&application=OpenMediakitTranscoder","rb");
       if ($f) {
 	$js="";
 	while ($s=fgets($f,1024)) { $js.=$s; }
