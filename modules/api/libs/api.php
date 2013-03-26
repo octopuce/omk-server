@@ -7,6 +7,7 @@ define("METADATA_RETRY",4); // retry 4 times each metadata search
 
 class Api {
 
+  public $me=array(); // current user
 
   /* ------------------------------------------------------------ */
   /** 
@@ -266,7 +267,7 @@ class Api {
     }
     // Search for the user api key
     $query = 'SELECT * FROM users WHERE apikey = ?';
-    $this->me=$db->qone($query, array($_REQUEST["key"]), PDO::FETCH_ASSOC);
+    $this->me=$db->qone($query, array($_REQUEST["transcoder_key"]), PDO::FETCH_ASSOC);
     if (!$this->me) {
       $this->apiError(API_ERROR_NOKEY,_("The specified APIKEY does not exist in this transcoder."));
     }

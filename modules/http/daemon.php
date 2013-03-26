@@ -15,6 +15,7 @@ if (!function_exists("curl_init")) {
 
 require_once __DIR__ . '/../../common.php';
 require_once MODULES . '/api/libs/api.php';
+require_once MODULES . '/users/libs/users.php';
 
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Download Daemon)";
 
@@ -43,10 +44,11 @@ while (true) {
     $api->setTaskFailedUnlock($task["id"]);
     continue;
   }
-  $media=$media[0];
+  $media = $media[0];
   
-  // ok, we try to download the file, with curl, with timeout and range management
-  
+  $api->me = Users::get($task["user"]);
+
+  // ok, we try to download the file, with curl, with timeout and range management  
   $curl=curl_init();
   $options=array(CURLOPT_USERAGENT => $useragent,
 		 CURLOPT_HEADER => false,
@@ -57,7 +59,10 @@ while (true) {
 		 );
   curl_setopt_array($curl,$options);
   
-  curl_setopt($curl,CURLOPT_URL,$task["params"]["url"]);
+  $url=$task["params"]["url"];
+  if (strpos($url,"?")!==false) $url.="&"; else $url="?";
+  $url.="app_key=".$api->me["clientkey"];
+  curl_setopt($curl,CURLOPT_URL,$url);
   
   @mkdir(STORAGE_PATH."/original/");
   $filename=STORAGE_PATH."/original/".$media["id"];
@@ -90,11 +95,11 @@ while (true) {
     }    
     // ok, transfer finished, let's mark it done
     $api->setTaskProcessedUnlock($task["id"]);
-    log(LOG_INFO,"Download task ".$task["id"]." finished for media ".$task["mediaid"]."");
+    $api->log(LOG_INFO,"Download task ".$task["id"]." finished for media ".$task["mediaid"]."");
   } else {
     // if we failed, we just mark it as failed, this will retry 5 min from now ...
     $api->setTaskFailedUnlock($task["id"]);
-    log(LOG_WARNING,"Download task ".$task["id"]." failed or unfinished for media ".$task["mediaid"]."");
+    $api->log(LOG_WARNING,"Download task ".$task["id"]." failed or unfinished for media ".$task["mediaid"]."");
   }
 
 } // while (true)

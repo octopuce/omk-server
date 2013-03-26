@@ -10,7 +10,7 @@ $id=1;
 $result=call("app_new_media",
 	     array(
 		   "id" => $id,
-		   "url" => CLIENT_ROOT."zz_api.php?action=getvideo&key=".myhash($id)."id=".$id
+		   "url" => CLIENT_ROOT."zz_api.php?action=getvideo&id=".$id
 		   ));
 
 print_r($result);

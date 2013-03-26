@@ -40,7 +40,8 @@ if (!$media) {
 }
 $media=$media[0];
 
-$filename=STORAGE_PATH."/".$media["id"];
+// TODO : ask the ADAPTER for the original path !!
+$filename=STORAGE_PATH."/original/".$media["id"];
 
 if (!file_exists($filename) || filesize($filename)==0 ) {
   error_log("FATAL: got task '".$task["id"]."' but file '".$filename."' not found or has zero size!!\n");
@@ -49,7 +50,7 @@ if (!file_exists($filename) || filesize($filename)==0 ) {
 
 // ok, now we use ffmpeg to get the metadata of the downloaded media
 // depending on FFMPEG / AVCONV version, we use one parser or the other ...
-$metadata=$ffmpeg->getFfmpegMetadata($filename,$params["cropdetect"]);
+$metadata=$ffmpeg->getFfmpegMetadata($filename);
 
 if ($metadata) {
 

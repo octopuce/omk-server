@@ -5,7 +5,7 @@
 require_once("zz_config.php");
 
 if (empty($_REQUEST["action"])) {
-  header("HTTP/1.1 404 Not Found");
+  header("HTTP/1.1 404 Not Found 1");
   exit();
 }
 
@@ -24,14 +24,10 @@ case "transcoder_cron":
 
 case "getvideo":
   if (empty($_REQUEST["id"])) {
-    header("HTTP/1.1 404 Not Found");
+    header("HTTP/1.1 404 Not Found 2");
     exit();
   }
   $id=intval($_REQUEST["id"]);
-  if ($_REQUEST["key"]!=myhash($id)) {
-    header("HTTP/1.1 404 Not Found");
-    exit();
-  }
   readfile("test.mp4");
   // Return the video file to the transcoder
   break;
