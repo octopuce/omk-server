@@ -1,5 +1,7 @@
 <?php
 
+require_once("config.php");
+
   // every hour, check all the transcoders.
   // remove immediately a non-running transcoder
   // reinsert a transcoder running fine for more than 2 hours
@@ -27,7 +29,7 @@ while ($c=mysql_fetch_array($r)) {
     } else {
       $sets=array();
       foreach($settings as $setting) {
-	$sets[]=$setting["id"];
+	$sets[]=intval($setting->id);
       }
       $sets=json_encode($sets);
       $sql="";
