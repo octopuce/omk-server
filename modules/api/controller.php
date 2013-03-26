@@ -29,14 +29,7 @@ class ApiController extends AController {
       }
     }
 
-    // TODO Show the API Documentation ;)     
-    $headers = array(
-		     'name' => _('Name'),
-		     'parameters' => _('Parameters'),
-		     'return' => _('Returned value'),
-		     'documentation' => _('Documentation'),
-		     );
-    $this->render('index', array('functions' => $functions, 'headers' => $headers));
+    $this->render('index');
   }
 
   
@@ -112,14 +105,14 @@ class ApiController extends AController {
 
 
   /** ********************************************************************
-   * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
-   * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
-   * Params for DOWNLOAD TASK : id (id of the video in the openmediakit) url (of the video at the omk side)
-   * Params for METADATA TASK : dometadata (default true)
-   * Depending on the pattern of the URL, a specific OMKTFileAdapter will be triggered for download.
+   * This is a  public api which doesn't require any authentication.
+   * returns the json-encoded list of settings supported by the transcoder.
+   * as an array of objects. Get them from libs/settings.php
+   * Also call a hook "settingsList" in case you added a module with new settings
+   * those custom settings MUST HAVE an ID > 1000 ! 
    */
   public function app_get_settingsAction() {
-    $this->me=$this->api->checkCallerIdentity();
+    //    $this->me=$this->api->checkCallerIdentity();
     $this->api->enforceLimits();
     $this->api->logApiCall("app_get_settings");
     // Return the settings available on this transcoder: 
@@ -137,7 +130,7 @@ class ApiController extends AController {
    * the parameters are : 
    * email: the email address of the subscriber (*it will be verified by sending an email*)
    * url: url of the api root of the client. will be used to call 
-   * key: the api Key the client want me to use when contacting him, <=32 characters
+   * app_key: the api Key the client want me to use when contacting him, <=32 characters
    * application: client application that request an account
    * version: version of the client application
    * non-mandatory parameters:
@@ -159,6 +152,7 @@ class ApiController extends AController {
 						   "version" => array("string",true),
 						   "lang" => array("string",false,"en_US"),
 						   ));
+    // TODO : use gettext to set the LOCALES according to the lang set by the caller.
     require_once(MODULES."/users/libs/users.php");
     $this->api->logApiCall("subscribe");
     // Check for application / version blacklist
