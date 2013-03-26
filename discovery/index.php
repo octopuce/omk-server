@@ -72,7 +72,7 @@ if (!empty($_REQUEST["action"])) {
 } 
 
   // ok, no action, let's show the application/json of all currently available public transcoders : 
-  $r=mysql_query("SELECT id, name, url FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=1 ORDER BY RAND();");
+  $r=mysql_query("SELECT id, name, url FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=2 ORDER BY RAND();");
   $res=array();
   while ($c=mysql_fetch_array($r)) {
     $t=new StdClass();
@@ -84,6 +84,4 @@ if (!empty($_REQUEST["action"])) {
   }
   header("Content-Type: application/json");
   echo json_encode($res);
-
-// TODO : periodically CHECK and PING the transcoder and keep only those who answer properly to the PING api !
 
