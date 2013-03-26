@@ -205,11 +205,12 @@ class Api {
 	$db->q("INSERT INTO appversions SET application=?, version=?",array($_REQUEST["application"],$_REQUEST["version"]));
 	$appversion=$db->qone("SELECT LAST_INSERT_ID() AS id;");
       }
+      $appversion = $appversion->id;
     } else $appversion=0;
 
     $query = 'INSERT INTO apicalls SET calltime=NOW(), user=?, api=?, params=?, ip=?, appversion=?;';
     $db->q($query,
-	   array($me,$api,$parray,$_SERVER["REMOTE_ADDR"],$appversion->id)
+	   array($me,$api,$parray,$_SERVER["REMOTE_ADDR"],$appversion)
 		 );
   }
 

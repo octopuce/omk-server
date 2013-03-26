@@ -22,10 +22,6 @@ if (!empty($_REQUEST["action"])) {
       if ($already["name"]!=$_REQUEST["name"]) {
 	$sql.=", name='".addslashes($_REQUEST["name"])."'";
       }
-      $settings=filterSettings($_REQUEST["settings"]);
-      if ($settings!=@unserialize($already["settings"])) {
-	$sql.=", settings='".addslashes(serialize($settings))."'";
-      }
       if ($already["email"]!=$_REQUEST["email"]) {
 	// mail changed, validate it
 	validate($already["id"],$_REQUEST["email"]);
@@ -72,14 +68,14 @@ if (!empty($_REQUEST["action"])) {
 } 
 
   // ok, no action, let's show the application/json of all currently available public transcoders : 
-  $r=mysql_query("SELECT id, name, url FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=2 ORDER BY RAND();");
+  $r=mysql_query("SELECT id, name, url, settings FROM transcoder WHERE lastseen > DATE_SUB(NOW(), INTERVAL 4 DAY) AND enabled=2 ORDER BY RAND();");
   $res=array();
   while ($c=mysql_fetch_array($r)) {
     $t=new StdClass();
     $t->id=$c["id"];
     $t->name=$c["name"];
     $t->url=$c["url"];
-    $t->settings=@unserialize($c["settings"]);
+    $t->settings=json_decode($c["settings"]);
     $res[]=$t;
   }
   header("Content-Type: application/json");

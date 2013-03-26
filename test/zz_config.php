@@ -17,6 +17,9 @@ define("CLIENT_ROOT","http://omk-client.local/");
 function call($method,$params=null) {
   $url="";
   if (is_array($params) && count($params)) {
+    $params["transcoder_key"] = API_KEY;
+    $params["application"] = APPLICATION_NAME;
+    $params["version"] = APPLICATION_VERSION;
     foreach($params as $k=>$v) {
       $url.="&";
       $url.=urlencode($k)."=".urlencode($v);

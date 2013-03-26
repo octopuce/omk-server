@@ -15,8 +15,6 @@ $result=call("app_subscribe",array(
 		       "email" => "benjamin@localhost",
 		       "app_key" => CLIENT_KEY,
 		       "url" => CLIENT_ROOT."zz_api.php",
-		       "application" => "OMK Transcoder Test Client",
-		       "version" => "1.0"
 		       ));
 
 file_put_contents(__DIR__."/apikey",$result->apikey);
