@@ -16,6 +16,7 @@ define('LIBS', ROOT . '/libs');
 define('LOCALES', ROOT . '/locales');
 define('VIEWS', ROOT . '/views');
 
+$db=new StdClass();
 // Configuration
 require_once __DIR__ . '/config.inc.php';
 
