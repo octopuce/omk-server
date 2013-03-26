@@ -2,11 +2,18 @@
 
 // this php script is called in a WEB SERVER by the Transcoder when it needs to tell me something ...
 // the only mandatory parameter is ?action=<action name> others depends on the action itself,
+require_once("zz_config.php");
 
 if (empty($_REQUEST["action"])) {
   header("HTTP/1.1 404 Not Found");
   exit();
 }
+
+if (empty($_REQUEST["key"]) || $_REQUEST["key"]!=CLIENT_KEY) {
+  header("HTTP/1.1 403 Not Authorized");
+  exit();
+}
+
 
 switch ($_REQUEST["action"]) {
 case "transcoder_cron":

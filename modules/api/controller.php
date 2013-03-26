@@ -137,6 +137,7 @@ class ApiController extends AController {
    * the parameters are : 
    * email: the email address of the subscriber (*it will be verified by sending an email*)
    * url: url of the api root of the client. will be used to call 
+   * key: the api Key the client want me to use when contacting him, <=32 characters
    * application: client application that request an account
    * version: version of the client application
    * non-mandatory parameters:
@@ -153,6 +154,7 @@ class ApiController extends AController {
     $this->params = $this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
 						   "email" => array("string",true),
 						   "url" => array("string",true),
+						   "key" => array("string",true),
 						   "application" => array("string",true),
 						   "version" => array("string",true),
 						   "lang" => array("string",false,"en_US"),
@@ -166,6 +168,7 @@ class ApiController extends AController {
     $this->params['enabled']=1;
     $this->params['validated']=0;
     $this->params['admin']=0;
+    $this->params['clientkey']=$this->params['key']; unset($this->params['key']);
     $uid=Users::addUser($this->params);
     if (!$uid) {
       $this->api->apiError(API_ERROR_CREATEACCOUNT,_("An error happened when creating the account. Please retry later."));

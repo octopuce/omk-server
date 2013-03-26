@@ -19,7 +19,7 @@ class Cron {
 
     // We also cronifie every 1 hours, each users whose last activity is more than one month ago, 
     // and whose last successfull cron is less than a month ago.
-    return $db->qlist("SELECT uid, url FROM users WHERE 
+    return $db->qlist("SELECT uid, url, clientkey FROM users WHERE 
     enabled=1 AND validated=1 AND url!='' AND 
     (
       ( lastactivity > DATE_SUB(NOW(), INTERVAL 31 DAY) 

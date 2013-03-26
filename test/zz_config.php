@@ -1,6 +1,7 @@
 <?php
 
 define("API_ROOT","http://omk.local/api");
+define("CLIENT_KEY","aa7ohxaelu4ue4ERoo3a");
 define("API_KEY",file_get_contents(__DIR__."/apikey"));
 define("APPLICATION_NAME","OMK Transcoder Test Client");
 define("APPLICATION_VERSION","1.0");

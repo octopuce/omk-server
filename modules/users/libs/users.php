@@ -45,9 +45,10 @@ class Users {
     $validated = (!empty($informations['validated']) && in_array($informations['validated'], array(true, 'on', 1))) ? true : false;
     $admin = (!empty($informations['admin']) && in_array($informations['admin'], array(true, 'on', 1))) ? true : false;
     $url = (empty($informations['url'])) ? '' :  trim((string)$informations['url']);
+    $clientkey = (empty($informations['clientkey'])) ? '' :  trim((string)$informations['clientkey']);
     $apikey=Users::generateApiKey();
 
-    $db->q('INSERT INTO `users` (uid, pass, email, enabled, validated, admin, url, apikey, lastactivity, lastcronsuccess) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+    $db->q('INSERT INTO `users` (uid, pass, email, enabled, validated, admin, url, apikey, clientkey, lastactivity, lastcronsuccess) VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
 	   array(
 		 $pass,
 		 $email,
@@ -55,7 +56,8 @@ class Users {
 		 ($validated) ? 1 : 0,
 		 ($admin) ? 1 : 0,
 		 $url,
-		 $apikey
+		 $apikey,
+		 $clientkey
 		 )
 	   );
 
