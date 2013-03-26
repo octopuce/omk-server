@@ -79,6 +79,7 @@ if (!empty($_REQUEST["action"])) {
     $t->id=$c["id"];
     $t->name=$c["name"];
     $t->url=$c["url"];
+    $t->settings=@unserialize($c["settings"]);
     $res[]=$t;
   }
   header("Content-Type: application/json");
