@@ -50,12 +50,12 @@ class Api {
     $query="SELECT * FROM queue WHERE task IN (".implode(",",$task).") AND status=? AND lockhost='' AND datetry<=NOW() $adapterfilter ORDER BY retry DESC, datequeue ASC LIMIT 1;";
     $me=$db->qone( $query, $params, PDO::FETCH_ASSOC );
     if (!$me) {
-      $db->q("UNLOCK TABLES queue;");
+      $db->q("UNLOCK TABLES;");
       return false;
     }
     $query="UPDATE queue SET status=?, lockhost=?, lockpid=?, datelaunch=NOW() WHERE id=?;";
     $db->q( $query,array(STATUS_PROCESSING,$hostname,$pid,$me["id"]) );
-    $db->q("UNLOCK TABLES queue;");
+    $db->q("UNLOCK TABLES;");
     $p=@unserialize($me["params"]); if (!empty($p)) $me["params"]=$p; // We unserialize the parameters of the task.
     return $me;
   }

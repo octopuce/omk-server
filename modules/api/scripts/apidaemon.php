@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-   // TODO : can we get the QUIT TERM INT signals and cleanup properly ?
-
    /** ************************************************************
     * Client API Calling process, may be launch as many time as needed
     * on the machine having a proper Internet connection.
@@ -27,6 +25,30 @@ $options=array(CURLOPT_USERAGENT => $useragent,
 	       CURLOPT_TIMEOUT => 30   // no more than 30 seconds of waiting for the client.
 	       );
 curl_setopt_array($curl,$options);
+
+declare(ticks = 1);
+
+// In case termination signal, Ctrl-C or other exit-requesting signal: 
+function sig_handler($signo) {
+  global $task, $api;
+  switch ($signo) {
+  case SIGTERM:
+  case SIGHUP:
+  case SIGINT:
+  case SIGQUIT:
+    $api->log(LOG_INFO, "Got Signal $signo, cleanup and quit.");
+    if ($task) {
+      $api->setTaskFailedUnlock($task["id"]);
+    }
+    exit;
+    break;
+  }  
+}
+
+pcntl_signal(SIGTERM, "sig_handler");
+pcntl_signal(SIGHUP,  "sig_handler");
+pcntl_signal(SIGINT, "sig_handler");
+pcntl_signal(SIGQUIT,  "sig_handler");
 
 while (true) {
 
@@ -83,14 +105,14 @@ while (true) {
   
   curl_setopt($curl,CURLOPT_URL,$url);
   $res=curl_exec($curl);
-  $info = curl_info_read($curl);
+  $info = curl_getinfo($curl);
   if (!$res || $info["http_code"]!=200 ) {
     $api->log(LOG_CRIT, "On task '".$task["id"]."' curl returned empty result or non-200 http_code (".$info["http_code"].")");
     $api->setTaskFailedUnlock($task["id"]);
     continue;    
   } 
   $res=@json_decode($res);
-  if ($res->code==0) {
+  if ($res->code==0 || $res->code==200) { // TODO : use http error code only here 
     $api->setTaskProcessedUnlock($task["id"]);
   } else {
     $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned code ".$res->code." and message ".$res->message.", which means fail, will try later");

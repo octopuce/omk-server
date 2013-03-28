@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-   // TODO : can we get the QUIT TERM INT signals and cleanup properly ?
 
    /** ************************************************************
     * Metadata maker process, may be launch as many time as needed
@@ -18,6 +17,31 @@ $api=new Api();
 $ffmpeg=new Ffmpeg();
 
 $api->log_caller="metadata-daemon"; 
+
+declare(ticks = 1);
+
+// In case termination signal, Ctrl-C or other exit-requesting signal: 
+function sig_handler($signo) {
+  global $task, $api;
+  switch ($signo) {
+  case SIGTERM:
+  case SIGHUP:
+  case SIGINT:
+  case SIGQUIT:
+    $api->log(LOG_INFO, "Got Signal $signo, cleanup and quit.");
+    if ($task) {
+      $api->setTaskFailedUnlock($task["id"]);
+    }
+    exit;
+    break;
+  }  
+  echo "oups";
+}
+
+pcntl_signal(SIGTERM, "sig_handler");
+pcntl_signal(SIGHUP,  "sig_handler");
+pcntl_signal(SIGINT, "sig_handler");
+pcntl_signal(SIGQUIT,  "sig_handler");
 
 while (true) {
 
@@ -84,3 +108,4 @@ while (true) {
   
   
 } // infinite loop...
+
