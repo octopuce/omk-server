@@ -8,3 +8,5 @@ tmp/
 storage/
 discovery/config.php
 test/apikey
+test/metadata.txt
+test/transcodes/

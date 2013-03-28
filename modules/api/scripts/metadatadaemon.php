@@ -12,6 +12,7 @@
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/api.php';
 require_once __DIR__ . '/../libs/ffmpeg.php';
+require_once MODULES.'/users/libs/users.php';
 
 $api=new Api();
 $ffmpeg=new Ffmpeg();
@@ -63,14 +64,20 @@ while (true) {
   $params=unserialize($task["params"]);
   
   $media=$api->mediaSearch(array("id"=>$task["mediaid"]));
-  $adapterObject=$this->api->getAdapter($task["adapter"]);
-  
-  if (!$media || !$adapterObject) {
-    $api->log(LOG_CRIT, "Got task '".$task["id"]."' but media '".$task["mediaid"]."' or adapter '".$task["adapter"]."' not found!!");
+  if (!$media) {
+    $api->log(LOG_CRIT, "Got task '".$task["id"]."' but media '".$task["mediaid"]."' not found!!");
     $api->setTaskFailedUnlock($task["id"]);
     continue;
   }
   $media=$media[0];
+
+  $api->me = Users::get($task["user"]);
+  $adapterObject=$api->getAdapter($media["adapter"]);
+  if (!$adapterObject) {
+    $api->log(LOG_CRIT, "Got task '".$task["id"]."' but adapter '".$task["adapter"]."' not found!!");
+    $api->setTaskFailedUnlock($task["id"]);
+    continue;
+  }
   
   $filename = $adapterObject->filePathMetadata($media);
 
@@ -85,27 +92,25 @@ while (true) {
     $api->setTaskFailedUnlock($task["id"]);
     continue;
   }
-  
+   
   // ok, now we use ffmpeg to get the metadata of the downloaded media
   // depending on FFMPEG / AVCONV version, we use one parser or the other ...
   $metadata=$ffmpeg->getFfmpegMetadata($filename);
   
   if ($metadata) {
-    
     // Store the metadata in the media object: 
     $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_OK, "metadata" => serialize($metadata) ));
-
     // Queue the task to tell the client that we have the metadata
     $api->queueAdd(TASK_SEND_METADATA,$task["mediaid"],API_RETRY);
-
     // ok, transfer finished, let's mark it done
     $api->setTaskProcessedUnlock($task["id"]);
+    $api->log(LOG_DEBUG, "Successully processed task '".$task["id"]."', metadata for media '".$task["mediaid"]."'");
 
   } else {
     // if we failed, we just mark it as failed, this will retry 5 min from now ...
     $api->setTaskFailedUnlock($task["id"]);
+    $api->log(LOG_DEBUG, "Failed when processing task '".$task["id"]."', metadata for media '".$task["mediaid"]."'");
   }
-  
   
 } // infinite loop...
 

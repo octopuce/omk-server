@@ -8,6 +8,7 @@
 
 require_once __DIR__ . '/../../../common.php';
 require_once __DIR__ . '/../libs/api.php';
+require_once MODULES.'/users/libs/users.php';
 
 $useragent="OpenMediaKit-Transcoder/".OMKT_VERSION." (Client API Daemon)";
 

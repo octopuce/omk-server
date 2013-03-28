@@ -85,16 +85,16 @@ class Api {
   public function setTaskFailedUnlock($id) {
     global $db;
     $id=intval($id);
-    $task=$db->qone("SELECT * FROM task WHERE id=?",array($id));
+    $task=$db->qone("SELECT * FROM queue WHERE id=?",array($id));
     if (!$task) return false;
 
-    if ($task["retry"]==1) {
+    if ($task->retry==1) {
       // failed for real...
-      $db->q( "UPDATE task SET datedone=NOW(), status=?, lockhost='', lockpid=0 WHERE id=?", array(STATUS_ERROR,$id) );
+      $db->q( "UPDATE queue SET datedone=NOW(), status=?, lockhost='', lockpid=0 WHERE id=?", array(STATUS_ERROR,$id) );
     } else {
       // retry in 5 min
-      $retry=$task["retry"]-1;
-      $db->q( "UPDATE task SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 10 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$id) );
+      $retry=$task->retry-1;
+      $db->q( "UPDATE queue SET status=?, retry=?, datetry=DATE_ADD(NOW(), INTERVAL 10 MINUTE), lockhost='', lockpid=0 WHERE id=?", array(STATUS_TODO,$retry,$id) );
     }
     // TODO: return the remaining number of retries : will allow the caller to tell the client if a task has failed for too long ...
     return true;

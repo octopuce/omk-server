@@ -31,6 +31,20 @@ case "getvideo":
   readfile("test.mp4");
   // Return the video file to the transcoder
   break;
+
+case "transcoder_send_metadata":
+  if (empty($_REQUEST["id"]) 
+      || empty($_REQUEST["metadata"]) 
+      || ($metadata=@json_decode($_REQUEST["metadata"]))===false ) {
+    header("HTTP/1.1 404 Not Found 2");
+    exit();
+  }
+  file_put_contents(__DIR__."/metadata.txt",serialize($metadata));
+  $ok=new StdClass();
+  $ok->code=200;
+  $ok->message=_("OK, metadata received");
+  echo json_encode($ok);
+  break;
 default:
   header("HTTP/1.1 404 Not Found");
   exit();
