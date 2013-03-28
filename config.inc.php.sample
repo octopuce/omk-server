@@ -31,6 +31,8 @@ define('TMP_PATH',ROOT.'/tmp');
 define('LOGGER','syslog');
 /* If logging to a file, put it here (must be writable by the web server Unix user) */
 define('LOGGER_FILE','/var/log/omk/transcoder.log');
+/* Shall we log DEBUG message or not ? */
+define('LOGGER_DEBUG',true);
 
 // How many days we keep the transcoded files after we made them?
 define('MAX_KEEP_TRANSCODE_DAYS',3);

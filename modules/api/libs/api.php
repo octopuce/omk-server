@@ -440,6 +440,9 @@ class Api {
   public function log($priority, $message) {
     static $logopened=false;
     if (!defined("LOGGER")) define("LOGGER","nowhere");
+    if (!defined("LOGGER_DEBUG")) define("LOGGER_DEBUG",true);
+
+    if (!LOGGER_DEBUG && $priority==LOG_DEBUG) return;
 
     if (LOGGER=="syslog") {
       if (!$logopened) {
