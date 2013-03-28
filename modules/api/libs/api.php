@@ -4,6 +4,7 @@ require_once(MODULES."/api/libs/constants.php");
 
 define("DOWNLOAD_RETRY",10); // retry 10 times each download
 define("METADATA_RETRY",4); // retry 4 times each metadata search
+define("API_RETRY",10); // retry 10 times each client API call
 
 class Api {
 
@@ -17,11 +18,28 @@ class Api {
    */ 
   public function getQueuedTaskLock($task, $adapter='') {
     global $db;
-    $task=intval($task);
-    if ($task<TASK_MIN || $task>TASK_MAX) return false;
+    if (is_array($task)) {
+      if (count($task)==1) {
+	$task=$task[0];
+      } elseif (count($task)==0) {
+	return false;
+      } else {
+	$tl=array();
+	foreach($task as $t) {
+	  if ($t<TASK_MIN || $t>TASK_MAX) return false;
+	  $tl[]=$t;
+	}
+	$task=$tl;
+      }
+    } else {
+      $task=intval($task);
+      if ($task<TASK_MIN || $task>TASK_MAX) return false;
+      $task=array($task);
+    }
+
     $hostname=gethostname();
     $pid=getmypid();
-    $params=array($task,STATUS_TODO);
+    $params=array(STATUS_TODO);
     if ($adapter!='') {
       $adapterfilter=" AND adapter=? ";
       $params[]=$adapter;
@@ -29,7 +47,7 @@ class Api {
       $adapterfilter="";
     }
     $db->q("LOCK TABLES queue;");
-    $query="SELECT * FROM queue WHERE task=? AND status=? AND lockhost='' AND datetry<=NOW() $adapterfilter ORDER BY retry DESC, datequeue ASC LIMIT 1;";
+    $query="SELECT * FROM queue WHERE task IN (".implode(",",$task).") AND status=? AND lockhost='' AND datetry<=NOW() $adapterfilter ORDER BY retry DESC, datequeue ASC LIMIT 1;";
     $me=$db->qone( $query, $params, PDO::FETCH_ASSOC );
     if (!$me) {
       $db->q("UNLOCK TABLES queue;");

@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+   // TODO : can we get the QUIT TERM INT signals and cleanup properly ?
+
    /** ************************************************************
     * Download process, may be launch as many time as needed
     * on the machine having the physical disks available.
