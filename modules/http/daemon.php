@@ -62,7 +62,7 @@ while (true) {
   }
 
   $media=$api->mediaSearch(array("id"=>$task["mediaid"]));
-  
+
   if (!$media) {
     $api->log(LOG_CRIT, "got task '".$task["id"]."' but media '".$task["mediaid"]."' not found");
     $api->setTaskFailedUnlock($task["id"]);
@@ -84,7 +84,11 @@ while (true) {
   curl_setopt_array($curl,$options);
   
   $url=$task["params"]["url"];
-  if (strpos($url,"?")!==false) $url.="&"; else $url="?";
+  if (!$url) {
+    $api->log(LOG_CRIT, "got task '".$task["id"]."' but its params has NO URL ('".$task["params"]."')");
+    $api->setTaskFailedUnlock($task["id"]);
+  }
+  if (strpos($url,"?")!==false) $url.="&"; else $url.="?";
   $url.="app_key=".$api->me["clientkey"];
   curl_setopt($curl,CURLOPT_URL,$url);
   
@@ -109,6 +113,7 @@ while (true) {
   }
   curl_setopt($curl,CURLOPT_FILE,$f);
   $res=curl_exec($curl);
+  $info = curl_getinfo($curl);
   fclose($f);
   if ($res) {
     // and mark the media as "locally downloaded"
@@ -123,6 +128,7 @@ while (true) {
   } else {
     // if we failed, we just mark it as failed, this will retry 5 min from now ...
     $api->setTaskFailedUnlock($task["id"]);
+    print_r($info);
     $api->log(LOG_WARNING,"Download task ".$task["id"]." failed or unfinished for media ".$task["mediaid"]."");
   }
 
