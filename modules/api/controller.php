@@ -26,13 +26,119 @@ class ApiController extends AController {
       $call=$_REQUEST["action"]."Action";
       if (method_exists($this,$call)) {
 	return $this->$call();
-      }
+      } 
+      $api->apiError(API_ERROR_NOTFOUND,_("Api call doesn't exist"));
     }
 
     $this->render('index');
   }
 
   
+  /* TODO : make a more complicated version of app_request_format for specific track extraction routines */
+  /** ********************************************************************
+   * when the Client asks the Transcoder for a transcode
+   * The Client can ask for multiple transcode at the same time, 
+   * Params : id (id of the video in the openmediakit) 
+   * settings_id_list = list of settings-id to transcode to, either as an array
+   * (using [] and setting multiple times), or as a json-encoded array of IDs
+   */
+  public function app_request_formatAction() {
+    $this->me=$this->api->checkCallerIdentity();
+    $this->api->enforceLimits();
+    // for each params, tell its name, and its type and if it is mandatory
+    $this->params=$this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
+						 "id" => array("integer",true),
+						 "settings_id_list" => array("any",true),
+						 ));
+    
+    $this->api->logApiCall("app_request_format");
+    if (! ($media=$this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"])))
+	|| !is_array($media) 
+	|| !count($media)) {
+      $this->api->apiError(API_ERROR_NOTFOUND,_("This media has not been uploaded by you yet, please upload it before asking for transcodes."));      
+    }
+    $media=$media[0];
+    if ($media["status"]!=MEDIA_METADATA_OK) {
+      $this->api->apiError(API_ERROR_BADMEDIA,_("The media's metadata has not been recognized, or it had expired."));
+    }
+    $adapterObject=$this->api->getAdapter($media["adapter"],$this->me);
+
+    // Now we check the settings : 
+    $tmp=$this->api->getAllSettings();
+    $allsettings=array();
+    foreach($tmp as $setting) {
+      $allsettings[]=$setting["id"];
+    }
+    if (!is_array($this->params["settings_id_list"]) || !count($this->params["settings_id_list"])) {
+      $this->params["settings_id_list"]=@json_decode($this->params["settings_id_list"]);
+      if (!is_array($this->params["settings_id_list"]) || !count($this->params["settings_id_list"])) {
+	$this->api->apiError(API_ERROR_BADPARAM,_("The settings_id_list is incorrect, it must be either a php-style array[] or a json array"));
+      }
+    }
+    $settings=array();
+    $hasgood=false;
+    foreach($this->params["settings_id_list"] as $one) {
+      $one=intval($one);
+      if (!in_array($allsettings,$one)) {
+	$settings[$one]=_("Setting unknown by this transcoder");
+      } else {
+	$settings[$one]="";
+	$hasgood=true;
+      }
+    }
+    if (!$hasgood) {
+      $this->api->apiError(API_ERROR_BADPARAM,_("None of your settings are known by this transcoder"));
+    }
+    $hasgood=false;
+    // We search for already-transcoded versions:
+    foreach($settings as $one=>$err) {
+      if ($err=="") {
+	$found=$this->api->transcodeSearch( array( "mediaid" => $media["id"], "setting" => $one, "status" => TRANSCODE_PROCESSED ) );
+	if ($found) {
+	  $settings[$one]=_("The video has already been transcoded to this setting");
+	}
+      }
+    }
+    if (!$hasgood) {
+      $this->api->apiError(API_ERROR_BADPARAM,_("This video has already been transcoded to all the settings you just asked"));
+    }
+
+    // We create the transcodes and add them to the transcode queue
+    foreach($settings as $one) {
+      $transcode_id=$this->api->transcodeAdd(array(
+						   "mediaid" => $media["id"],
+						   "setting" => $one,
+						   "status" => TRANSCODE_ASKED,
+						   ) );
+      if ($transcode_id) {
+	if ($this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
+				 array("url" => $this->params["url"], 
+				       "dometadata" => $this->params["dometadata"], 
+				       ),$this->params["adapter"]) ) {
+	  
+      }
+      $this->api->apiError(API_ERROR_OK,_("OK, Download task queued"));
+    } else {
+      $this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
+    }
+    
+    if (!$media_id) {
+      $this->api->apiError(API_ERROR_CREATEMEDIA,_("Cannot create a new media, please retry later."));
+    }
+    if ($status==MEDIA_REMOTE_AVAILABLE) {
+      // then we queue the download of the media
+    } else {
+      // already locally available? let's queue the metadata search:
+      if ( $this->api->queueAdd(TASK_DO_METADATA,$media_id,METADATA_RETRY,null,$this->params["adapter"])) {
+	$this->api->apiError(API_ERROR_OK,_("OK, Metadata task queued"));
+      } else {
+	$this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
+      }
+    }
+
+    } // app_new_mediaAction
+  }
+
   /** ********************************************************************
    * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
    * The Client can ask for a metadata recognition as soon as it has been downloaded by the Transcoder.
@@ -51,7 +157,7 @@ class ApiController extends AController {
 						 "dometadata" => array("boolean",false,true),
 						 ));
     
-    $this->api->logApiCall("newmedia");
+    $this->api->logApiCall("app_new_media");
     if ($this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"]))) {
       $this->api->apiError(API_ERROR_ALREADY,_("You already added this media ID from you to this transcoder. Cannot proceed."));      
     }
@@ -154,7 +260,7 @@ class ApiController extends AController {
 						   ));
     // TODO : use gettext to set the LOCALES according to the lang set by the caller.
     require_once(MODULES."/users/libs/users.php");
-    $this->api->logApiCall("subscribe");
+    $this->api->logApiCall("app_subscribe");
     // Check for application / version blacklist
     $this->api->allowApplication($this->params['application'], $this->params['version']);
     // Create an account 

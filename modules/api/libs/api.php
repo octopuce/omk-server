@@ -171,7 +171,7 @@ class Api {
    * Search for one or more media
    * @param $search is an array of key => value to search for 
    * @param $operator the AND operator is the default, could be OR
-   * @return integer the newly created media id 
+   * @return array the list of found media
    */
   public function mediaSearch($search,$operator="AND") {
     global $db;
@@ -186,6 +186,29 @@ class Api {
     }
     if (!$sql) return false; // no information!
     $query = "SELECT * FROM media WHERE $sql";
+    return $db->qlist($query, $val, PDO::FETCH_ASSOC);
+  }
+
+
+  /** ****************************************
+   * Search for one or more transcode
+   * @param $search is an array of key => value to search for 
+   * @param $operator the AND operator is the default, could be OR
+   * @return array the list of found transcodes
+   */
+  public function transcodeSearch($search,$operator="AND") {
+    global $db;
+    $k=array("id","status","mediaid","setting","subsetting");
+    $sql=""; $val=array();
+    foreach($k as $key) {
+      if (isset($search[$key])) { 
+	if ($sql) $sql.=" $operator ";
+	$sql.="$key=?";
+	$val[]=$search[$key];
+      }
+    }
+    if (!$sql) return false; // no information!
+    $query = "SELECT * FROM transcodes WHERE $sql";
     return $db->qlist($query, $val, PDO::FETCH_ASSOC);
   }
 

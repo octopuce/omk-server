@@ -47,6 +47,16 @@ define("MEDIA_METADATA_OK",3);
 define("MEDIA_EXPIRED",4);
 
 
+/* In which status can be a transcode */
+define("TRANSCODE_MIN",0); define("TRANSCODE_MAX",2);  // min/max value of this flag.
+/* The transcode has been asked, not yet processed */
+define("TRANSCODE_ASKED",0);
+/* The transcode has been processed successfully */
+define("TRANSCODE_PROCESSED",1);
+/* The transcode has not been processed due to some error */
+define("TRANSCODE_ERROR",2);
+
+
 
 /* A file with an undefined duration */
 define("DURATION_UNDEFINED",-1);
@@ -83,4 +93,6 @@ define("API_ERROR_ADAPTERNOTSUPPORTED",12);
 define("API_ERROR_BADURL",13);
 define("API_ERROR_CODEERROR",14);
 define("API_ERROR_NOQUEUE",15);
+define("API_ERROR_NOTFOUND",404);
+define("API_ERROR_BADMEDIA",505);
 //define("API_ERROR_",);
