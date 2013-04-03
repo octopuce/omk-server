@@ -186,6 +186,17 @@ when using -vf cropdetect
     } // parse lines, 
 
     $attribs["tracks"]=$tracks;
+    
+    
+    // finally attempt to retrieve the mime-type
+    $cmd = "file -i ".escapeshellarg($file).' | cut -d " " -f 2|cut -d ";" -f 1';
+    exec($exec,$out, $return_var);
+    if( !$return_var){
+        // TODO Deal with errors
+    }else{
+        $attribs["mime_type"] = $out[0];
+    }
+
     return $attribs;
   }
 
