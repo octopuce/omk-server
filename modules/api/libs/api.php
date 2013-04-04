@@ -5,6 +5,7 @@ require_once(MODULES."/api/libs/constants.php");
 define("DOWNLOAD_RETRY",10); // retry 10 times each download
 define("METADATA_RETRY",4); // retry 4 times each metadata search
 define("API_RETRY",10); // retry 10 times each client API call
+define("TRANSCODE_RETRY",3); // retry 3 times each transcode request
 
 class Api {
 

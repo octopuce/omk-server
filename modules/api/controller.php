@@ -41,6 +41,7 @@ class ApiController extends AController {
    * Params : id (id of the video in the openmediakit) 
    * settings_id_list = list of settings-id to transcode to, either as an array
    * (using [] and setting multiple times), or as a json-encoded array of IDs
+   * Return a list of error code + message for each setting.
    */
   public function app_request_formatAction() {
     $this->me=$this->api->checkCallerIdentity();
@@ -80,7 +81,7 @@ class ApiController extends AController {
     foreach($this->params["settings_id_list"] as $one) {
       $one=intval($one);
       if (!in_array($allsettings,$one)) {
-	$settings[$one]=_("Setting unknown by this transcoder");
+	$settings[$one]=array("code" => API_ERROR_BADPARAM, "message" => _("Setting unknown by this transcoder"));
       } else {
 	$settings[$one]="";
 	$hasgood=true;
@@ -95,49 +96,49 @@ class ApiController extends AController {
       if ($err=="") {
 	$found=$this->api->transcodeSearch( array( "mediaid" => $media["id"], "setting" => $one, "status" => TRANSCODE_PROCESSED ) );
 	if ($found) {
-	  $settings[$one]=_("The video has already been transcoded to this setting");
+	  $settings[$one]=array("code" => API_ERROR_ALREADY, "message" => _("The video has already been transcoded to this setting"));
+	} else {
+	  $hasgood=true;
 	}
       }
     }
+
     if (!$hasgood) {
-      $this->api->apiError(API_ERROR_BADPARAM,_("This video has already been transcoded to all the settings you just asked"));
+      $this->api->apiError(API_ERROR_ALREADY,_("This video has already been transcoded to all the settings you just asked"));
     }
 
-    // We create the transcodes and add them to the transcode queue
-    foreach($settings as $one) {
-      $transcode_id=$this->api->transcodeAdd(array(
-						   "mediaid" => $media["id"],
-						   "setting" => $one,
-						   "status" => TRANSCODE_ASKED,
-						   ) );
-      if ($transcode_id) {
-	if ($this->api->queueAdd(TASK_DOWNLOAD,$media_id,DOWNLOAD_RETRY,
-				 array("url" => $this->params["url"], 
-				       "dometadata" => $this->params["dometadata"], 
-				       ),$this->params["adapter"]) ) {
-	  
+    // We create the transcodes and add them to the transcode queue for the good settings
+    $hasgood=false;
+    foreach($settings as $one=>$err) {
+      if ($err=="") {
+	$transcode_id=$this->api->transcodeAdd(array(
+						     "mediaid" => $media["id"],
+						     "setting" => $one,
+						     "status" => TRANSCODE_ASKED,
+						     ) );
+	if ($transcode_id) {
+	  if ($this->api->queueAdd(TASK_DO_TRANSCODE,$media_id,TRANSCODE_RETRY,
+				   array("setting" => $one,
+					 ),$media["adapter"]) ) {
+	    $hasgood=true;
+	    $settings[$one]=array("code" => API_ERROR_OK, "message" => _("Transcode requested") );
+	  }
+	} else {
+	  $settings[$one]=array("code" => API_ERROR_EXEC, "message" => _("Can't request this Transcode, retry later") );
+	}
       }
-      $this->api->apiError(API_ERROR_OK,_("OK, Download task queued"));
-    } else {
-      $this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
-    }
-    
-    if (!$media_id) {
-      $this->api->apiError(API_ERROR_CREATEMEDIA,_("Cannot create a new media, please retry later."));
-    }
-    if ($status==MEDIA_REMOTE_AVAILABLE) {
-      // then we queue the download of the media
-    } else {
-      // already locally available? let's queue the metadata search:
-      if ( $this->api->queueAdd(TASK_DO_METADATA,$media_id,METADATA_RETRY,null,$this->params["adapter"])) {
-	$this->api->apiError(API_ERROR_OK,_("OK, Metadata task queued"));
-      } else {
-	$this->api->apiError(API_ERROR_NOQUEUE,_("Can't queue the task now, please try later."));	
-      }
+    } 
+
+    if (!$hasgood) {
+      $this->api->apiError(API_ERROR_EXEC,_("No transcode has been launch, retry later"));
     }
 
-    } // app_new_mediaAction
-  }
+    // Return one code+message for each requested setting
+    header("Content-Type: application/json");
+    echo json_encode($settings);
+    exit();
+
+  } /* app_request_formatAction */
 
   /** ********************************************************************
    * when the Client tells the Transcoder that a new media must be downloaded asap from the Client.
