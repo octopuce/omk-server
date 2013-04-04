@@ -198,6 +198,7 @@ when using -vf cropdetect
     } // parse lines, 
 
     $attribs["tracks"]=$tracks;
+
     if ($hasvideo) {
       $attribs["type"]=TRACK_TYPE_VIDEO;
     } else if ($hasaudio && !$hasvideo) {
