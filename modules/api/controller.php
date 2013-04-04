@@ -80,7 +80,7 @@ class ApiController extends AController {
     $hasgood=false;
     foreach($this->params["settings_id_list"] as $one) {
       $one=intval($one);
-      if (!in_array($allsettings,$one)) {
+      if (!in_array($one,$allsettings)) {
 	$settings[$one]=array("code" => API_ERROR_BADPARAM, "message" => _("Setting unknown by this transcoder"));
       } else {
 	$settings[$one]="";
@@ -90,6 +90,7 @@ class ApiController extends AController {
     if (!$hasgood) {
       $this->api->apiError(API_ERROR_BADPARAM,_("None of your settings are known by this transcoder"));
     }
+
     $hasgood=false;
     // We search for already-transcoded versions:
     foreach($settings as $one=>$err) {
@@ -117,7 +118,7 @@ class ApiController extends AController {
 						     "status" => TRANSCODE_ASKED,
 						     ) );
 	if ($transcode_id) {
-	  if ($this->api->queueAdd(TASK_DO_TRANSCODE,$media_id,TRANSCODE_RETRY,
+	  if ($this->api->queueAdd(TASK_DO_TRANSCODE,$media["id"],TRANSCODE_RETRY,
 				   array("setting" => $one,
 					 ),$media["adapter"]) ) {
 	    $hasgood=true;

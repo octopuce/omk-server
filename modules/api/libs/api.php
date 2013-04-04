@@ -129,7 +129,7 @@ class Api {
     $k=array( "status", "remoteid", "remoteurl", "owner", "adapter" );
     $sql=""; $val=array();
     foreach($k as $key) {
-      if ($v[$key]) { 
+      if (isset($v[$key])) { 
 	if ($sql) $sql.=", ";
 	$sql.="$key=?";
 	$val[]=$v[$key];
@@ -188,6 +188,29 @@ class Api {
     if (!$sql) return false; // no information!
     $query = "SELECT * FROM media WHERE $sql";
     return $db->qlist($query, $val, PDO::FETCH_ASSOC);
+  }
+
+
+  /** ****************************************
+   * Add a transcode into the transcode table
+   * $v is an associative array with fields name and value
+   * @return integer the newly created transcode id 
+   */
+  public function transcodeAdd($v) {
+    global $db;
+    $k=array("id","status","mediaid","setting","subsetting");
+    $sql=""; $val=array();
+    foreach($k as $key) {
+      if (isset($v[$key])) { 
+	if ($sql) $sql.=", ";
+	$sql.="$key=?";
+	$val[]=$v[$key];
+      }
+    }
+    if (!$sql) return false; // no information!
+    $query = "INSERT INTO transcode SET datecreate=NOW(), $sql";
+    $db->q($query,$val);
+    return $db->lastInsertId();
   }
 
 
