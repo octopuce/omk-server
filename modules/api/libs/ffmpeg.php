@@ -14,6 +14,16 @@ class Ffmpeg {
     // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
     $DEBUG=0;
 
+    $attribs=array();
+    $hasvideo=false;
+    $hasaudio=false;
+    $hassubtitle=false;
+
+    // first, let's get the file mime type : 
+    exec("file -b --mime-type ".escapeshellarg($file),$out);
+    if (!empty($out[0])) {
+      $attribs["mime"]=trim($out[0]);
+    }
     // If we do a "stream copy" for the video track, we can't do cropdetect ... 
     if (!$cropdetect) {
       $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -vf cropdetect -f rawvideo -y /dev/null 2>&1";
@@ -55,7 +65,6 @@ And also the crop black borders:
 when using -vf cropdetect
     */     
     $track=array(); // per-track attributes
-    $attribs=array(); // entire file's attributes
     $mode=1;
 
     foreach($out as $line) {
@@ -88,6 +97,7 @@ when using -vf cropdetect
 	  }
 	  switch ($mat[2]) {
 	  case "Audio":
+	    $hasaudio=true;
 	    $track["type"]=TRACK_TYPE_AUDIO;
 	    // Parsing an audio-type track
 	    $codec=explode(" ",$params[0]);
@@ -110,6 +120,7 @@ when using -vf cropdetect
 	    }
 	    break;
 	  case "Video":
+	    $hasvideo=true;
 	    $track["type"]=TRACK_TYPE_VIDEO;
 	    // Parsing a video-type track
 	    $codec=explode(" ",$params[0]);
@@ -143,6 +154,7 @@ when using -vf cropdetect
 	    }
 	    break;
 	  case "Subtitle":
+	    $hassubtitle=true;
 	    $track["type"]=TRACK_TYPE_SUBTITLE;
 	    // Parsing a subtitle track
 	    $codec=explode(" ",$params[0]);
@@ -186,6 +198,15 @@ when using -vf cropdetect
     } // parse lines, 
 
     $attribs["tracks"]=$tracks;
+    if ($hasvideo) {
+      $attribs["type"]=TRACK_TYPE_VIDEO;
+    } else if ($hasaudio && !$hasvideo) {
+      $attribs["type"]=TRACK_TYPE_AUDIO;
+    } else if ($hassubtitle) {
+      $attribs["type"]=TRACK_TYPE_SUBTITLE;
+    } else {
+      $attribs["type"]=TRACK_TYPE_OTHER;
+    }
     return $attribs;
   }
 
