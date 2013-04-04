@@ -208,7 +208,7 @@ class Api {
       }
     }
     if (!$sql) return false; // no information!
-    $query = "INSERT INTO transcode SET datecreate=NOW(), $sql";
+    $query = "INSERT INTO transcodes SET datecreate=NOW(), $sql";
     $db->q($query,$val);
     return $db->lastInsertId();
   }

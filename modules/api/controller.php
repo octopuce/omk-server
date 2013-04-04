@@ -95,9 +95,9 @@ class ApiController extends AController {
     // We search for already-transcoded versions:
     foreach($settings as $one=>$err) {
       if ($err=="") {
-	$found=$this->api->transcodeSearch( array( "mediaid" => $media["id"], "setting" => $one, "status" => TRANSCODE_PROCESSED ) );
+	$found=$this->api->transcodeSearch( array( "mediaid" => $media["id"], "setting" => $one ) );
 	if ($found) {
-	  $settings[$one]=array("code" => API_ERROR_ALREADY, "message" => _("The video has already been transcoded to this setting"));
+	  $settings[$one]=array("code" => API_ERROR_ALREADY, "message" => _("The video has already been transcoded to this setting, or this transcode is in progress."));
 	} else {
 	  $hasgood=true;
 	}
@@ -105,7 +105,7 @@ class ApiController extends AController {
     }
 
     if (!$hasgood) {
-      $this->api->apiError(API_ERROR_ALREADY,_("This video has already been transcoded to all the settings you just asked"));
+      $this->api->apiError(API_ERROR_ALREADY,_("This video has already been transcoded to all the settings you just asked, or transcode is in progress."));
     }
 
     // We create the transcodes and add them to the transcode queue for the good settings
