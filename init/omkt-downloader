@@ -1,0 +1,93 @@
+#!/bin/sh -e
+
+### BEGIN INIT INFO
+# Provides:          omkt-downloader
+
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Should-Start:      $network $syslog
+# Should-Stop:       $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start and stop OpenMediakit Transcoder Download daemon
+# Description:       The OpenMediakit API service is a media and document 
+#    transcoding service. This is its download daemon 
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+OPTIONS=""
+
+test -f /etc/default/omkt && . /etc/default/omkt
+
+test -x /usr/sbin/rndc || exit 0
+
+. /lib/lsb/init-functions
+PIDFILE=/var/run/omkt/omkt-downloader.pid
+NAME="omkt-downloader"
+DESCRIPTION="OpenMediakit Transcoder downloader daemon"
+
+case "$1" in
+    start)
+	log_daemon_msg "Starting ${DESCRIPTION}..." "$NAME"
+
+	# dirs under /var/run can go away on reboots.
+	mkdir -p /var/run/omkt
+	chmod 775 /var/run/omkt
+	chown root:www-data /var/run/omkt >/dev/null 2>&1 || true
+
+	if [ ! -x /usr/sbin/named ]; then
+	    log_action_msg "named binary missing - not starting"
+	    log_end_msg 1
+	fi
+
+	if start-stop-daemon --start --oknodo --quiet --exec /usr/sbin/named \
+		--pidfile ${PIDFILE} -- $OPTIONS; then
+	    log_end_msg 0
+	else
+	    log_end_msg 1
+	fi
+    ;;
+
+    stop)
+	log_daemon_msg "Stopping ${DESCRIPTION}..." "$NAME"
+	if ! check_network; then
+	    log_action_msg "no networks configured"
+	    log_end_msg 1
+	fi
+
+	start-stop-daemon --stop --oknodo --quiet --exec /usr/sbin/named \
+	    --pidfile ${PIDFILE} -- $OPTIONS
+# FIXME
+	if [ -n $pid ]; then
+	  while kill -0 $pid 2>/dev/null; do
+	    log_progress_msg "waiting for pid $pid to die"
+	    sleep 1
+	  done
+	fi
+	log_end_msg 0
+    ;;
+
+    reload|force-reload)
+	log_daemon_msg "Reloading ${DESCRIPTION}: not implemented" "$NAME"
+	log_end_msg 1
+    ;;
+
+    restart)
+	$0 stop
+	$0 start
+    ;;
+    
+    status)
+    	ret=0
+	status_of_proc -p ${PIDFILE} /usr/sbin/named bind9 2>/dev/null || ret=$?
+	exit $ret
+	;;
+
+    *)
+	log_action_msg "Usage: $0 {start|stop|restart|status}"
+	exit 1
+    ;;
+esac
+
+exit 0
