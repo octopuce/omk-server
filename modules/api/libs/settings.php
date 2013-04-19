@@ -8,7 +8,7 @@
 global $settings;
 $settings=array(
    array(
-          "id" => "1",
+	 "id" => "1",
           "type" => "video",
           "slug" => "video_240p_flv",
           "name" => "Video at very low definition and flash sorenson format",

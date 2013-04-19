@@ -215,6 +215,31 @@ class Api {
 
 
   /** ****************************************
+   * Update a transcode in the transcode table
+   * @param $id integer The transcode id
+   * @param $v array An associative array with fields name and value
+   * @return boolean true if the media has been updated
+   */
+  public function transcodeUpdate($id,$v) {
+    global $db;
+    $k=array("status","mediaid","setting","subsetting");
+    $sql=""; $val=array();
+    foreach($k as $key) {
+      if (isset($v[$key])) { 
+	if ($sql) $sql.=", ";
+	$sql.="$key=?";
+	$val[]=$v[$key];
+      }
+    }
+    if (!$sql) return false; // no information!
+    $val[]=$id;
+    $query = "UPDATE transcodes SET dateupdate=NOW(), $sql WHERE id=?";
+    $db->q($query,$val);
+    return true;
+  }
+
+
+  /** ****************************************
    * Search for one or more transcode
    * @param $search is an array of key => value to search for 
    * @param $operator the AND operator is the default, could be OR

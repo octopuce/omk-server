@@ -5,8 +5,8 @@
    /** ************************************************************
     * Metadata maker process, may be launch as many time as needed
     * on the machine having a proper ffmpeg installed.
-    * returns as soon as a metadata has been computer
-    * or wait 10 seconds if no do_metadata task is queued.
+    * this is a daemon: it never returns
+    * you should launch it using an init script
     */
 
 require_once __DIR__ . '/../../../common.php';

@@ -119,7 +119,7 @@ class ApiController extends AController {
 						     ) );
 	if ($transcode_id) {
 	  if ($this->api->queueAdd(TASK_DO_TRANSCODE,$media["id"],TRANSCODE_RETRY,
-				   array("setting" => $one,
+				   array("setting" => $one, "transcode" => $transcode_id
 					 ),$media["adapter"]) ) {
 	    $hasgood=true;
 	    $settings[$one]=array("code" => API_ERROR_OK, "message" => _("Transcode requested") );

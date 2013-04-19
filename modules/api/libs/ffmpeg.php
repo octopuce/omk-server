@@ -209,7 +209,126 @@ when using -vf cropdetect
       $attribs["type"]=TRACK_TYPE_OTHER;
     }
     return $attribs;
+  } /* getFfmpegMetadata */
+
+
+  public function transcode($media,$source,$destination,$setting) {
+    $metadata=@unserialize($media["metadata"]);
+    // Standard settings are <10000.
+    // Non-standard are using a plugin system, in that case we launch the hook ...
+    if ($setting>=10000) {
+      $all=array("result"=>false,
+		 "media" => $media, 
+		 "source"=>$source,
+		 "destination"=>$destination,
+		 "setting"=>$setting
+		 );
+      Hooks::call('transcodeCustom',$all);
+      return $all["result"];
+    }
+    // standard settings are managed here : 
+    include(__DIR__."/../libs/ffmpeg_settings.php");
+    if (!isset($ffmpeg_commands[$setting])) {
+      return false; // setting not found !!!
+    }
+    
+    // is it 16/9, 4/3, or ... 
+    $params=$this->computeOutputSize($metadata);
+    switch($params["ratio"]) {
+    case "16:9":
+      $size=$ffmpeg_commands[$setting]["size169"];
+      break;
+    case "4:3":
+      $size=$ffmpeg_commands[$setting]["size43"];
+      break;
+    case "1:1":
+      $size=$ffmpeg_commands[$setting]["size169"];
+      list($w,$h)=explode($size,"x");
+      $size=$h."x".$h;
+      break;
+    default:
+      $size=$ffmpeg_commands[$setting]["size169"];
+      list($w,$h)=explode($size,"x");
+      $size=intval(round( ($h*$params["realratio"]) /4)*4)."x".$h;
+      break;
+    }
+    if ($params["invert"]) {
+      list($w,$h)=explode($size,"x");
+      $size=$h."x".$w;
+    }
+    $failed=false;
+    // substitution
+    foreach($ffmpeg_commands[$setting] as $k=>$v) {
+	$v=str_replace("%%SIZE%%",$size,$v);
+	$v=str_replace("%%SOURCE%%",escapeshellarg($source),$v);
+	$v=str_replace("%%DESTINATION%%",escapeshellarg($destination),$v);
+	$v=str_replace("%%RATIO%%",$ratio,$v);
+	$ffmpeg_commands[$setting][$k]=$v;
+    }
+    // Execution
+    foreach($ffmpeg_commands[$setting] as $k=>$v) {
+      if (substr($k,0,7)=="command") {
+	exec($v,$out,$ret);
+	if ($ret!=0) {
+	  // Command FAILED
+	  $failed=true;
+	  break;
+	}
+      }
+    }
+    if ($failed) {
+      return false;
+    }
+    // Where is the file / dir ? 
+    if (is_file($ffmpeg_commands[$setting]["output"])
+	|| is_dir($ffmpeg_commands[$setting]["output"])
+	) {
+      return $ffmpeg_commands[$setting]["output"];
+    }
+    return false; // something went wrong ...
+
+  } // transcode()
+
+
+  /* ------------------------------------------------------------ */
+  /** 
+   * Compute the black bands to add (or not) and the proper aspect ratio
+   * of the video. (4:3 or 16:9)
+   * @param $meta array the hashset of the metadata of the media
+   * @return array an hashset with the aspect ratio and the black band to put on top/bottom/left/right. 
+   * TODO : if the settings ask to keep 4/3 16/9 3/4 9/16 ratio
+   */
+  function computeOutputSize($meta,$setting=null) {
+    $params=array();
+    $x=$meta["width"]; $y=$meta["height"];
+    if (isset($meta["PAR1"]) && isset($meta["PAR2"])) {
+      // compute realX and realY from X/Y using Pixel Aspect Ratio
+      $x=$x*(intval($meta["PAR1"])/intval($meta["PAR2"]));
+      // Here a PAL video of 4:3 720x576 has now 768/576 == 4/3  
+      // And  a PAL video of 16:9 720x576 has now 1024/576 == 16/9  
+    }
+    if (($x/$y)<1) {
+      $params["invert"]==true;
+      $z=$y;      $y=$x;      $x=$z;
+    }
+    // Depending on the original aspect ratio, we keep the usual 4/3 or 16/9,
+    // or we set it to keep the original ratio
+    if (($x/$y)<1.85 && ($x/$y)>1.70) {
+      $params["ratio"]="169";
+    } 
+    else if (($x/$y)<1.40 && ($x/$y)>1.26) {
+      $params["ratio"]="43";
+    }
+    else if ( ($x/$y)<1.05 && ($x/$y)>0.95 ) {
+      $params["ratio"]="1";
+    }
+    else {
+      $params["ratio"]=intval($x).":".intval($y);
+      $params["realration"]=($x/$y);
+    }
+    return $params;
   }
+  
 
 
 } /* class Ffmpeg */
