@@ -46,11 +46,11 @@ class HttpAdapter {
   function filePathTranscode($media,$settings) {
     @mkdir(STORAGE_PATH."/transcoded/");
     if ($settings["type"]=="thumbnails") {
-      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]);      
+      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings);      
     }
     return array(
 		 STORAGE_PATH."/original/".$media["id"],
-		 STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]
+		 STORAGE_PATH."/transcoded/".$media["id"]."-".$settings
 		 );
   }
 

@@ -8,15 +8,23 @@
  * %%SIZE%% will be the "<width>x<height>" of the video, 
  * taking "size_43" key if we have a 4/3 source,
  * or "size_169" key if we have a 16/9 source.
+ * 
+ * This file requires the deb-multimedia or medibuntu packages of AVCONV and LIBAVCODEC 
+ * to work properly.
  */
 
-global $settings;
-$settings=array(
+
+$x264_params=" -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y ";
+
+// -b:v "$MP4_BR"k -maxrate "$MP4_BR"k -b:a "$MP3_BR"k
+
+global $ffmpeg_commands;
+$ffmpeg_commands=array(
 		"1" => array(
 			     "slug" => "video_240p_flv",
 			     "size_43" => "320x240",
 			     "size_169" => "426x240",
-			     "command_1" => "ffmpeg -i %%SOURCE%% -acodec mp3 -vcodec flv -ar 44100 -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
+			     "command_1" => "avconv -i %%SOURCE%% -acodec libmp3lame -vcodec flv -ar 44100 -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
 			     "output" => "%%DESTINATION%%.flv",
 			     ),
 
@@ -24,7 +32,7 @@ $settings=array(
 			     "slug" => "video_360p_flv",
 			     "size_43" => "480x360",
 			     "size_169" => "640x360",
-			     "command_1" => "ffmpeg -i %%SOURCE%% -acodec mp3 -vcodec flv -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
+			     "command_1" => "avconv -i %%SOURCE%% -acodec libmp3lame -vcodec flv -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
 			     "output" => "%%DESTINATION%%.flv",
 			     ),
 
@@ -32,7 +40,7 @@ $settings=array(
 			     "slug" => "video_480p_flv",
 			     "size_43" => "640x480",
 			     "size_169" => "854x480",
-			     "command_1" => "ffmpeg -i %%SOURCE%% -acodec mp3 -vcodec flv -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
+			     "command_1" => "avconv -i %%SOURCE%% -acodec libmp3lame -vcodec flv -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.flv",
 			     "output" => "%%DESTINATION%%.flv",
 			     ),
 
@@ -40,7 +48,7 @@ $settings=array(
 			      "slug" => "video_240p_mp4",
 			      "size_43" => "320x240",
 			      "size_169" => "426x240",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libfaac -vcodec libx264 -ar 44100 -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -pre:v medium $x264_params -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.mp4",
 			      ),
 
@@ -48,7 +56,7 @@ $settings=array(
 			      "slug" => "video_360p_mp4",
 			      "size_43" => "480x360",
 			      "size_169" => "640x360",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libfaac -vcodec libx264 -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -pre:v medium $x264_params -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.mp4",
 			      ),
 
@@ -56,7 +64,7 @@ $settings=array(
 			      "slug" => "video_480p_mp4",
 			      "size_43" => "640x480",
 			      "size_169" => "854x480",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libfaac -vcodec libx264 -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -pre:v high $x264_params -ab 128k -b 440k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.mp4",
 			      ),
    
@@ -64,7 +72,7 @@ $settings=array(
 			      "slug" => "video_720p_mp4",
 			      "size_43" => "960x720",
 			      "size_169" => "1280x720",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libfaac -vcodec libx264 -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -pre:v high $x264_params -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.mp4",
 			      ),
    
@@ -72,7 +80,7 @@ $settings=array(
 			      "slug" => "video_1080p_mp4",
 			      "size_43" => "1440x1080",
 			      "size_169" => "1920x1080",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libfaac -vcodec libx264 -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -pre:v high $x264_params -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.mp4",
 			      ),
    
@@ -80,7 +88,7 @@ $settings=array(
 			      "slug" => "video_240p_webm",
 			      "size_43" => "320x240",
 			      "size_169" => "426x240",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.webm",
+			      "command_1" => "avconv -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 64k -b 280k -s %%SIZE%% -r 25 %%DESTINATION%%.webm",
 			      "output" => "%%DESTINATION%%.webm",
 			      
 			      ),
@@ -89,7 +97,7 @@ $settings=array(
 			      "slug" => "video_360p_webm",
 			      "size_43" => "480x360",
 			      "size_169" => "640x360",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+			      "command_1" => "avconv -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
 			      "output" => "%%DESTINATION%%.webm",
 			      ),
 		
@@ -97,14 +105,14 @@ $settings=array(
 			      "slug" => "video_480p_webm",
 			      "size_43" => "640x480",
 			      "size_169" => "854x480",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
+			      "command_1" => "avconv -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 128k -b 440k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
 			      "output" => "%%DESTINATION%%.webm",
 			      ),
 		"24" => array(
 			      "slug" => "video_720p_webm",
 			      "size_43" => "960x720",
 			      "size_169" => "1280x720",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
+			      "command_1" => "avconv -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
 			      "output" => "%%DESTINATION%%.webm",
 			      ),
 		
@@ -112,7 +120,7 @@ $settings=array(
 			      "slug" => "video_1080p_webm",
 			      "size_43" => "1440x1080",
 			      "size_169" => "1920x1080",
-			      "command_1" => "ffmpeg -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
+			      "command_1" => "avconv -i %%SOURCE%% -acodec libvorbis -vcodec libvpx -ar 44100 -ab 192k -b 1650k -s %%SIZE%% -r 30 %%DESTINATION%%.webm",
 			      "output" => "%%DESTINATION%%.webm",
 			      ),
 		

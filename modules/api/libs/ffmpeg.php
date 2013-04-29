@@ -213,6 +213,8 @@ when using -vf cropdetect
 
 
   public function transcode($media,$source,$destination,$setting) {
+    global $api;
+    $api->log(LOG_DEBUG, "[ffmpeg::transcode] media:$media source:$source destination:$destination setting:$setting");      
     $metadata=@unserialize($media["metadata"]);
     // Standard settings are <10000.
     // Non-standard are using a plugin system, in that case we launch the hook ...
@@ -229,27 +231,38 @@ when using -vf cropdetect
     // standard settings are managed here : 
     include(__DIR__."/../libs/ffmpeg_settings.php");
     if (!isset($ffmpeg_commands[$setting])) {
-      return false; // setting not found !!!
+      $api->log(LOG_ERR, "[ffmpeg::transcode] Setting not found");      
+      return false; 
     }
     
     // is it 16/9, 4/3, or ... 
     $params=$this->computeOutputSize($metadata);
+    if ($params===false) {
+      // no video track ??
+      $api->log(LOG_ERR, "[ffmpeg::transcode] No video track found");      
+      return false; 
+    }
+    print_r($params);
+
+    $ratio=$params["ratio"];
+
     switch($params["ratio"]) {
     case "16:9":
-      $size=$ffmpeg_commands[$setting]["size169"];
+      $size=$ffmpeg_commands[$setting]["size_169"];
       break;
     case "4:3":
-      $size=$ffmpeg_commands[$setting]["size43"];
+      $size=$ffmpeg_commands[$setting]["size_43"];
       break;
     case "1:1":
-      $size=$ffmpeg_commands[$setting]["size169"];
+      $size=$ffmpeg_commands[$setting]["size_169"];
       list($w,$h)=explode($size,"x");
       $size=$h."x".$h;
       break;
     default:
-      $size=$ffmpeg_commands[$setting]["size169"];
+      $size=$ffmpeg_commands[$setting]["size_169"];
       list($w,$h)=explode($size,"x");
       $size=intval(round( ($h*$params["realratio"]) /4)*4)."x".$h;
+      $ratio=$params["realratio"];
       break;
     }
     if ($params["invert"]) {
@@ -268,6 +281,7 @@ when using -vf cropdetect
     // Execution
     foreach($ffmpeg_commands[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
+	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
 	exec($v,$out,$ret);
 	if ($ret!=0) {
 	  // Command FAILED
@@ -299,6 +313,17 @@ when using -vf cropdetect
    * TODO : if the settings ask to keep 4/3 16/9 3/4 9/16 ratio
    */
   function computeOutputSize($meta,$setting=null) {
+    $found=false;
+    foreach($meta["tracks"] as $track) {
+      if ($track["type"]==TRACK_TYPE_VIDEO) {
+	$meta=$track;
+	$found=true;
+	break;
+      }
+    }
+    if (!$found) {
+      return false;
+    }
     $params=array();
     $x=$meta["width"]; $y=$meta["height"];
     if (isset($meta["PAR1"]) && isset($meta["PAR2"])) {
@@ -307,24 +332,28 @@ when using -vf cropdetect
       // Here a PAL video of 4:3 720x576 has now 768/576 == 4/3  
       // And  a PAL video of 16:9 720x576 has now 1024/576 == 16/9  
     }
+    $params["invert"]=false;
     if (($x/$y)<1) {
-      $params["invert"]==true;
+      $params["invert"]=true;
       $z=$y;      $y=$x;      $x=$z;
     }
     // Depending on the original aspect ratio, we keep the usual 4/3 or 16/9,
     // or we set it to keep the original ratio
     if (($x/$y)<1.85 && ($x/$y)>1.70) {
-      $params["ratio"]="169";
+      $params["ratio"]="16:9";
+      $params["realratio"]=16/9;
     } 
     else if (($x/$y)<1.40 && ($x/$y)>1.26) {
-      $params["ratio"]="43";
+      $params["ratio"]="4:3";
+      $params["realratio"]=4/3;
     }
     else if ( ($x/$y)<1.05 && ($x/$y)>0.95 ) {
-      $params["ratio"]="1";
+      $params["ratio"]="1:1";
+      $params["realratio"]=1;
     }
     else {
       $params["ratio"]=intval($x).":".intval($y);
-      $params["realration"]=($x/$y);
+      $params["realratio"]=($x/$y);
     }
     return $params;
   }

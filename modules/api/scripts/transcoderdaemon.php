@@ -61,7 +61,7 @@ while (true) {
   }
 
   // Get the task's parameters */
-  $params=unserialize($task["params"]);
+   $params=$task["params"];
   
   $media=$api->mediaSearch(array("id"=>$task["mediaid"]));
   if (!$media) {
@@ -118,7 +118,7 @@ while (true) {
   } else {
     // if we failed, we just mark it as failed, this will retry 5 min from now ...
     $api->setTaskFailedUnlock($task["id"]);
-    $api->log(LOG_DEBUG, "Failed when processing task '".$task["id"]."', transcode for media '".$task["mediaid"]."' for setting '".$params["setting"]."'");
+    $api->log(LOG_DEBUG, "Ffmpeg call failed when processing task '".$task["id"]."', transcode for media '".$task["mediaid"]."' for setting '".$params["setting"]."'");
   }
   
 } // infinite loop...
