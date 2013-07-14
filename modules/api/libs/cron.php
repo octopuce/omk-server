@@ -134,6 +134,7 @@ The OpenMediakit Transcoder public instance at
    */
   function rolling_curl($urls, $callback, $custom_options = null) {
     // make sure the rolling window isn't greater than the # of urls
+    if (!isset($GLOBALS["DEBUG"])) $GLOBALS["DEBUG"]=false;
     $rolling_window = MAX_SOCKETS;
     $rolling_window = (count($urls) < $rolling_window) ? count($urls) : $rolling_window;
     

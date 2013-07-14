@@ -214,7 +214,7 @@ when using -vf cropdetect
 
   public function transcode($media,$source,$destination,$setting) {
     global $api;
-    $api->log(LOG_DEBUG, "[ffmpeg::transcode] media:$media source:$source destination:$destination setting:$setting");      
+    $api->log(LOG_DEBUG, "[ffmpeg::transcode] media:".$media["id"]." source:$source destination:$destination setting:$setting");      
     $metadata=@unserialize($media["metadata"]);
     // Standard settings are <10000.
     // Non-standard are using a plugin system, in that case we launch the hook ...
@@ -229,8 +229,8 @@ when using -vf cropdetect
       return $all["result"];
     }
     // standard settings are managed here : 
-    include(__DIR__."/../libs/ffmpeg_settings.php");
-    if (!isset($ffmpeg_commands[$setting])) {
+    include(__DIR__."/../libs/settings.php");
+    if (!isset($settings[$setting])) {
       $api->log(LOG_ERR, "[ffmpeg::transcode] Setting not found");      
       return false; 
     }
@@ -248,18 +248,18 @@ when using -vf cropdetect
 
     switch($params["ratio"]) {
     case "16:9":
-      $size=$ffmpeg_commands[$setting]["size_169"];
+      $size=$settings[$setting]["size_169"];
       break;
     case "4:3":
-      $size=$ffmpeg_commands[$setting]["size_43"];
+      $size=$settings[$setting]["size_43"];
       break;
     case "1:1":
-      $size=$ffmpeg_commands[$setting]["size_169"];
+      $size=$settings[$setting]["size_169"];
       list($w,$h)=explode($size,"x");
       $size=$h."x".$h;
       break;
     default:
-      $size=$ffmpeg_commands[$setting]["size_169"];
+      $size=$settings[$setting]["size_169"];
       list($w,$h)=explode($size,"x");
       $size=intval(round( ($h*$params["realratio"]) /4)*4)."x".$h;
       $ratio=$params["realratio"];
@@ -271,19 +271,25 @@ when using -vf cropdetect
     }
     $failed=false;
     // substitution
-    foreach($ffmpeg_commands[$setting] as $k=>$v) {
+    foreach($settings[$setting] as $k=>$v) {
 	$v=str_replace("%%SIZE%%",$size,$v);
 	$v=str_replace("%%SOURCE%%",escapeshellarg($source),$v);
 	$v=str_replace("%%DESTINATION%%",escapeshellarg($destination),$v);
 	$v=str_replace("%%RATIO%%",$ratio,$v);
-	$ffmpeg_commands[$setting][$k]=$v;
+	$settings[$setting][$k]=$v;
     }
     // Execution
-    foreach($ffmpeg_commands[$setting] as $k=>$v) {
+    foreach($settings[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
 	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
 	exec($v,$out,$ret);
 	if ($ret!=0) {
+	  $cancel=$settings[$setting]["cancelcommand"];
+	  if ($cancel) {
+	    // Launch cancel command
+	    $api->log(LOG_DEBUG, "[ffmpeg::transcode] CANCEL exec: $cancel");
+	    exec($cancel);
+	  }
 	  // Command FAILED
 	  $failed=true;
 	  break;
@@ -293,13 +299,7 @@ when using -vf cropdetect
     if ($failed) {
       return false;
     }
-    // Where is the file / dir ? 
-    if (is_file($ffmpeg_commands[$setting]["output"])
-	|| is_dir($ffmpeg_commands[$setting]["output"])
-	) {
-      return $ffmpeg_commands[$setting]["output"];
-    }
-    return false; // something went wrong ...
+    return true;
 
   } // transcode()
 

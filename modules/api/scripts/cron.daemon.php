@@ -55,7 +55,7 @@ while (true) {
 function cron_callback($url,$content,$curl) {
   global $cron,$api;
   
-  //  $api->log(LOG_DEBUG, "return from cron call for url ".$url." has http_code ".$curl["http_code"]);
+  $api->log(LOG_DEBUG, "return from cron call for url ".implode(":",$url)." has http_code ".$curl["http_code"]);
 
   if (empty($url["uid"])) return; // not normal...
 

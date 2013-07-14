@@ -62,10 +62,10 @@ define("TRANSCODE_ERROR",2);
 define("DURATION_UNDEFINED",-1);
 
 /* The different kind of track we are dealing with: */
-define("TRACK_TYPE_AUDIO",0);
-define("TRACK_TYPE_VIDEO",1);
-define("TRACK_TYPE_SUBTITLE",2);
-define("TRACK_TYPE_OTHER",3);
+define("TRACK_TYPE_AUDIO","audio");
+define("TRACK_TYPE_VIDEO","video");
+define("TRACK_TYPE_SUBTITLE","subtitle");
+define("TRACK_TYPE_OTHER","other");
 
 
 /* the ADAPTER_NEW_MEDIA_* constants are returned by the addNewMedia() method of an adapter */

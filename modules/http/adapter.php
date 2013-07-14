@@ -46,7 +46,7 @@ class HttpAdapter {
   function filePathTranscode($media,$settings) {
     @mkdir(STORAGE_PATH."/transcoded/");
     if ($settings["type"]=="thumbnails") {
-      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings);      
+      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings);
     }
     return array(
 		 STORAGE_PATH."/original/".$media["id"],
