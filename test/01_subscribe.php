@@ -12,7 +12,7 @@ require_once("zz_config.php");
    * lang: language of the client, default to en_US (for discussion & email verification text)
    */
 $result=call("app_subscribe",array(
-		       "email" => "benjamin@localhost",
+		       "email" => ADMIN_MAIL,
 		       "app_key" => CLIENT_KEY,
 		       "url" => CLIENT_ROOT."zz_api.php",
 		       ));

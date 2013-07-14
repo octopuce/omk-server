@@ -1,12 +1,13 @@
 <?php
 
-define("API_ROOT","http://omk.local/api");
+define("ADMIN_MAIL","benjamin@octopuce.fr");
+define("API_ROOT","http://omkt.octopuce.fr/api");
 define("CLIENT_KEY","aa7ohxaelu4ue4ERoo3a");
-define("API_KEY",file_get_contents(__DIR__."/apikey"));
+define("API_KEY",@file_get_contents(__DIR__."/apikey"));
 define("APPLICATION_NAME","OMK Transcoder Test Client");
 define("APPLICATION_VERSION","1.0");
 // url (ending by /) where this test/ folder is pointed at
-define("CLIENT_ROOT","http://omk-client.local/");
+define("CLIENT_ROOT","http://omk-test-client.octopuce.fr/");
 
 
 

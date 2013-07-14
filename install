@@ -34,3 +34,5 @@ if (!file_exists(__DIR__ . '/tmp')) {
   chmod(__DIR__ . '/tmp',755);
 }
 
+@mkdir(STORAGE_PATH."/original");
+@mkdir(STORAGE_PATH."/transcoded");
