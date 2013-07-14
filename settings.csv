@@ -26,10 +26,10 @@ ID,Type,Slug,Name,Technical,Extension,Recommend,Size_43,Size_169,Cardinality,Com
 71,audio,audio_64k_aac,"Audio track only, with low quality and aac codec","mp4 container, aac audio track at 64kb/s quality and 22KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
 72,audio,audio_128k_aac,"Audio track only, with standard quality and aac codec","mp4 container, aac audio track at 128kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
 73,audio,audio_192k_aac,"Audio track only, with highest quality and aac codec","mp4 container, aac audio track at 192kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
-101,thumbnails,100_240p_thumbs_jpg,100 thumbnails at 240p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 426x240",jpg,0,320x240,426x240,folder,,,,,rm -rf %%DESTINATION%%/
-102,thumbnails,100_360p_thumbs_jpg,100 thumbnails at 360p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 640x360",jpg,0,480x360,640x360,folder,,,,,rm -rf %%DESTINATION%%/
-103,thumbnails,100_480p_thumbs_jpg,100 thumbnails at 480p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 854x480",jpg,1,640x480,854x480,folder,,,,,rm -rf %%DESTINATION%%/
-104,thumbnails,100_720p_thumbs_jpg,100 thumbnails at 720p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1280x720",jpg,0,960x720,1280x720,folder,,,,,rm -rf %%DESTINATION%%/
-105,thumbnails,100_1080p_thumbs_jpg,100 thumbnails at 1080p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1920x1080",jpg,0,1440x1080,1920x1080,folder,,,,,rm -rf %%DESTINATION%%/
-110,thumbnails,100_small_thumbs_jpg,100 small thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 100x60 (width guaranteed)",jpg,1,100x60,100x60,folder,,,,,rm -rf %%DESTINATION%%/
-111,thumbnails,100_medium_thumbs_jpg,100 medium thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 200x120 (width guaranteed)",jpg,0,200x100,200x120,folder,,,,,rm -rf %%DESTINATION%%/
+101,thumbnails,100_240p_thumbs_jpg,100 thumbnails at 240p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 426x240",jpg,0,320x240,426x240,folder,,,,,rm -rf %%DESTINATION%%
+102,thumbnails,100_360p_thumbs_jpg,100 thumbnails at 360p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 640x360",jpg,0,480x360,640x360,folder,,,,,rm -rf %%DESTINATION%%
+103,thumbnails,100_480p_thumbs_jpg,100 thumbnails at 480p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 854x480",jpg,1,640x480,854x480,folder,,,,,rm -rf %%DESTINATION%%
+104,thumbnails,100_720p_thumbs_jpg,100 thumbnails at 720p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1280x720",jpg,0,960x720,1280x720,folder,,,,,rm -rf %%DESTINATION%%
+105,thumbnails,100_1080p_thumbs_jpg,100 thumbnails at 1080p as jpg files,"100 jpg at 80% quality, no more than 1 every 10 seconds, size 1920x1080",jpg,0,1440x1080,1920x1080,folder,,,,,rm -rf %%DESTINATION%%
+110,thumbnails,100_small_thumbs_jpg,100 small thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 100x60 (width guaranteed)",jpg,1,100x60,100x60,folder,,,,,rm -rf %%DESTINATION%%
+111,thumbnails,100_medium_thumbs_jpg,100 medium thumbnails as jpg files,"100 jpg at 80% quality, no more than 1 every 2 seconds, size 200x120 (width guaranteed)",jpg,0,200x100,200x120,folder,,,,,rm -rf %%DESTINATION%%
