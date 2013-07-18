@@ -299,8 +299,31 @@ when using -vf cropdetect
     if ($failed) {
       return false;
     }
-    return true;
 
+    // Get the metadata of the stored file :
+    $metadata=false;
+    if (is_file($destination.".".$settings[$setting]["extension"])) {
+      $metadata=$this->getFfmpegMetadata($destination.".".$settings[$setting]["extension"]);
+      $metadata["cardinality"]=1;
+    } else {
+    // multiple files are set as this : 
+      if (is_file($destination."/00001.".$settings[$setting]["extension"])) {
+	$metadata=$this->getFfmpegMetadata($destination."/00001.".$settings[$setting]["extension"]);
+	// count the number of files in the folder:
+	$cardinality=0;
+	$d=opendir($destination);
+	while ($c=readdir($d)) {
+	  if (is_file($destination."/".$c))
+	    $cardinality++;
+	}
+	closedir($d);
+	$metadata["cardinality"]=$cardinality;
+      }
+    }
+    if (!$metadata) {
+      return false;
+    }
+    return $metadata;
   } // transcode()
 
 

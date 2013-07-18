@@ -198,7 +198,7 @@ class Api {
    */
   public function transcodeAdd($v) {
     global $db;
-    $k=array("id","status","mediaid","setting","subsetting");
+    $k=array("id","status","mediaid","setting","subsetting","metadata");
     $sql=""; $val=array();
     foreach($k as $key) {
       if (isset($v[$key])) { 
@@ -222,7 +222,7 @@ class Api {
    */
   public function transcodeUpdate($id,$v) {
     global $db;
-    $k=array("status","mediaid","setting","subsetting");
+    $k=array("status","mediaid","setting","subsetting","metadata");
     $sql=""; $val=array();
     foreach($k as $key) {
       if (isset($v[$key])) { 
@@ -247,7 +247,7 @@ class Api {
    */
   public function transcodeSearch($search,$operator="AND") {
     global $db;
-    $k=array("id","status","mediaid","setting","subsetting");
+    $k=array("id","status","mediaid","setting","subsetting","metadata");
     $sql=""; $val=array();
     foreach($k as $key) {
       if (isset($search[$key])) { 

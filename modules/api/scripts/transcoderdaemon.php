@@ -109,12 +109,12 @@ while (true) {
   $result=$ffmpeg->transcode($media,$source,$destination,$params["setting"]);
   
   if ($result) {
-    // Store the transcode object: 
-    $api->transcodeUpdate($transcode["id"],array("status"=>MEDIA_TRANSCODE_PROCESSED ) );;
+    $api->transcodeUpdate($transcode["id"],array("status"=>TRANSCODE_PROCESSED, "metadata"=>serialize($result) ) );;    
     // Queue the task to tell the client that we have the metadata
     $api->queueAdd(TASK_SEND_TRANSCODE,$task["mediaid"],API_RETRY, array("transcode"=>$params["transcode"] ),$media["adapter"]);
     // ok, transfer finished, let's mark it done
     $api->setTaskProcessedUnlock($task["id"]);
+        // Queue the task to tell the client that we have the metadata
     $api->log(LOG_DEBUG, "Successully processed task '".$task["id"]."', transcode for media '".$task["mediaid"]."' for setting '".$params["setting"]."'");
 
   } else {

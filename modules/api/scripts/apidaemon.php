@@ -90,11 +90,21 @@ while (true) {
     $ok=true;
     break;
   case TASK_SEND_TRANSCODE:
+    $transcode=$api->transcodeSearch(array("id"=>$task["params"]["transcode"]));
+    if (!$transcode) {
+      $api->log(LOG_CRIT, "Got task '".$task["id"]."' but transcode '".$task["transcodeid"]."' not found!!");
+      $api->setTaskFailedUnlock($task["id"]);
+      continue;
+    }
+    $transcode=$transcode[0];
+    $metadata=unserialize($transcode["metadata"]);
     $url.="&action=transcoder_send_format";
     $url.="&id=".$media["remoteid"];
-    // TODO : implement this (TASK_SEND_TRANSCODE)
-    $ok=false;
-
+    $url.="&settings_id=".$transcode["setting"];
+    $url.="&cardinality=".intval($metadata["cardinality"]);
+    $url.="&adapter=".$media["adapter"];
+    $url.="&metadata=".urlencode(json_encode($metadata));
+    $ok=true;
     break;
   } 
 
@@ -113,6 +123,11 @@ while (true) {
     continue;    
   } 
   $res=@json_decode($res);
+  if (!isset($res->code)) {
+    $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned a non-json content or no 'code' element");
+    $api->setTaskFailedUnlock($task["id"]);
+    continue;
+  }
   if ($res->code==0 || $res->code==200) { // TODO : use http error code only here 
     $api->setTaskProcessedUnlock($task["id"]);
   } else {
