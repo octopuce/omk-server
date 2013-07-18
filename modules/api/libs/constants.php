@@ -94,6 +94,7 @@ define("API_ERROR_BADURL",13);
 define("API_ERROR_CODEERROR",14);
 define("API_ERROR_NOQUEUE",15);
 define("API_ERROR_NOTFOUND",404);
+define("API_ERROR_BADRANGE",216);
 define("API_ERROR_BADMEDIA",505);
 define("API_ERROR_EXEC",503); // error during a query or something similar (fatal, but not 'code error')
 

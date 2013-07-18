@@ -287,4 +287,40 @@ class ApiController extends AController {
   }
   
 
+
+  /** ********************************************************************
+   * when the Client has been told by the transcoder that a transcode is READY
+   * it may ask for the media itself (when the adapter is HTTP)
+   * 
+   */
+  public function app_get_mediaAction() {
+    $this->me=$this->api->checkCallerIdentity();
+    // We don't enforce api calls limit here: when downloading 100's of images, we will likely do it within a few seconds
+    // TODO : prevent MORE THAN X MULTIPLE PARALLEL downloads from the same IP or USER to allow the others to have more resource...
+    //    $this->api->enforceLimits();
+    // for each params, tell its name, and its type and if it is mandatory
+    $this->params=$this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
+						 "id" => array("integer",true),
+						 "settings_id" => array("integer",true),
+						 "serial" => array("integer",false,1),
+						 "range" => array("string",false,""),
+						 ));
+    
+    $this->api->logApiCall("app_get_media");
+    if (!($media=$this->api->mediaSearch(array("owner"=>$this->me["uid"], "remoteid" => $this->params["id"])))) {
+      $this->api->apiError(API_ERROR_NOTFOUND,_("Media not found."));
+    }
+    $media=$media[0];
+    if (!$this->api->transcodeSearch(array("mediaid"=>$media["id"], "setting" => $this->params["settings_id"]))) {
+      $this->api->apiError(API_ERROR_NOTFOUND,_("Transcode not found."));
+    }
+    $adapterObject=$this->api->getAdapter($this->params["adapter"],$this->me);
+    if (!method_exists($adapterObject,"sendMedia")) {
+      $this->api->apiError(API_ERROR_NOTFOUND,_("Adapter not compatible with HTTP."));
+    }
+    $adapterObject->sendMedia($media,$transcode,$this->params["serial"],$this->params["range"]);
+    return;
+  }
+  
+
 } /* APIController */

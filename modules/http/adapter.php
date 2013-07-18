@@ -72,7 +72,94 @@ class HttpAdapter {
   }
   
 
+  /* ------------------------------------------------------------ */
+  /** This method is called when the API is about to send TRANSCODED CONTENT
+   * to the OMK Client
+   * @param $media array() The entire media object using that Adapter
+   * @param $transcode array() The entire transcode object
+   * @param $serial integer the number (if not 1) of the object to send.
+   * @param $range string a range object offset1-offset2
+   * @return echoes the content properly
+   */
+  function sendMedia($media,$transcode,$serial=1,$range="") {
+    $this->api=new Api();
+
+    include(__DIR__."/../api/libs/settings.php");
+    if (!$range) {
+      foreach(getallheaders() as $name=>$value) {
+	if ($name=="Range") {
+	  if (preg_match('#^bytes=([0-9]*-[0-9]*)$#',$value,$mat)) {
+	    $range=$mat[1];
+	  }
+	}
+      }
+      if (!$range) $range="0-";
+    }
+    $start=0; $end=-1;
+    if (preg_match("#^([0-9]*)-([0-9]*)$#",trim($range),$mat)) {
+      $start=$mat[1];
+      $end=$mat[2];
+    }
+    if ($start !=0 && $end!=0 && $end!=-1) {
+      if ($start > $end) $this->api->apiError(API_ERROR_BADRANGE,_("Requested Range Not Satisfiable (start > end)"));
+    }
+    
+    $destination=STORAGE_PATH."/transcoded/".$media["id"]."-".$transcode["setting"];
+    $metadata=unserialize($transcode["metadata"]);
+    if ($metadata["cardinality"]!=1) {
+      $dest=$destination."/".sprintf("%05d",$serial).".".$settings[$transcode["setting"]]["extension"];
+    } else {
+      if ($serial!=1) {
+	$this->api->apiError(API_ERROR_BADRANGE,_("Serial must be 1"));
+      }
+      $dest=$destination.".".$settings[$transcode["setting"]]["extension"];
+    }
+    $filesize=filesize($dest);
+    if ($filesize<$start) {
+      $this->api->apiError(API_ERROR_BADRANGE,_("Requested Range Not Satisfiable (start > size)"));
+    }
+    // Search for the destination file ...
+    if ($end!=-1) {
+      $tosend=$end-$start;
+    }
+    if ($end==-1 || ($tosend+$start>$filesize)) $tosend=$filesize-$start;
+
+    // SEND THE FILE
+    $f=fopen($dest,"rb");
+    if (!$f) {
+      $this->api->apiError(API_ERROR_NOTFOUND,_("File not found!"));
+    }
+    header("Content-Range: bytes ".$start."-".$end."/".filesize($dest));
+    header("Content-Length: ".$tosend);
+    header("Content-Type: ".$metadata["mime"]);
+    if ($start!=0) fseek($f,$start);
+    while ($tosend) {
+      $res=fread($f,min(8192,$tosend));
+      $tosend-=strlen($res);
+      echo $res;
+    }
+    fclose($f);
+    exit();
+  }
 
 } // class DummyAdapter
+
+
+// NGINX compatibility
+if (!function_exists('getallheaders'))
+  {
+    function getallheaders()
+    {
+      $headers = '';
+      foreach ($_SERVER as $name => $value)
+	{
+	  if (substr($name, 0, 5) == 'HTTP_')
+	    {
+	      $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+	    }
+	}
+      return $headers;
+    }
+  } 
 
 ?>
