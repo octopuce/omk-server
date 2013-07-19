@@ -24,11 +24,11 @@ class Cron {
     (
       ( lastactivity > DATE_SUB(NOW(), INTERVAL 31 DAY) 
       AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 7 DAY) 
-      AND  lastcron < DATE_SUB(NOW(), INTERVAL 5 MINUTE)  ) 
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 1 MINUTE)  ) 
     OR 
       ( lastactivity <= DATE_SUB(NOW(), INTERVAL 31 DAY) 
       AND lastcronsuccess > DATE_SUB(NOW(), INTERVAL 31 DAY)  
-      AND  lastcron < DATE_SUB(NOW(), INTERVAL 1 HOUR) ) 
+      AND  lastcron < DATE_SUB(NOW(), INTERVAL 30 MINUTE) ) 
     )
     ",NULL, PDO::FETCH_ASSOC);    
   }

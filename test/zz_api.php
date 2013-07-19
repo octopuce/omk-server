@@ -48,10 +48,10 @@ case "transcoder_send_metadata":
 
 case "transcoder_send_format":
   if (empty($_REQUEST["id"])
-      || empty($_REQUEST["url"])
-      header("HTTP/1.1 404 Not Found 2");
-      exit();
-      }
+      || empty($_REQUEST["url"])) {
+    header("HTTP/1.1 404 Not Found 2");
+    exit();
+  }
   file_put_contents(__DIR__."/transcode_url.txt",$_REQUEST["url"]);
   $ok=new StdClass();
   $ok->code=200;
