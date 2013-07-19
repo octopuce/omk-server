@@ -303,7 +303,7 @@ class ApiController extends AController {
 						 "id" => array("integer",true),
 						 "settings_id" => array("integer",true),
 						 "serial" => array("integer",false,1),
-						 "range" => array("string",false,""),
+						 "content_range" => array("string",false,""),
 						 ));
     
     $this->api->logApiCall("app_get_media");
@@ -311,14 +311,15 @@ class ApiController extends AController {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Media not found."));
     }
     $media=$media[0];
-    if (!$this->api->transcodeSearch(array("mediaid"=>$media["id"], "setting" => $this->params["settings_id"]))) {
+    if (!($transcode=$this->api->transcodeSearch(array("mediaid"=>$media["id"], "setting" => $this->params["settings_id"])))) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Transcode not found."));
     }
+    $transcode=$transcode[0];
     $adapterObject=$this->api->getAdapter($media["adapter"],$this->me);
     if (!method_exists($adapterObject,"sendMedia")) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Adapter not compatible with HTTP."));
     }
-    $adapterObject->sendMedia($media,$transcode,$this->params["serial"],$this->params["range"]);
+    $adapterObject->sendMedia($media,$transcode,$this->params["serial"],$this->params["content_range"]);
     return;
   }
   

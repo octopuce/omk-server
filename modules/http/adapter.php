@@ -68,12 +68,14 @@ class HttpAdapter {
   function sendMedia($media,$transcode,$serial=1,$range="") {
     $this->api=new Api();
 
+    $hasRangeHeader=false;
     include(__DIR__."/../api/libs/settings.php");
     if (!$range) {
       foreach(getallheaders() as $name=>$value) {
 	if ($name=="Range") {
 	  if (preg_match('#^bytes=([0-9]*-[0-9]*)$#',$value,$mat)) {
 	    $range=$mat[1];
+	    $hasRangeHeader=true;
 	  }
 	}
       }
@@ -84,6 +86,7 @@ class HttpAdapter {
       $start=$mat[1];
       $end=$mat[2];
     }
+    if ($end==0) $end=-1;
     if ($start !=0 && $end!=0 && $end!=-1) {
       if ($start > $end) $this->api->apiError(API_ERROR_BADRANGE,_("Requested Range Not Satisfiable (start > end)"));
     }
@@ -102,18 +105,20 @@ class HttpAdapter {
     if ($filesize<$start) {
       $this->api->apiError(API_ERROR_BADRANGE,_("Requested Range Not Satisfiable (start > size)"));
     }
+    
     // Search for the destination file ...
-    if ($end!=-1) {
+    if ($end==-1) $end=$filesize;
       $tosend=$end-$start;
-    }
-    if ($end==-1 || ($tosend+$start>$filesize)) $tosend=$filesize-$start;
+    if ($tosend+$start>$filesize) $tosend=$filesize-$start;
 
     // SEND THE FILE
     $f=fopen($dest,"rb");
     if (!$f) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("File not found!"));
     }
-    header("Content-Range: bytes ".$start."-".$end."/".filesize($dest));
+    if ($hasRangeHeader) {
+      header("Content-Range: bytes ".$start."-".($end-1)."/".$filesize);
+    }
     header("Content-Length: ".$tosend);
     header("Content-Type: ".$metadata["mime"]);
     if ($start!=0) fseek($f,$start);
