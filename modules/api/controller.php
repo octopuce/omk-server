@@ -314,7 +314,7 @@ class ApiController extends AController {
     if (!$this->api->transcodeSearch(array("mediaid"=>$media["id"], "setting" => $this->params["settings_id"]))) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Transcode not found."));
     }
-    $adapterObject=$this->api->getAdapter($this->params["adapter"],$this->me);
+    $adapterObject=$this->api->getAdapter($media["adapter"],$this->me);
     if (!method_exists($adapterObject,"sendMedia")) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Adapter not compatible with HTTP."));
     }
