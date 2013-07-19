@@ -56,19 +56,6 @@ class DummyAdapter {
   }
 
 
-  /* ------------------------------------------------------------ */
-  /** This method is called when the API is about to tell the OMK Client
-   * that a transcoded file is available.
-   * @param $media array() The entire media object using that Adapter
-   * @param $settings array() The entire settings object that is used by Ffmpeg 
-   * @return $url The URL where the OMK Client will be able to find the transcoded file.
-   *  please note that some settings are 'multiple-destination' one,
-   *  in that case, $url must be explicit enough for the OMK Client 
-   *  (who knows that Adapter) to understand where it will find all the files.
-   */
-  function transcodedURL($media,$settings) {
-    return "dummy://".$media["id"]."/".$settings["id"];
-  }
   
 
 
