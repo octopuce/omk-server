@@ -24,6 +24,8 @@ class Ffmpeg {
     if (!empty($out[0])) {
       $attribs["mime"]=trim($out[0]);
     }
+    $attribs["filesize"]=filesize($file);
+
     // If we do a "stream copy" for the video track, we can't do cropdetect ... 
     if (!$cropdetect) {
       $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec copy -acodec copy -vf cropdetect -f rawvideo -y /dev/null 2>&1";

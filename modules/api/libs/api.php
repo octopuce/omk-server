@@ -284,7 +284,13 @@ class Api {
    */
   public function logApiCall($api) {
     global $db;
-    if (empty($this->me["uid"])) $me=0; else $me=$this->me["uid"];
+    if (empty($this->me["uid"])) {
+      $me=0; 
+    } else {
+      $me=$this->me["uid"];
+      $db->q("UPDATE users SET lastactivity=NOW() WHERE uid=".intval($me).";");
+    }
+    
     if (isset($this->params)) {
       $parray=serialize($this->params);
     } else {

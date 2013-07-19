@@ -102,7 +102,7 @@ class HttpAdapter {
       $dest=$destination.".".$settings[$transcode["setting"]]["extension"];
     }
     $filesize=filesize($dest);
-    if ($filesize<$start) {
+    if ($start>=$filesize) {
       $this->api->apiError(API_ERROR_BADRANGE,_("Requested Range Not Satisfiable (start > size)"));
     }
     
