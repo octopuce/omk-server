@@ -5,6 +5,7 @@ The OpenMediaKit-Transcoder is a free software to manage your media online.
 This part of the OpenMediaKit project is the TRANSCODER
 
 Its aim is to
+
 * get media files from an OpenMediaKit or any API-compatible application
 * extract the metadata of the media (size, codecs, bitrates ...)
 * transcode them to other formats (thumbnails, web format, mobile ...)
@@ -12,7 +13,7 @@ Its aim is to
 
 Go to http://www.open-mediakit.org/ for more information, downloads, documentation...
 
-Copyright (C) 2008-2012 Benjamin Sonntag <benjamin@sonntag.fr>
+Copyright (C) 2008-2013 Benjamin Sonntag <benjamin@sonntag.fr>
 <other contributors, put your name/email here>
 
 This program is free software: you can redistribute it and/or modify

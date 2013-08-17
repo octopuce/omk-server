@@ -1,20 +1,18 @@
 To install the open-mediakit transcoder, you will need the following : 
 
-- a Linux or *Nix install with a webserver and php5 (version 5.3 minimum) and php libraries (php5-curl)
+- a Linux or *Nix install with a webserver, php5 (version 5.3 minimum), MySQL-server and php libraries (php5-curl)
 
 - ffmpeg and imagemagick WITH proprietary codecs if you want to be able to encode to mp4, mp3 etc.
 
 To do this, under debian Linux, use deb-multimedia repository as follow 
 (add this line in /etc/apt/sources.list.d/deb-multimedia.list )
 
-deb http://debian.octopuce.fr/debian-multimedia squeeze-backports main contrib non-free
-deb http://debian.octopuce.fr/debian squeeze-backports main contrib non-free
+deb http://debian.octopuce.fr/debian-multimedia wheezy main contrib non-free
 
 then launch, as root : 
 
 # aptitude update
-# aptitude install -t squeeze-backports ffmpeg libavcodec-extra-53 libavdevice-extra-53 libavfilter-extra-2 libavformat-extra-53 libavutil-extra-51
-(later, when we will support document parsing, we may need pdfutils, htmltotext, unoconv ...)
+# aptitude install ffmpeg 
 
 other recommended commands to install the Transcoder properly (on debian) : 
 
@@ -25,9 +23,7 @@ Then install a vhost pointing to your openmediakit-transcode instance (in our ex
 for example here in /etc/apache2/sites-available/omkt
 
 <Virtualhost *:80>
-
   ServerName <your domain name here>
-
   DocumentRoot /var/www/omkt/public
 
   ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -38,15 +34,15 @@ for example here in /etc/apache2/sites-available/omkt
     Allow from all
     AllowOverride All
   </Directory>
-
 </VirtualHost>	  
 
 then
 
 # a2ensite omkt
-# /etc/init.d/apache2 reload
+# /etc/init.d/apache2 restart
 
 Install the database and configure it properly in /var/www/omkt/config.php
+NOTE: If you want to install a MULTISERVER openmediakit transcoder, you will need to use a *remote mysql* configuration, read MULTISERVER for more informations
 
 # mysql -B -e "CREATE DATABASE omkt; GRANT ALL ON omkt.* TO 'omkt'@'localhost' IDENTIFIED BY 'randompassword';"
 # cp /var/www/omkt/config.inc.php.sample /var/www/omkt/config.inc.php
@@ -60,11 +56,10 @@ Launch install.php to initialize the database (this program will also UPGRADE th
 
 The current process to run are : 
 
-- the "crontab" file installed in a user crontab (the same user as the web server one) with proper path!!
-- modules/api/scripts/cron.daemon.php must be launched as a daemon, it calls the cron action of each valid client every 5 minutes or 1 hour
-- modules/api/scripts/downloader.php must be launched as a daemon on any number of machines you want (as long as they share the same NFS and MySQL access) We recommend launching it on the NFS server though (faster download)
-- modules/api/scripts/dometadata.php must be launched as a daemon on any number of machines you want (as long as they share the	same NFS and MySQL access) 
-- 
+* the "crontab" file installed in a user crontab (the same user as the web server one) with proper path!!
+* modules/api/scripts/cron.daemon.php must be launched as a daemon, it calls the cron action of each valid client every 5 minutes or 1 hour
+* modules/api/scripts/downloader.php must be launched as a daemon on any number of machines you want (as long as they share the same NFS and MySQL access) We recommend launching it on the NFS server though (faster download)
+* modules/api/scripts/dometadata.php must be launched as a daemon on any number of machines you want (as long as they share the	same NFS and MySQL access) 
 
 
 
