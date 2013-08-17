@@ -2,6 +2,7 @@
 
 all: locales
 
+.SECONDARY:
 
 install-locales:
 	mkdir -p ./locales/en_US/LC_MESSAGES/ ./locales/fr_FR/LC_MESSAGES/

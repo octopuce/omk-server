@@ -1,0 +1,747 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-08-17 09:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: common.php:25 common.php:37 common.php:37
+msgid "Cannot connect to the database:"
+msgstr ""
+
+#: libs/utils.php:22 libs/utils.php:22
+msgid "Page Not Found"
+msgstr ""
+
+#: libs/utils.php:22 libs/utils.php:22
+msgid ""
+"The requested page has not been found or an error happened. Please check"
+msgstr ""
+
+#: libs/Db.php:100
+msgid "Erreur base de données PDO prepare :"
+msgstr ""
+
+#: views/header.php:27
+#, php-format
+msgid "Connected as %s"
+msgstr ""
+
+#: views/footer.php:4 views/footer.php:4
+msgid "Top"
+msgstr ""
+
+#: views/menu.php:17 views/menu.php:17
+msgid "Plus ↓"
+msgstr ""
+
+#: public/index.php:14 public/index.php:14
+msgid "Error:"
+msgstr ""
+
+#: modules/index/hooks.php:7 modules/index/hooks.php:7
+msgid "Home"
+msgstr ""
+
+#: modules/index/views/index.php:9 modules/index/views/index.php:9
+msgid "Home page"
+msgstr ""
+
+#: modules/index/controller.php:11 modules/index/controller.php:11
+msgid "Welcome to the OpenMediaKit transcoder!"
+msgstr ""
+
+#: modules/api/libs/api.php:400 modules/api/libs/api.php:336
+#: modules/api/libs/api.php:342 modules/api/libs/api.php:342
+#, php-format
+msgid "Parameter %s is mandatory"
+msgstr ""
+
+#: modules/api/libs/api.php:419 modules/api/libs/api.php:356
+#: modules/api/libs/api.php:362 modules/api/libs/api.php:362
+msgid "API key, application name and version number are mandatory."
+msgstr ""
+
+#: modules/api/libs/api.php:427 modules/api/libs/api.php:362
+#: modules/api/libs/api.php:368 modules/api/libs/api.php:368
+msgid "The specified APIKEY does not exist in this transcoder."
+msgstr ""
+
+#: modules/api/libs/api.php:430 modules/api/libs/api.php:365
+#: modules/api/libs/api.php:371 modules/api/libs/api.php:371
+msgid ""
+"Your account is disabled, please contact the administrator of this "
+"transcoder."
+msgstr ""
+
+#: modules/api/libs/api.php:450 modules/api/libs/api.php:434
+#: modules/api/libs/api.php:440 modules/api/libs/api.php:440
+msgid ""
+"You sent too many queries per minute, please wait a little bit before "
+"sending more..."
+msgstr ""
+
+#: modules/api/views/index.php:2
+msgid "API Documentation"
+msgstr ""
+
+#: modules/api/controller.php:26
+msgid "Name"
+msgstr ""
+
+#: modules/api/controller.php:27
+msgid "Parameters"
+msgstr ""
+
+#: modules/api/controller.php:28
+msgid "Returned value"
+msgstr ""
+
+#: modules/api/controller.php:29
+msgid "Documentation"
+msgstr ""
+
+#: modules/api/controller.php:54 modules/api/controller.php:165
+#: modules/api/controller.php:165
+msgid ""
+"You already added this media ID from you to this transcoder. Cannot proceed."
+msgstr ""
+
+#: modules/api/controller.php:61 modules/api/controller.php:192
+#: modules/api/controller.php:192
+msgid "Cannot create a new media, please retry later."
+msgstr ""
+
+#: modules/users/hooks.php:14 modules/users/hooks.php:14
+msgid "User Management"
+msgstr ""
+
+#: modules/users/hooks.php:20 modules/users/views/me.php:18
+#: modules/users/views/show.php:23 modules/users/hooks.php:20
+#: modules/users/views/me.php:18 modules/users/views/show.php:23
+msgid "Login"
+msgstr ""
+
+#: modules/users/hooks.php:25 modules/users/hooks.php:25
+msgid "My Account"
+msgstr ""
+
+#: modules/users/hooks.php:57 modules/users/hooks.php:57
+#, php-format
+msgid "En vrai, vous êtes %s et vous vous faites passer pour %s."
+msgstr ""
+
+#: modules/users/hooks.php:60 modules/users/hooks.php:60
+msgid "Arrêter l'usurpation d'identité."
+msgstr ""
+
+#: modules/users/views/me.php:2 modules/users/views/form.php:8
+#: modules/users/views/me.php:2 modules/users/views/form.php:8
+msgid "My account"
+msgstr ""
+
+#: modules/users/views/me.php:5 modules/users/views/show.php:5
+#: modules/users/controller.php:50 modules/users/controller.php:56
+#: modules/media/controller.php:43 modules/users/controller.php:56
+#: modules/users/views/me.php:5 modules/users/views/show.php:5
+#: modules/media/controller.php:43
+msgid "Actions"
+msgstr ""
+
+#: modules/users/views/me.php:5 modules/users/views/form.php:4
+#: modules/users/views/form.php:8 modules/users/views/show.php:6
+#: modules/users/controller.php:38 modules/users/controller.php:44
+#: modules/media/controller.php:31 modules/users/controller.php:44
+#: modules/users/views/me.php:5 modules/users/views/form.php:4
+#: modules/users/views/form.php:8 modules/users/views/show.php:6
+#: modules/media/controller.php:31
+msgid "Edit"
+msgstr ""
+
+#: modules/users/views/me.php:9 modules/users/views/show.php:13
+#: modules/users/views/me.php:9 modules/users/views/show.php:13
+msgid "Other informations"
+msgstr ""
+
+#: modules/users/views/me.php:16 modules/users/views/me.php:16
+msgid "General information"
+msgstr ""
+
+#: modules/users/views/me.php:21 modules/users/views/form.php:36
+#: modules/users/views/show.php:26 modules/users/views/me.php:21
+#: modules/users/views/form.php:36 modules/users/views/show.php:26
+msgid "Email address"
+msgstr ""
+
+#: modules/users/views/form.php:7 modules/users/views/form.php:7
+msgid "Edit my account"
+msgstr ""
+
+#: modules/users/views/form.php:11 modules/users/views/list.php:4
+#: modules/users/views/form.php:11 modules/users/views/list.php:4
+msgid "Create a user"
+msgstr ""
+
+#: modules/users/views/form.php:12 modules/users/views/form.php:12
+msgid "Add"
+msgstr ""
+
+#: modules/users/views/form.php:34 modules/users/views/form.php:34
+msgid "Identity"
+msgstr ""
+
+#: modules/users/views/form.php:40 modules/users/views/form.php:40
+msgid "Keep this empty if you don't want to change the password"
+msgstr ""
+
+#: modules/users/views/form.php:42 modules/users/views/form.php:42
+msgid "Password:"
+msgstr ""
+
+#: modules/users/views/form.php:43 modules/users/views/form.php:43
+msgid "Password (confirmation):"
+msgstr ""
+
+#: modules/users/views/form.php:45 modules/users/views/form.php:45
+msgid "Send the password by mail"
+msgstr ""
+
+#: modules/users/views/form.php:47 modules/users/views/form.php:47
+msgid "Send a mail telling about that new account"
+msgstr ""
+
+#: modules/users/views/form.php:52 modules/users/views/form.php:52
+msgid "Is it an administrator?"
+msgstr ""
+
+#: modules/users/views/form.php:53 modules/users/views/form.php:53
+msgid "Is it enabled?"
+msgstr ""
+
+#: modules/users/views/form.php:55 modules/users/views/form.php:55
+msgid "Application API URL"
+msgstr ""
+
+#: modules/users/views/form.php:58 modules/users/views/form.php:58
+msgid "Will be created automatically"
+msgstr ""
+
+#: modules/users/views/form.php:66 modules/users/views/form.php:66
+msgid "Add this user"
+msgstr ""
+
+#: modules/users/views/form.php:67 modules/users/views/form.php:67
+msgid "Edit this user"
+msgstr ""
+
+#: modules/users/views/form.php:68 modules/users/views/form.php:68
+msgid "Change my infos"
+msgstr ""
+
+#: modules/users/views/form.php:69 modules/users/views/form.php:69
+msgid "Cancel"
+msgstr ""
+
+#: modules/users/views/delete.php:3 modules/users/views/delete.php:3
+msgid "Supprimer"
+msgstr ""
+
+#: modules/users/views/delete.php:8 modules/users/views/delete.php:8
+#, php-format
+msgid "Do you really want to delete user '%s'?"
+msgstr ""
+
+#: modules/users/views/delete.php:9 modules/users/views/delete.php:9
+msgid "This will delete all its associated media"
+msgstr ""
+
+#: modules/users/views/delete.php:17 modules/users/views/delete.php:17
+msgid "Yes, delete it"
+msgstr ""
+
+#: modules/users/views/delete.php:18 modules/users/views/delete.php:18
+msgid "No, don't do anything"
+msgstr ""
+
+#: modules/users/views/contacts.php:1 modules/users/views/contacts.php:1
+msgid "Contacts techniques"
+msgstr ""
+
+#: modules/users/views/contacts.php:4 modules/users/views/contacts.php:4
+msgid "Personnes autorisés à agir au nom du client (e-mail)"
+msgstr ""
+
+#: modules/users/views/contacts.php:6 modules/users/views/contacts.php:6
+msgid "Aucun contact e-mail n'est autorisé à agir au nom du client."
+msgstr ""
+
+#: modules/users/views/contacts.php:9 modules/users/views/contacts.php:9
+msgid "Personnes autorisés à agir au nom du client (téléphone)"
+msgstr ""
+
+#: modules/users/views/contacts.php:11 modules/users/views/contacts.php:11
+msgid "Aucun contact téléphonique n'est autorisé à agir au nom du client."
+msgstr ""
+
+#: modules/users/views/contacts.php:14 modules/users/views/contacts.php:14
+msgid "Personnes à prévenir en cas d'urgence (e-mail)"
+msgstr ""
+
+#: modules/users/views/contacts.php:16 modules/users/views/contacts.php:16
+msgid "Aucun contact à prévenir par e-mail n'est défini."
+msgstr ""
+
+#: modules/users/views/contacts.php:19 modules/users/views/contacts.php:19
+msgid "Personnes à prévenir en cas d'urgence (SMS)"
+msgstr ""
+
+#: modules/users/views/contacts.php:21 modules/users/views/contacts.php:21
+msgid "Aucun contact à prévenir par sms n'est défini."
+msgstr ""
+
+#: modules/users/views/show.php:7 modules/users/controller.php:39
+#: modules/users/controller.php:45 modules/media/controller.php:32
+#: modules/users/controller.php:45 modules/users/views/show.php:7
+#: modules/media/controller.php:32
+msgid "Delete"
+msgstr ""
+
+#: modules/users/views/show.php:8 modules/users/views/show.php:8
+msgid "Connect As"
+msgstr ""
+
+#: modules/users/views/show.php:21 modules/users/views/show.php:21
+msgid "General informations"
+msgstr ""
+
+#: modules/users/views/show.php:29 modules/users/views/show.php:29
+msgid "Enabled?"
+msgstr ""
+
+#: modules/users/views/show.php:32 modules/users/controller.php:47
+#: modules/users/controller.php:53 modules/media/controller.php:40
+#: modules/users/controller.php:53 modules/users/views/show.php:32
+#: modules/media/controller.php:40
+msgid "Application URL"
+msgstr ""
+
+#: modules/users/views/show.php:35 modules/users/views/show.php:35
+msgid "API Key"
+msgstr ""
+
+#: modules/users/views/show.php:38 modules/users/views/show.php:38
+msgid "Administrator?"
+msgstr ""
+
+#: modules/users/views/list.php:2 modules/users/views/list.php:2
+msgid "Users"
+msgstr ""
+
+#: modules/users/scripts/gen-htpasswd.php:10
+#: modules/users/scripts/gen-htpasswd.php:10
+msgid "Erreur lors de la connexion à la base de données."
+msgstr ""
+
+#: modules/users/controller.php:40 modules/users/controller.php:46
+#: modules/media/controller.php:33 modules/users/controller.php:46
+#: modules/media/controller.php:33
+msgid "Connect as"
+msgstr ""
+
+#: modules/users/controller.php:44 modules/users/controller.php:50
+#: modules/media/controller.php:37 modules/users/controller.php:50
+#: modules/media/controller.php:37
+msgid "Email"
+msgstr ""
+
+#: modules/users/controller.php:45 modules/users/controller.php:51
+#: modules/media/controller.php:38 modules/users/controller.php:51
+#: modules/media/controller.php:38
+msgid "Enabled"
+msgstr ""
+
+#: modules/users/controller.php:46 modules/users/controller.php:52
+#: modules/media/controller.php:39 modules/users/controller.php:52
+#: modules/media/controller.php:39
+msgid "Admin."
+msgstr ""
+
+#: modules/users/controller.php:72 modules/users/controller.php:78
+#: modules/users/controller.php:78
+msgid "yes"
+msgstr ""
+
+#: modules/users/controller.php:72 modules/users/controller.php:78
+#: modules/users/controller.php:78
+msgid "no"
+msgstr ""
+
+#: modules/users/controller.php:84 modules/users/controller.php:90
+#: modules/users/controller.php:90
+msgid "The email address is mandatory"
+msgstr ""
+
+#: modules/users/controller.php:87 modules/users/controller.php:93
+#: modules/users/controller.php:93
+msgid "The passwords are different, please check"
+msgstr ""
+
+#: modules/users/controller.php:90 modules/users/controller.php:96
+#: modules/users/controller.php:96
+msgid "Please set a password"
+msgstr ""
+
+#: modules/users/controller.php:135
+msgid "User added..."
+msgstr ""
+
+#: modules/users/controller.php:210 modules/users/controller.php:198
+#: modules/users/controller.php:198
+msgid "User changed..."
+msgstr ""
+
+#: modules/users/controller.php:252 modules/users/controller.php:240
+#: modules/users/controller.php:240
+msgid "Yes, Delete"
+msgstr ""
+
+#: modules/users/controller.php:257 modules/users/controller.php:245
+#: modules/users/controller.php:245
+#, php-format
+msgid "User %s successfully deleted"
+msgstr ""
+
+#: modules/users/controller.php:262 modules/users/controller.php:250
+#: modules/users/controller.php:250
+msgid "Nothing has been deleted"
+msgstr ""
+
+#: modules/users/controller.php:335 modules/users/controller.php:351
+#: modules/users/controller.php:351
+msgid "User account changed..."
+msgstr ""
+
+#: modules/users/controller.php:374 modules/users/controller.php:391
+#: modules/users/controller.php:391
+msgid "Changement de mot de passe sur le Panel Octopuce"
+msgstr ""
+
+#: modules/users/controller.php:375 modules/users/controller.php:392
+#: modules/users/controller.php:392
+#, php-format
+msgid ""
+"\n"
+"Bonjour,\n"
+"\n"
+"le mot de passe de votre compte sur le panneau de contrôle d'Octopuce vient "
+"d'être modifié.\n"
+"\n"
+"Vous pouvez y accéder à l'adresse : %s\n"
+"\n"
+"Votre nom d'utilisateur est : %s\n"
+"Votre mot de passe est : %s\n"
+"\n"
+"--\n"
+"Cordialement,\n"
+"\n"
+"L'équipe technique d'Octopuce\n"
+msgstr ""
+
+#: modules/users/controller.php:401 modules/users/controller.php:418
+#: modules/users/controller.php:418
+msgid "Votre compte sur le Panel Octopuce"
+msgstr ""
+
+#: modules/users/controller.php:402 modules/users/controller.php:419
+#: modules/users/controller.php:419
+#, php-format
+msgid ""
+"\n"
+"Bonjour,\n"
+"\n"
+"votre compte sur le panneau de contrôle d'Octopuce vient d'être créé.\n"
+"\n"
+"Vous pouvez y accéder à l'adresse : %s\n"
+"\n"
+"Votre nom d'utilisateur est : %s\n"
+"Votre mot de passe est : %s\n"
+"\n"
+"Nous vous invitons à le modifier en cliquant sur 'Mon compte' puis "
+"'Modifier'\n"
+"\n"
+"--\n"
+"Cordialement,\n"
+"\n"
+"L'équipe technique d'Octopuce\n"
+msgstr ""
+
+#: discovery/functions.php:38 modules/users/libs/users.php:85
+#: discovery/functions.php:38 modules/users/libs/users.php:85
+msgid "Email validation for the public OpenMediakit Transcoder"
+msgstr ""
+
+#: discovery/functions.php:39 discovery/functions.php:39
+#, php-format
+msgid ""
+"\n"
+"Hi,\n"
+"\n"
+"Someone, maybe you, created a PUBLICLY AVAILABLE instance of the "
+"OpenMediakit Transcoder service.\n"
+"\n"
+"This email is sent to the administrator email to validate its ownership. \n"
+"Please click the link below if you want to confirm that you want your "
+"transcoder instance to be made public\n"
+"\n"
+"%s\n"
+"\n"
+"Please note that your transcoder will not appear as a publicly available one "
+"until your email has been validated, since we may need to contact you if "
+"something goes wrong with this service.\n"
+"\n"
+"If you didn't asked for this account, please ignore this message.\n"
+"\n"
+"--\n"
+"Regards,\n"
+"\n"
+"The OpenMediakit Team\n"
+msgstr ""
+
+#: modules/users/controller.php:131 modules/users/controller.php:131
+msgid "User successfully added."
+msgstr ""
+
+#: modules/users/controller.php:134 modules/users/controller.php:134
+msgid "An error occurred when adding the user."
+msgstr ""
+
+#: modules/users/controller.php:296 modules/users/controller.php:296
+msgid ""
+"The address you entered is incorrect, please check the mail you received (1)"
+msgstr ""
+
+#: modules/users/controller.php:303 modules/users/controller.php:303
+msgid ""
+"The address you entered is incorrect, please check the mail you received (2)"
+msgstr ""
+
+#: modules/users/controller.php:310 modules/users/controller.php:310
+msgid ""
+"Your account has been validated, you can now use the OpenMediakit Transcoder "
+"service"
+msgstr ""
+
+#: modules/users/libs/users.php:86 modules/users/libs/users.php:86
+#, php-format
+msgid ""
+"\n"
+"Hi,\n"
+"\n"
+"Someone, maybe you, created an account on a public OpenMediakit Transcoder "
+"service.\n"
+"\n"
+"This email is sent to the subscription email to validate its ownership. "
+"Please click the link below if you want to confirm the account creation.\n"
+"\n"
+"%s\n"
+"\n"
+"Please note that you will not be able to use this public transcoder until "
+"your email has been validated, since we may need to contact you if something "
+"goes wrong with this service.\n"
+"\n"
+"If you didn't asked for this account, please ignore this message.\n"
+"\n"
+"--\n"
+"Regards,\n"
+"\n"
+"The OpenMediakit Transcoder public instance service at\n"
+"%s\n"
+msgstr ""
+
+#: modules/api/controller.php:30 modules/api/controller.php:30
+msgid "Api call doesn't exist"
+msgstr ""
+
+#: modules/api/controller.php:59 modules/api/controller.php:59
+msgid ""
+"This media has not been uploaded by you yet, please upload it before asking "
+"for transcodes."
+msgstr ""
+
+#: modules/api/controller.php:63 modules/api/controller.php:63
+msgid "The media's metadata has not been recognized, or it had expired."
+msgstr ""
+
+#: modules/api/controller.php:76 modules/api/controller.php:76
+msgid ""
+"The settings_id_list is incorrect, it must be either a php-style array[] or "
+"a json array"
+msgstr ""
+
+#: modules/api/controller.php:84 modules/api/controller.php:84
+msgid "Setting unknown by this transcoder"
+msgstr ""
+
+#: modules/api/controller.php:91 modules/api/controller.php:91
+msgid "None of your settings are known by this transcoder"
+msgstr ""
+
+#: modules/api/controller.php:100 modules/api/controller.php:100
+msgid ""
+"The video has already been transcoded to this setting, or this transcode is "
+"in progress."
+msgstr ""
+
+#: modules/api/controller.php:108 modules/api/controller.php:108
+msgid ""
+"This video has already been transcoded to all the settings you just asked, "
+"or transcode is in progress."
+msgstr ""
+
+#: modules/api/controller.php:125 modules/api/controller.php:125
+msgid "Transcode requested"
+msgstr ""
+
+#: modules/api/controller.php:128 modules/api/controller.php:128
+msgid "Can't request this Transcode, retry later"
+msgstr ""
+
+#: modules/api/controller.php:134 modules/api/controller.php:134
+msgid "No transcode has been launch, retry later"
+msgstr ""
+
+#: modules/api/controller.php:173 modules/api/controller.php:173
+msgid "The remote url is incorrect for this adapter. Please check your code"
+msgstr ""
+
+#: modules/api/controller.php:180 modules/api/controller.php:180
+msgid "BAD IMPLEMENTATION of AdapterClass in "
+msgstr ""
+
+#: modules/api/controller.php:200 modules/api/controller.php:200
+msgid "OK, Download task queued"
+msgstr ""
+
+#: modules/api/controller.php:202 modules/api/controller.php:209
+#: modules/api/controller.php:202 modules/api/controller.php:209
+msgid "Can't queue the task now, please try later."
+msgstr ""
+
+#: modules/api/controller.php:207 modules/api/controller.php:207
+msgid "OK, Metadata task queued"
+msgstr ""
+
+#: modules/api/controller.php:251 modules/api/controller.php:251
+msgid "This server is not a public transcoder, please use another one"
+msgstr ""
+
+#: modules/api/controller.php:277 modules/api/controller.php:277
+msgid "An error happened when creating the account. Please retry later."
+msgstr ""
+
+#: modules/api/views/index.php:2 modules/api/views/index.php:2
+msgid "API"
+msgstr ""
+
+#: modules/api/libs/cron.php:89 modules/api/libs/cron.php:89
+msgid "Account disabled in the public OpenMediakit Transcoder"
+msgstr ""
+
+#: modules/api/libs/cron.php:90 modules/api/libs/cron.php:90
+#, php-format
+msgid ""
+"\n"
+"Hi,\n"
+"\n"
+"Days ago, you subscribed to a public transcoder service.\n"
+"\n"
+"Since then, your account has not used our service for more than 2 months, "
+"and your website seems down since more than 1 month.\n"
+"\n"
+"As a result, we just disabled your account for the application using our "
+"transcoding service.  \n"
+"\n"
+"For your records, your website was located at %s.\n"
+"\n"
+"Feel free to resubscribe if you need to use this service later again,\n"
+"\n"
+"--\n"
+"Regards,\n"
+"\n"
+"The OpenMediakit Transcoder public instance at\n"
+"%s\n"
+msgstr ""
+
+#: modules/api/libs/api.php:386 modules/api/libs/api.php:392
+#: modules/api/libs/api.php:392
+msgid "Adapter not allowed"
+msgstr ""
+
+#: modules/api/libs/api.php:404 modules/api/libs/api.php:410
+#: modules/api/libs/api.php:410
+msgid "The requested adapter is not supported on this Transcoder"
+msgstr ""
+
+#: test/zz_api.php:45 test/zz_api.php:45
+msgid "OK, metadata received"
+msgstr ""
+
+#: libs/Db.php:99 libs/Db.php:99
+msgid "Error during PDO Prepare:"
+msgstr ""
+
+#: modules/http/adapter.php:91 modules/http/adapter.php:91
+msgid "Requested Range Not Satisfiable (start > end)"
+msgstr ""
+
+#: modules/http/adapter.php:100 modules/http/adapter.php:100
+msgid "Serial must be 1"
+msgstr ""
+
+#: modules/http/adapter.php:106 modules/http/adapter.php:106
+msgid "Requested Range Not Satisfiable (start > size)"
+msgstr ""
+
+#: modules/http/adapter.php:117 modules/http/adapter.php:117
+msgid "File not found!"
+msgstr ""
+
+#: modules/transcode/hooks.php:6 modules/transcode/hooks.php:6
+msgid "transcode"
+msgstr ""
+
+#: modules/media/hooks.php:6 modules/media/hooks.php:6
+msgid "media"
+msgstr ""
+
+#: modules/queue/hooks.php:6 modules/queue/hooks.php:6
+msgid "queue"
+msgstr ""
+
+#: modules/api/controller.php:311 modules/api/controller.php:311
+msgid "Media not found."
+msgstr ""
+
+#: modules/api/controller.php:315 modules/api/controller.php:315
+msgid "Transcode not found."
+msgstr ""
+
+#: modules/api/controller.php:320 modules/api/controller.php:320
+msgid "Adapter not compatible with HTTP."
+msgstr ""
+
+#: test/zz_api.php:58 test/zz_api.php:58
+msgid "OK, url received"
+msgstr ""
