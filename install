@@ -36,3 +36,6 @@ if (!file_exists(__DIR__ . '/tmp')) {
 
 @mkdir(STORAGE_PATH."/original");
 @mkdir(STORAGE_PATH."/transcoded");
+
+echo "Now copy the init/* files into /etc/init.d/ and do the appropriate sysV or other daemon boot launcher."
+

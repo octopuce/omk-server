@@ -1,25 +1,25 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          OpenMediaKit-Transcoder-Downloader
+# Provides:          OpenMediaKit-Transcoder-API
 # Required-Start:    $network $named $remote_fs $syslog
 # Required-Stop:     $network $named $remote_fs $syslog
-# Should-Start:      OpenMediaKit-Transcoder-Downloader
+# Should-Start:      OpenMediaKit-Transcoder-API
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: OpenMediaKit Transcoder Downloader computing service
+# Short-Description: OpenMediaKit Transcoder API caller
 # Description:       The OpenMediaKit Transcoder service is providing
 #                    its subscribed users with a Video Transcoding service. 
-#                    This daemon do the Downloader finding on the subscribers videos
+#                    This daemon do the API calls on the subscribers website
 ### END INIT INFO
 
 OMKTROOT=/var/www/omkt
 CHOWN=www-data
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=$OMKTROOT/modules/http/downloader.daemon.php
+DAEMON=$OMKTROOT/modules/api/scripts/api.daemon.php
 DAEMON_OPTS=""
-NAME="omkt-downloader"
-DESC="OpenMediaKit Transcoder DOWNLOADER Service"
+NAME="omkt-api"
+DESC="OpenMediaKit Transcoder API caller"
 PIDFILE="/var/run/${NAME}.pid"
 
 test -x $DAEMON || exit 0
