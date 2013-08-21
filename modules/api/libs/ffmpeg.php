@@ -10,8 +10,8 @@ class Ffmpeg {
    * of associative array with the metadata of each track.
    */
   public function getFfmpegMetadata($file,$cropdetect=false) {
-
-    // This code is for the SQUEEZE version of deb-multimedia ffmpeg version
+    global $api;
+    // This code is for the WHEEZY version of deb-multimedia ffmpeg version
     $DEBUG=0;
 
     $attribs=array();
@@ -32,10 +32,10 @@ class Ffmpeg {
     } else {
       $exec="ffmpeg -i ".escapeshellarg($file)." -vcodec rawvideo -acodec copy -vf cropdetect -f rawvideo -y /dev/null 2>&1";
     }
-    if ($DEBUG) echo "exec:$exec\n";
-    exec($exec,$out);
+    $api->log(LOG_DEBUG,"[ffmpeg::metadata] getting metadata, launching $exec");
+    exec($exec,$out,$ret);
     // now we parse the lines of stdout to know the tracks
-
+      
     $tracks=array(); // no track to start with
     $duration=DURATION_UNDEFINED; // undefined duration to start with
     // Each time we start a new track, we start a $track array 
@@ -244,7 +244,6 @@ when using -vf cropdetect
       $api->log(LOG_ERR, "[ffmpeg::transcode] No video track found");      
       return false; 
     }
-    print_r($params);
 
     $ratio=$params["ratio"];
 
@@ -282,16 +281,20 @@ when using -vf cropdetect
 	$settings[$setting][$k]=$v;
     }
     // Execution
+    // We cd to a temporary folder where we can write (for statistics files)
+    $TMP="/tmp/transcode-".getmypid();
+    mkdir($TMP); $push=getcwd(); chdir($TMP);
     foreach($settings[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
 	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
 	if (substr($v,0,8)=="scripts-") {
-	  exec(dirname(__FILE__)."/../transcodes/".$v,$out,$ret);
+	  exec(dirname(__FILE__)."/../transcodes/".$v." </dev/null 2>&1",$out,$ret);
 	} else {
-	  exec($v,$out,$ret);
+	  exec($v." </dev/null 2>&1",$out,$ret);
 	}
 	if ($ret!=0) {
 	  $cancel=$settings[$setting]["cancelcommand"];
+	  $api->log(LOG_ERR,"[ffmpeg::transcode] previous exec failed, output was ".substr(implode("|",$out),-100));
 	  if ($cancel) {
 	    // Launch cancel command
 	    $api->log(LOG_DEBUG, "[ffmpeg::transcode] CANCEL exec: $cancel");
@@ -303,6 +306,7 @@ when using -vf cropdetect
 	}
       }
     }
+    exec("rm -rf ".escapeshellarg($TMP)); chdir($push);
     if ($failed) {
       return false;
     }
