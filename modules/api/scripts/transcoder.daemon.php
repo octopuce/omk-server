@@ -72,7 +72,7 @@ while (true) {
   $media=$media[0];
 
   $transcode=$api->transcodeSearch(array("id"=>$params["transcode"]));
-  $api->log(LOG_DEBUG, "Trasncode search'".$params["transcode"]."' returns '".print_r($transcode,1));
+  $api->log(LOG_DEBUG, "Transcode search '".$params["transcode"]."' returns '".print_r($transcode,1)."'");
 
   if (!$transcode) {
     $api->log(LOG_CRIT, "Got task '".$task["id"]."' but transcode '".$params["transcode"]."' not found!!");

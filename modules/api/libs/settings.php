@@ -7,7 +7,7 @@
 
 global $settings;
 $settings=array(
-   array(
+     "1" => array(
           "id" => "1",
           "type" => "video",
           "slug" => "video_240p_flv",
@@ -21,7 +21,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "2" => array(
           "id" => "2",
           "type" => "video",
           "slug" => "video_360p_flv",
@@ -35,7 +35,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "3" => array(
           "id" => "3",
           "type" => "video",
           "slug" => "video_480p_flv",
@@ -49,7 +49,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "11" => array(
           "id" => "11",
           "type" => "video",
           "slug" => "video_240p_mp4",
@@ -61,11 +61,11 @@ $settings=array(
           "size_169" => "426x240",
           "cardinality" => "1",
           "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 512k -maxrate:v 800k -bufsize 10M -profile:v baseline -strict experimental -f rawvideo -an /dev/null",
-          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 512k -maxrate:v 800k -bufsize 10M -profile:v baseline -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 96k %%DESTINATION%%",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 512k -maxrate:v 800k -bufsize 10M -profile:v baseline -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 96k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "12" => array(
           "id" => "12",
           "type" => "video",
           "slug" => "video_360p_mp4",
@@ -76,11 +76,11 @@ $settings=array(
           "size_169" => "640x360",
           "cardinality" => "1",
           "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 800k -maxrate:v 2M -bufsize 20M -profile:v main -strict experimental -f rawvideo -an /dev/null",
-          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 800k -maxrate:v 2M -bufsize 20M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 800k -maxrate:v 2M -bufsize 20M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "13" => array(
           "id" => "13",
           "type" => "video",
           "slug" => "video_480p_mp4",
@@ -91,11 +91,11 @@ $settings=array(
           "size_169" => "854x480",
           "cardinality" => "1",
           "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 2M -maxrate:v 4M -bufsize 30M -profile:v main -strict experimental -f rawvideo -an /dev/null",
-          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 2M -maxrate:v 4M -bufsize 30M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 2M -maxrate:v 4M -bufsize 30M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "14" => array(
           "id" => "14",
           "type" => "video",
           "slug" => "video_720p_mp4",
@@ -107,11 +107,11 @@ $settings=array(
           "size_169" => "1280x720",
           "cardinality" => "1",
           "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 4M -maxrate:v 8M -bufsize 40M -profile:v main -strict experimental -f rawvideo -an /dev/null",
-          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 4M -maxrate:v 8M -bufsize 40M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 4M -maxrate:v 8M -bufsize 40M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "15" => array(
           "id" => "15",
           "type" => "video",
           "slug" => "video_1080p_mp4",
@@ -123,11 +123,11 @@ $settings=array(
           "size_169" => "1920x1080",
           "cardinality" => "1",
           "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 8M -maxrate:v 12M -bufsize 80M -profile:v main -strict experimental -f rawvideo -an /dev/null",
-          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 8M -maxrate:v 12M -bufsize 80M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 8M -maxrate:v 12M -bufsize 80M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "21" => array(
           "id" => "21",
           "type" => "video",
           "slug" => "video_240p_webm",
@@ -141,7 +141,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "22" => array(
           "id" => "22",
           "type" => "video",
           "slug" => "video_360p_webm",
@@ -155,7 +155,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "23" => array(
           "id" => "23",
           "type" => "video",
           "slug" => "video_480p_webm",
@@ -169,7 +169,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "24" => array(
           "id" => "24",
           "type" => "video",
           "slug" => "video_720p_webm",
@@ -183,7 +183,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "25" => array(
           "id" => "25",
           "type" => "video",
           "slug" => "video_1080p_webm",
@@ -197,7 +197,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "31" => array(
           "id" => "31",
           "type" => "video",
           "slug" => "video_240p_mpeg",
@@ -210,7 +210,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "32" => array(
           "id" => "32",
           "type" => "video",
           "slug" => "video_360p_mpeg",
@@ -223,7 +223,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "33" => array(
           "id" => "33",
           "type" => "video",
           "slug" => "video_480p_mpeg",
@@ -236,7 +236,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "34" => array(
           "id" => "34",
           "type" => "video",
           "slug" => "video_720p_mpeg",
@@ -249,7 +249,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "35" => array(
           "id" => "35",
           "type" => "video",
           "slug" => "video_1080p_mpeg",
@@ -262,7 +262,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "51" => array(
           "id" => "51",
           "type" => "audio",
           "slug" => "audio_64k_mp3",
@@ -275,7 +275,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "52" => array(
           "id" => "52",
           "type" => "audio",
           "slug" => "audio_128k_mp3",
@@ -288,7 +288,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "53" => array(
           "id" => "53",
           "type" => "audio",
           "slug" => "audio_v0_mp3",
@@ -301,7 +301,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "61" => array(
           "id" => "61",
           "type" => "audio",
           "slug" => "audio_64k_vorbis",
@@ -314,7 +314,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "62" => array(
           "id" => "62",
           "type" => "audio",
           "slug" => "audio_128k_vorbis",
@@ -327,7 +327,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "63" => array(
           "id" => "63",
           "type" => "audio",
           "slug" => "audio_v0_vorbis",
@@ -340,7 +340,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "71" => array(
           "id" => "71",
           "type" => "audio",
           "slug" => "audio_64k_aac",
@@ -353,7 +353,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "72" => array(
           "id" => "72",
           "type" => "audio",
           "slug" => "audio_128k_aac",
@@ -366,7 +366,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "73" => array(
           "id" => "73",
           "type" => "audio",
           "slug" => "audio_192k_aac",
@@ -379,7 +379,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "101" => array(
           "id" => "101",
           "type" => "thumbnails",
           "slug" => "20_original_and_small_thumbs_jpg",
@@ -390,7 +390,7 @@ $settings=array(
           "size_43" => "1440x1080",
           "size_169" => "1920x1080",
           "cardinality" => "40",
-          "command1" => "scripts-thumbnails1.php %%SOURCE%% %%DESTINATION%% %%DURATION%%",
+          "command1" => "scripts-thumbnails1.php %%SOURCE%% %%DESTINATION%% %%DURATION%%",
           "cancelcommand" => "rm -rf %%DESTINATION%%",
         ),
 
