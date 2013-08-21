@@ -36,3 +36,15 @@ if (!file_exists(__DIR__ . '/tmp')) {
 
 @mkdir(STORAGE_PATH."/original");
 @mkdir(STORAGE_PATH."/transcoded");
+
+if (!is_file("/etc/debian_version")) {
+   echo "Now copy the init/* files into /etc/init.d/ and do the appropriate sysV or other daemon boot launcher. (warning, they are from Debian, they may not work on your system)"
+} else {
+  $services=array("omkt-api","omkt-cron","omkt-downloader","omkt-metadata","omkt-transcoder");
+  foreach($services as $service) {
+    echo "Installing $service daemon.";
+    copy("init/$service","/etc/init.d/$service");
+    exec("update-rc.d $service defaults");
+    echo ".. done\n"; flush();
+  } 
+}

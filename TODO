@@ -1,0 +1,9 @@
+
+* init scripts
+* settings for kmotion
+* thumbnails
+  * zip contenant 2 * 20 fichiers .jpg
+    h00 to h19.jpg
+    l00 to l19.jpg
+  * file_size donne la taille du .zip, pas des .jpg
+
