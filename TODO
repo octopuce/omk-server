@@ -1,9 +1,11 @@
 
-* init scripts
+DONE * init scripts
+
 * settings for kmotion
-* thumbnails
-  * zip contenant 2 * 20 fichiers .jpg
+
+IN PROGRESS * thumbnails
+  * zip with 2 * 20 .jpg files
     h00 to h19.jpg
     l00 to l19.jpg
-  * file_size donne la taille du .zip, pas des .jpg
+  * file_size is the zip file, not the jpg one
 

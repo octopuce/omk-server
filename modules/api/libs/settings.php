@@ -7,14 +7,13 @@
 
 global $settings;
 $settings=array(
-   array(
+     "1" => array(
           "id" => "1",
           "type" => "video",
           "slug" => "video_240p_flv",
           "name" => "Video at very low definition and flash sorenson format",
           "technical" => "flv container, sorenson video at 280kb/s, mp3 audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",
           "extension" => "flv",
-          "recommend" => "1",
           "size_43" => "320x240",
           "size_169" => "426x240",
           "cardinality" => "1",
@@ -22,14 +21,13 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "2" => array(
           "id" => "2",
           "type" => "video",
           "slug" => "video_360p_flv",
           "name" => "Video at low definition and flash sorenson format",
           "technical" => "flv container, sorenson video at 440kb/s, mp3 audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",
           "extension" => "flv",
-          "recommend" => "1",
           "size_43" => "480x360",
           "size_169" => "640x360",
           "cardinality" => "1",
@@ -37,7 +35,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "3" => array(
           "id" => "3",
           "type" => "video",
           "slug" => "video_480p_flv",
@@ -51,80 +49,85 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.flv",
         ),
 
-   array(
+     "11" => array(
           "id" => "11",
           "type" => "video",
           "slug" => "video_240p_mp4",
           "name" => "Video at very low definition and portable mp4 format",
-          "technical" => "mp4 container, h264 video at 280kb/s, aac audio at 64kb/s and 22KHz, 426x240 pixels on 16:9, 25fps",
+          "technical" => "mp4 container, double-pass h264 video main coding, between 512 and 800kbps, aac audio at 96kbps and 44KHz, 426x240 pixels on 16:9, 25fps",
           "extension" => "mp4",
+          "recommend" => "1",
           "size_43" => "320x240",
           "size_169" => "426x240",
           "cardinality" => "1",
-          "command1" => "avconv -i %%SOURCE%% -pre:v medium -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y  -b:a 64k -b:v 280k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+          "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 512k -maxrate:v 800k -bufsize 10M -profile:v baseline -strict experimental -f rawvideo -an /dev/null",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 512k -maxrate:v 800k -bufsize 10M -profile:v baseline -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 96k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "12" => array(
           "id" => "12",
           "type" => "video",
           "slug" => "video_360p_mp4",
           "name" => "Video at low definition and portable mp4 format",
-          "technical" => "mp4 container, h264 video at 440kb/s, aac audio at 128kb/s and 44KHz, 640x360 pixels on 16:9, 25fps",
+          "technical" => "mp4 container, double-pass h264 video main coding, between 800Kbps and 2Mbps, aac audio at 96kbps and 44KHz, 640x360 pixels on 16:9, 25fps",
           "extension" => "mp4",
           "size_43" => "480x360",
           "size_169" => "640x360",
           "cardinality" => "1",
-          "command1" => "avconv -i %%SOURCE%% -pre:v medium -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y -b:a 128k -b:v 440k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+          "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 800k -maxrate:v 2M -bufsize 20M -profile:v main -strict experimental -f rawvideo -an /dev/null",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -r 25 -codec:v libx264 -b:v 800k -maxrate:v 2M -bufsize 20M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "13" => array(
           "id" => "13",
           "type" => "video",
           "slug" => "video_480p_mp4",
           "name" => "Video at standard definition and portable mp4 format",
-          "technical" => "mp4 container, h264 video at 680kb/s, aac audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",
+          "technical" => "mp4 container, double-pass h264 video main coding, between 2 and 4Mbps, aac audio at 128kbps and 44KHz, 854x480 pixels on 16:9, up to 30fps",
           "extension" => "mp4",
-          "recommend" => "1",
           "size_43" => "640x480",
           "size_169" => "854x480",
           "cardinality" => "1",
-          "command1" => "avconv -i %%SOURCE%% -pre:v medium -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y -b:a 128k -b:v 680k  -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+          "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 2M -maxrate:v 4M -bufsize 30M -profile:v main -strict experimental -f rawvideo -an /dev/null",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 2M -maxrate:v 4M -bufsize 30M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 128k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "14" => array(
           "id" => "14",
           "type" => "video",
           "slug" => "video_720p_mp4",
           "name" => "Video at high definition and portable mp4 format",
-          "technical" => "mp4 container, h264 video at 1650kb/s, aac audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",
+          "technical" => "mp4 container, double-pass h264 video main coding, between 4 and 8Mbps, aac audio at 192kbps and 44KHz, 1280x720 pixels on 16:9, up to 30fps",
           "extension" => "mp4",
           "recommend" => "1",
           "size_43" => "960x720",
           "size_169" => "1280x720",
           "cardinality" => "1",
-          "command1" => "avconv -i %%SOURCE%% -pre:v medium -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y -b:a 192k -b:v 1650k  -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+          "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 4M -maxrate:v 8M -bufsize 40M -profile:v main -strict experimental -f rawvideo -an /dev/null",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 4M -maxrate:v 8M -bufsize 40M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "15" => array(
           "id" => "15",
           "type" => "video",
           "slug" => "video_1080p_mp4",
           "name" => "Video at full-hd definition and portable mp4 format",
-          "technical" => "mp4 container, h264 video at 4000kb/s, aac audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",
+          "technical" => "mp4 container, double-pass h264 video main coding, between 8 and 12Mbps, aac audio at 192kbps and 44KHz, 1920x1080 pixels on 16:9, up to 30fps",
           "extension" => "mp4",
           "recommend" => "1",
           "size_43" => "1440x1080",
           "size_169" => "1920x1080",
           "cardinality" => "1",
-          "command1" => "avconv -i %%SOURCE%% -pre:v medium -deinterlace -c:v libx264 -flags +loop -cmp +chroma -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -coder 0 -refs 1 -bufsize 4M -level 21 -partitions parti4x4+partp8x8+partb8x8 -subq 5 -threads 0 -c:a aac -strict experimental -ar 44100 -ac 2 -y  -b:a 192k -b:v 4000k -s %%SIZE%% -r 25 %%DESTINATION%%.mp4",
+          "command1" => "avconv -y -v info -i %%SOURCE%% -pass 1 -s %%SIZE%% -codec:v libx264 -b:v 8M -maxrate:v 12M -bufsize 80M -profile:v main -strict experimental -f rawvideo -an /dev/null",
+          "command2" => "avconv -y -v info -i %%SOURCE%% -pass 2 -s %%SIZE%% -codec:v libx264 -b:v 8M -maxrate:v 12M -bufsize 80M -profile:v main -strict experimental -f mp4 -codec:a aac -ar 44100 -ac 2 -b:a 192k %%DESTINATION%%",
           "cancelcommand" => "rm %%DESTINATION%%.mp4",
         ),
 
-   array(
+     "21" => array(
           "id" => "21",
           "type" => "video",
           "slug" => "video_240p_webm",
@@ -138,7 +141,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "22" => array(
           "id" => "22",
           "type" => "video",
           "slug" => "video_360p_webm",
@@ -152,14 +155,13 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "23" => array(
           "id" => "23",
           "type" => "video",
           "slug" => "video_480p_webm",
           "name" => "Video at standard definition webm opensource format",
           "technical" => "webm container, vp8 video at 680kb/s, vorbis audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",
           "extension" => "webm",
-          "recommend" => "1",
           "size_43" => "640x480",
           "size_169" => "854x480",
           "cardinality" => "1",
@@ -167,14 +169,13 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "24" => array(
           "id" => "24",
           "type" => "video",
           "slug" => "video_720p_webm",
           "name" => "Video at high definition and webm opensource format",
           "technical" => "webm container, vp8 video at 1650kb/s, vorbis audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",
           "extension" => "webm",
-          "recommend" => "1",
           "size_43" => "960x720",
           "size_169" => "1280x720",
           "cardinality" => "1",
@@ -182,14 +183,13 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "25" => array(
           "id" => "25",
           "type" => "video",
           "slug" => "video_1080p_webm",
           "name" => "Video at full-hd definition and webm opensource format",
           "technical" => "webm container, vp8 video at 4000kb/s, vorbis audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",
           "extension" => "webm",
-          "recommend" => "1",
           "size_43" => "1440x1080",
           "size_169" => "1920x1080",
           "cardinality" => "1",
@@ -197,7 +197,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.webm",
         ),
 
-   array(
+     "31" => array(
           "id" => "31",
           "type" => "video",
           "slug" => "video_240p_mpeg",
@@ -210,7 +210,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "32" => array(
           "id" => "32",
           "type" => "video",
           "slug" => "video_360p_mpeg",
@@ -223,7 +223,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "33" => array(
           "id" => "33",
           "type" => "video",
           "slug" => "video_480p_mpeg",
@@ -236,7 +236,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "34" => array(
           "id" => "34",
           "type" => "video",
           "slug" => "video_720p_mpeg",
@@ -249,7 +249,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "35" => array(
           "id" => "35",
           "type" => "video",
           "slug" => "video_1080p_mpeg",
@@ -262,7 +262,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mpg",
         ),
 
-   array(
+     "51" => array(
           "id" => "51",
           "type" => "audio",
           "slug" => "audio_64k_mp3",
@@ -275,35 +275,33 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "52" => array(
           "id" => "52",
           "type" => "audio",
           "slug" => "audio_128k_mp3",
           "name" => "Audio track only, with standard quality",
           "technical" => "mp3 container, mp3 audio track at 128Kb/s and 44KHz, stereo",
           "extension" => "mp3",
-          "recommend" => "1",
           "size_43" => "na",
           "size_169" => "na",
           "cardinality" => "1",
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "53" => array(
           "id" => "53",
           "type" => "audio",
           "slug" => "audio_v0_mp3",
           "name" => "Audio track only, with highest mp3 quality",
           "technical" => "mp3 container, mp3 audio track at V0 quality and 44KHz, stereo",
           "extension" => "mp3",
-          "recommend" => "1",
           "size_43" => "na",
           "size_169" => "na",
           "cardinality" => "1",
           "cancelcommand" => "rm %%DESTINATION%%.mp3",
         ),
 
-   array(
+     "61" => array(
           "id" => "61",
           "type" => "audio",
           "slug" => "audio_64k_vorbis",
@@ -316,7 +314,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "62" => array(
           "id" => "62",
           "type" => "audio",
           "slug" => "audio_128k_vorbis",
@@ -329,7 +327,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "63" => array(
           "id" => "63",
           "type" => "audio",
           "slug" => "audio_v0_vorbis",
@@ -342,7 +340,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.ogg",
         ),
 
-   array(
+     "71" => array(
           "id" => "71",
           "type" => "audio",
           "slug" => "audio_64k_aac",
@@ -355,7 +353,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "72" => array(
           "id" => "72",
           "type" => "audio",
           "slug" => "audio_128k_aac",
@@ -368,7 +366,7 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "73" => array(
           "id" => "73",
           "type" => "audio",
           "slug" => "audio_192k_aac",
@@ -381,96 +379,18 @@ $settings=array(
           "cancelcommand" => "rm %%DESTINATION%%.m4a",
         ),
 
-   array(
+     "101" => array(
           "id" => "101",
           "type" => "thumbnails",
-          "slug" => "100_240p_thumbs_jpg",
-          "name" => "100 thumbnails at 240p as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 10 seconds, size 426x240",
-          "extension" => "jpg",
-          "size_43" => "320x240",
-          "size_169" => "426x240",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "102",
-          "type" => "thumbnails",
-          "slug" => "100_360p_thumbs_jpg",
-          "name" => "100 thumbnails at 360p as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 10 seconds, size 640x360",
-          "extension" => "jpg",
-          "size_43" => "480x360",
-          "size_169" => "640x360",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "103",
-          "type" => "thumbnails",
-          "slug" => "100_480p_thumbs_jpg",
-          "name" => "100 thumbnails at 480p as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 10 seconds, size 854x480",
+          "slug" => "20_original_and_small_thumbs_jpg",
+          "name" => "20 thumbnails at original size and small size in JPEG",
+          "technical" => "Up to 20 JPEG images at 60% quality, with at least 1 minute between each, at original WxH and at 100x100px",
           "extension" => "jpg",
           "recommend" => "1",
-          "size_43" => "640x480",
-          "size_169" => "854x480",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "104",
-          "type" => "thumbnails",
-          "slug" => "100_720p_thumbs_jpg",
-          "name" => "100 thumbnails at 720p as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 10 seconds, size 1280x720",
-          "extension" => "jpg",
-          "size_43" => "960x720",
-          "size_169" => "1280x720",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "105",
-          "type" => "thumbnails",
-          "slug" => "100_1080p_thumbs_jpg",
-          "name" => "100 thumbnails at 1080p as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 10 seconds, size 1920x1080",
-          "extension" => "jpg",
           "size_43" => "1440x1080",
           "size_169" => "1920x1080",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "110",
-          "type" => "thumbnails",
-          "slug" => "100_small_thumbs_jpg",
-          "name" => "100 small thumbnails as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 2 seconds, size 100x60 (width guaranteed)",
-          "extension" => "jpg",
-          "recommend" => "1",
-          "size_43" => "100x60",
-          "size_169" => "100x60",
-          "cardinality" => "folder",
-          "cancelcommand" => "rm -rf %%DESTINATION%%",
-        ),
-
-   array(
-          "id" => "111",
-          "type" => "thumbnails",
-          "slug" => "100_medium_thumbs_jpg",
-          "name" => "100 medium thumbnails as jpg files",
-          "technical" => "100 jpg at 80% quality, no more than 1 every 2 seconds, size 200x120 (width guaranteed)",
-          "extension" => "jpg",
-          "size_43" => "200x100",
-          "size_169" => "200x120",
-          "cardinality" => "folder",
+          "cardinality" => "40",
+          "command1" => "scripts-thumbnails1.php %%SOURCE%% %%DESTINATION%% %%DURATION%%",
           "cancelcommand" => "rm -rf %%DESTINATION%%",
         ),
 

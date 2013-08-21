@@ -278,13 +278,18 @@ when using -vf cropdetect
 	$v=str_replace("%%SOURCE%%",escapeshellarg($source),$v);
 	$v=str_replace("%%DESTINATION%%",escapeshellarg($destination),$v);
 	$v=str_replace("%%RATIO%%",$ratio,$v);
+	$v=str_replace("%%DURATION%%",floor($metadata["time"]),$v);
 	$settings[$setting][$k]=$v;
     }
     // Execution
     foreach($settings[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
 	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
-	exec($v,$out,$ret);
+	if (substr($v,0,8)=="scripts-") {
+	  exec(dirname(__FILE__)."/../transcodes/".$v,$out,$ret);
+	} else {
+	  exec($v,$out,$ret);
+	}
 	if ($ret!=0) {
 	  $cancel=$settings[$setting]["cancelcommand"];
 	  if ($cancel) {

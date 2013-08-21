@@ -24,11 +24,11 @@ foreach($s as $field) {
 }
 
 while ($s=fgetcsv($f)) {
-  fputs($g,"   array(\n");
+  fputs($g,'     "'.$s[0].'"'." => array(\n");
   $i=0;
   foreach($fields as $field) {
     if (trim($s[$i])) {
-      fputs($g,"          \"".$field."\" => \"".str_replace('"','\"',$s[$i])."\",\n");
+      fputs($g,"          \"".$field."\" => \"".str_replace(" "," ",str_replace('"','\"',$s[$i]))."\",\n");
     }
     $i++;
   }
