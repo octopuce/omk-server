@@ -125,6 +125,7 @@ while (true) {
   $res=@json_decode($res);
   if (!isset($res->code)) {
     $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned a non-json content or no 'code' element");
+    $api->log(LOG_DEBUG, "content was ".$res."");
     $api->setTaskFailedUnlock($task["id"]);
     continue;
   }
