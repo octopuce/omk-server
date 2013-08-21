@@ -449,7 +449,11 @@ class Api {
    */ 
   public function apiError($code,$msg) {
     header("Content-Type: application/json");
-    header("HTTP/1.0 {$code}");
+    if ($code>100) {
+      header("HTTP/1.0 {$code}");
+    } else {
+      header("HTTP/1.0 200 OK");
+    }
     $o=new StdClass();
     $o->code=$code; $o->message=$msg;
     echo json_encode($o);
