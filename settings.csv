@@ -17,13 +17,13 @@ ID,Type,Slug,Name,Technical,Extension,Recommend,Size_43,Size_169,Cardinality,Com
 33,video,video_480p_mpeg,Video at standard definition mpeg broadcast format,"mpeg container, mpeg2 video at 680kb/s, mpeg2 audio at 128kb/s and 44KHz, 854x480 pixels on 16:9, 30fps",mpg,0,640x480,854x480,1,,,,,rm %%DESTINATION%%.mpg
 34,video,video_720p_mpeg,Video at high definition and mpeg broadcast format,"mpeg container, mpeg2 video at 1650kb/s, mpeg2 audio at 192kb/s and 44KHz, 1280x720 pixels on 16:9, 30fps",mpg,0,960x720,1280x720,1,,,,,rm %%DESTINATION%%.mpg
 35,video,video_1080p_mpeg,Video at full-hd definition and mpeg broadcast format,"mpeg container, mpeg2 video at 4000kb/s, mpeg2 audio at 192kb/s and 44KHz, 1920x1080 pixels on 16:9, 30fps",mpg,0,1440x1080,1920x1080,1,,,,,rm %%DESTINATION%%.mpg
-51,audio,audio_64k_mp3,"Audio track only, with low quality","mp3 container, mp3 audio track at 64Kb/s and 22KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
-52,audio,audio_128k_mp3,"Audio track only, with standard quality","mp3 container, mp3 audio track at 128Kb/s and 44KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
-53,audio,audio_v0_mp3,"Audio track only, with highest mp3 quality","mp3 container, mp3 audio track at V0 quality and 44KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
-61,audio,audio_64k_vorbis,"Audio track only, with low quality and opensource vorbis codec","ogg container, vorbis audio track at 64Kb/s and 22KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
-62,audio,audio_128k_vorbis,"Audio track only, with standard quality and opensource vorbis codec","ogg container, vorbis audio track at 128Kb/s and 44KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
-63,audio,audio_v0_vorbis,"Audio track only, with highest quality and opensource vorbis codec","ogg container, vorbis audio track at V0 quality and 44KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
-71,audio,audio_64k_aac,"Audio track only, with low quality and aac codec","mp4 container, aac audio track at 64kb/s quality and 22KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
-72,audio,audio_128k_aac,"Audio track only, with standard quality and aac codec","mp4 container, aac audio track at 128kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
-73,audio,audio_192k_aac,"Audio track only, with highest quality and aac codec","mp4 container, aac audio track at 192kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
-101,thumbnails,20_original_and_small_thumbs_jpg,20 thumbnails at original size and small size in JPEG,"Up to 20 JPEG images at 60% quality, with at least 1 minute between each, at original WxH and at 100x100px",jpg,1,1440x1080,1920x1080,40,scripts-thumbnails1,,,,
+51,video,audio_64k_mp3,"Audio track only, with low quality","mp3 container, mp3 audio track at 64Kb/s and 22KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
+52,video,audio_128k_mp3,"Audio track only, with standard quality","mp3 container, mp3 audio track at 128Kb/s and 44KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
+53,video,audio_v0_mp3,"Audio track only, with highest mp3 quality","mp3 container, mp3 audio track at V0 quality and 44KHz, stereo",mp3,0,na,na,1,,,,,rm %%DESTINATION%%.mp3
+61,video,audio_64k_vorbis,"Audio track only, with low quality and opensource vorbis codec","ogg container, vorbis audio track at 64Kb/s and 22KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
+62,video,audio_128k_vorbis,"Audio track only, with standard quality and opensource vorbis codec","ogg container, vorbis audio track at 128Kb/s and 44KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
+63,video,audio_v0_vorbis,"Audio track only, with highest quality and opensource vorbis codec","ogg container, vorbis audio track at V0 quality and 44KHz, stereo",ogg,0,na,na,1,,,,,rm %%DESTINATION%%.ogg
+71,video,audio_64k_aac,"Audio track only, with low quality and aac codec","mp4 container, aac audio track at 64kb/s quality and 22KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
+72,video,audio_128k_aac,"Audio track only, with standard quality and aac codec","mp4 container, aac audio track at 128kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
+73,video,audio_192k_aac,"Audio track only, with highest quality and aac codec","mp4 container, aac audio track at 192kb/s quality and 44KHz, stereo",m4a,0,na,na,1,,,,,rm %%DESTINATION%%.m4a
+101,video,20_original_and_small_thumbs_jpg,20 thumbnails at original size and small size in JPEG,"Up to 20 JPEG images at 60% quality, with at least 1 minute between each, at original WxH and at 100x100px",jpg,1,1440x1080,1920x1080,40,scripts-thumbnails1,,,,
