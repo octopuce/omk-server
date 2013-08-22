@@ -4,7 +4,8 @@ require_once(MODULES."/api/libs/constants.php");
 
 class HttpAdapter {
 
-  
+  private $hastmpdir=false;
+
   /* ------------------------------------------------------------ */
   /** This method is called when we receive a "app_new_media" API Call
    * and that the adapter is this one.
@@ -55,17 +56,63 @@ class HttpAdapter {
   }
 
   
+  /* ------------------------------------------------------------ */
+  /** This method is called when ffmpeg want to transcode a media
+   * with multiple files as output. 
+   * @param $media array() The entire media object using that Adapter
+   * @param $settings array() The entire settings object that is used by Ffmpeg
+   * @param $prefix string is a (non mandatory) prefix for the file, which may give information on some file's specificities
+   * @param $suffix string is a (non mandatory) suffix for the file, (typically its extension)
+   * like "high definition" or "small size" etc.
+   * @return $destination The filepath where the transcoder will need to store 
+   *  the media.
+   */
+  function filePathTranscodeMultiple($media,$settings,$prefix="",$suffix="") {
+    $this->hastmpdir=true;
+    $tmpdir="/tmp/http-adapter-".getmypid();
+    if (!is_dir($tmpdir)) {
+      @mkdir($tmpdir);
+    }
+    return $tmpdir."/".$prefix.$suffix;
+  }
+
+  
+  /* ------------------------------------------------------------ */
+  /** This method is called when ffmpeg ends the transcode of a media
+   * @param $media array() The entire media object using that Adapter
+   * @param $metadata array() The metadata array for the transcoded object.
+   * @param $settings array() The entire settings object that is used by Ffmpeg
+   * this function may end some treatment, purge temporary folders etc.
+   * @return the function doesn't return a thing, but may have changed $metadata
+   */
+  function filePathTranscodeEnd($media,&$metadata,$settings) {
+    global $api;
+    if ($this->hastmpdir) {
+      $tmpdir="/tmp/http-adapter-".getmypid();
+      $zip=STORAGE_PATH."/transcoded/".$media["id"]."-".$settings.".zip";
+      chdir($tmpdir);
+      $api->log(LOG_DEBUG,"doing the zip $zip in $tmpdir");
+      exec( "zip -Z store ".escapeshellarg($zip)." *");
+      exec("ls |wc -l",$out);
+      $metadata["cardinality"]=intval($out[0]);
+      $metadata["file_size"]=filesize($zip);
+      exec( "rm -rf ".escapeshellarg($tmpdir) );
+    }
+    return true;
+  }
+  
+
+  
 
   /* ------------------------------------------------------------ */
   /** This method is called when the API is about to send TRANSCODED CONTENT
    * to the OMK Client
    * @param $media array() The entire media object using that Adapter
    * @param $transcode array() The entire transcode object
-   * @param $serial integer the number (if not 1) of the object to send.
    * @param $range string a range object offset1-offset2
    * @return echoes the content properly
    */
-  function sendMedia($media,$transcode,$serial=1,$range="") {
+  function sendMedia($media,$transcode,$range="") {
     $this->api=new Api();
 
     $hasRangeHeader=false;
@@ -94,11 +141,8 @@ class HttpAdapter {
     $destination=STORAGE_PATH."/transcoded/".$media["id"]."-".$transcode["setting"];
     $metadata=unserialize($transcode["metadata"]);
     if ($metadata["cardinality"]!=1) {
-      $dest=$destination."/".sprintf("%05d",$serial).".".$settings[$transcode["setting"]]["extension"];
+      $dest=$destination.".zip";
     } else {
-      if ($serial!=1) {
-	$this->api->apiError(API_ERROR_BADRANGE,_("Serial must be 1"));
-      }
       $dest=$destination.".".$settings[$transcode["setting"]]["extension"];
     }
     $filesize=filesize($dest);
@@ -131,7 +175,7 @@ class HttpAdapter {
     exit();
   }
 
-} // class DummyAdapter
+} // class HTTPAdapter
 
 
 // NGINX compatibility

@@ -1,52 +1,54 @@
 #!/usr/bin/php
 <?php
 
+
    /**
-    * Usage: scripts-thumbnails1.php <source> <destination> <duration in second>
     * Generate up to 20 thumbnails (min 1 per minute) for the video <source>
     * The thumbnails will be generated as 60% quality JPEG at original size AND 100x100
     */
-
-if (count($argv)!=4 || 
-    !is_file($argv[1]) ||
-    file_exists($argv[2]) ||
-    intval($argv[3])==0) {
-  echo "Usage: scripts-thumbnails1.php <source> <destination> <duration in second>\n";
-  echo "<source> must be a file, <destination> must not exist, <duration> must be a non-null integer\n";
-  exit(1);
-}
-$source=$argv[1];
-$destination=$argv[2];
-$duration=intval($argv[3]);
-
-$ratio="1/60";
-if ($duration>(20*60)) {
-  $ratio="1/".floor($duration/20)
-}
-mkdir($destination);
-exec("ffmpeg -i ".escapeshellarg($source)." -vf fps=fps=".$ratio." -vcodec png -f image2 -an ".escapeshellarg($destination."/tmp%02d.png"),$out,$res);
-if ($res!=0) {
-  echo "Error launching ffmpeg for thumbnails\n";
-  exit(2);
-}
-
-// Now we convert them into JPG original size AND 100x100px
-for($i=0;$i<20;$i++) {
-  if (!is_file($destination.sprintf("/tmp%02d",$i))) {
-    break;
+function thumbnails1($media,$source,$destination,$setting,$adapterObject) {
+  
+  $metadata=@unserialize($media["metadata"]);
+  $duration=intval($metadata["time"]);
+  
+  $ratio="1/60";
+  if ($duration>(20*60)) {
+    $ratio="1/".floor($duration/20);
   }
-  exec("convert ".escapeshellarg($destination.sprintf("/tmp%02d",$i))." -quality 60% ".escapeshellarg($destination.sprintf("/h%02d",$i)),$out,$res);
+  $tmpdir="/tmp/thumbs-".getmypid();
+  mkdir($tmpdir);
+  exec("ffmpeg -i ".escapeshellarg($source)." -vf fps=fps=".$ratio." -vcodec png -f image2 -an ".escapeshellarg($tmpdir."/tmp%02d.png"),$out,$res);
   if ($res!=0) {
-    echo "Error launching convert for original jpeg\n";
-    exit(3);
+    $GLOBALS["error"]="Error launching ffmpeg for thumbnails";
+    return false;
   }
-  exec("convert ".escapeshellarg($destination.sprintf("/tmp%02d",$i))." -quality 60% -size 100x100 ".escapeshellarg($destination.sprintf("/l%02d",$i)),$out,$res);
-  if ($res!=0) {
-    echo "Error launching convert for smaller jpeg\n";
-    exit(4);
+  
+  // Now we convert them into JPG original size AND 100x100px
+  $id=0;
+  for($i=0;$i<20;$i++) {
+    if (!is_file($tmpdir.sprintf("/tmp%02d.png",$i+1))) {
+      break;
+    }
+    $destfile = $adapterObject->filePathTranscodeMultiple($media,$setting,sprintf("h%02d",$i),".jpg");
+    
+    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 60% ".escapeshellarg($destfile),$out,$res);
+    if ($res!=0) {
+      $GLOBALS["error"]="Error launching convert for original jpeg";
+      return false;
+    }
+    
+    $destfile = $adapterObject->filePathTranscodeMultiple($media,$setting,sprintf("l%02d",$i),".jpg");
+    
+    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 60% -resize 100x100 ".escapeshellarg($destfile),$out,$res);
+    if ($res!=0) {
+      $GLOBALS["error"]="Error launching convert for smaller jpeg";
+      return false;
+    }
+    unlink($tmpdir.sprintf("/tmp%02d.png",$i+1));
   }
-  unlink($destination.sprintf("/tmp%02d",$i));
-}
+  rmdir($tmpdir);
 
-echo "Thumbnails generated ($i)\n";
-exit(0);
+  $GLOBALS["error"]="Thumbnails generated ($i)";
+  return true;
+   }
+

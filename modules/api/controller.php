@@ -302,7 +302,6 @@ class ApiController extends AController {
     $this->params=$this->api->filterParams(array(/* "paramname" => array("type",mandatory?,defaultvalue), */
 						 "id" => array("integer",true),
 						 "settings_id" => array("integer",true),
-						 "serial" => array("integer",false,1),
 						 "content_range" => array("string",false,""),
 						 ));
     
@@ -319,7 +318,7 @@ class ApiController extends AController {
     if (!method_exists($adapterObject,"sendMedia")) {
       $this->api->apiError(API_ERROR_NOTFOUND,_("Adapter not compatible with HTTP."));
     }
-    $adapterObject->sendMedia($media,$transcode,$this->params["serial"],$this->params["content_range"]);
+    $adapterObject->sendMedia($media,$transcode,$this->params["content_range"]);
     return;
   }
   

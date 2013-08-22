@@ -390,7 +390,7 @@ $settings=array(
           "size_43" => "1440x1080",
           "size_169" => "1920x1080",
           "cardinality" => "40",
-          "command1" => "scripts-thumbnails1.php %%SOURCE%% %%DESTINATION%% %%DURATION%%",
+          "command1" => "scripts-thumbnails1",
           "cancelcommand" => "rm -rf %%DESTINATION%%",
         ),
 

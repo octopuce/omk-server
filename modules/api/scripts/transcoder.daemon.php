@@ -106,7 +106,7 @@ while (true) {
   
   // ok, now we use ffmpeg to get the metadata of the downloaded media
   // depending on FFMPEG / AVCONV version, we use one parser or the other ...
-  $result=$ffmpeg->transcode($media,$source,$destination,$params["setting"]);
+  $result=$ffmpeg->transcode($media,$source,$destination,$params["setting"],$adapterObject);
   
   if ($result) {
     $api->transcodeUpdate($transcode["id"],array("status"=>TRANSCODE_PROCESSED, "metadata"=>serialize($result) ) );;    

@@ -214,7 +214,7 @@ when using -vf cropdetect
   } /* getFfmpegMetadata */
 
 
-  public function transcode($media,$source,$destination,$setting) {
+  public function transcode($media,$source,$destination,$setting,$adapterObject) {
     global $api;
     $api->log(LOG_DEBUG, "[ffmpeg::transcode] media:".$media["id"]." source:$source destination:$destination setting:$setting");      
     $metadata=@unserialize($media["metadata"]);
@@ -287,9 +287,21 @@ when using -vf cropdetect
     foreach($settings[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
 	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
-	if (substr($v,0,8)=="scripts-") {
-	  exec(dirname(__FILE__)."/../transcodes/".$v." </dev/null 2>&1",$out,$ret);
-	} else {
+
+	if (substr($v,0,8)=="scripts-") { // scripts-functionname.php in transcodes/
+	  if (!function_exists(substr($v,8))) {
+	    require_once(dirname(__FILE__)."/../transcodes/".$v.".php");
+	  }
+	  $called=substr($v,8);
+	  $result=$called($media,$source,$destination,$setting,$adapterObject);
+	  if ($result) {
+	    $ret=0;
+	  } else {
+	    $out=array($GLOBALS["error"]);
+	    $ret=1;
+	  }
+
+	} else { // or simple executable
 	  exec($v." </dev/null 2>&1",$out,$ret);
 	}
 	if ($ret!=0) {
@@ -318,8 +330,7 @@ when using -vf cropdetect
       $metadata["cardinality"]=1;
     } else {
     // multiple files are set as this : 
-      if (is_file($destination."/00001.".$settings[$setting]["extension"])) {
-	$metadata=$this->getFfmpegMetadata($destination."/00001.".$settings[$setting]["extension"]);
+      if (is_dir($destination)) {
 	// count the number of files in the folder:
 	$cardinality=0;
 	$d=opendir($destination);
@@ -331,6 +342,9 @@ when using -vf cropdetect
 	$metadata["cardinality"]=$cardinality;
       }
     }
+    // multiple cardinality files may require a finalization function call 
+    $adapterObject->filePathTranscodeEnd($media,$metadata,$setting);
+
     if (!$metadata) {
       return false;
     }
