@@ -44,23 +44,33 @@ class Ffmpeg {
      * input
      * output 
      * frame/video parsing: 
-Seems stream 0 codec frame rate differs from container frame rate: 2000.00 (2000/1) -> 25.00 (25/1)
-Input #0, flv, from 'le-vinvinteur--2012-10-14-20h00.flv':
-  Duration: 00:25:48.53, start: 0.000000, bitrate: 1233 kb/s
-    Stream #0.0: Video: h264 (Main), yuv420p, 640x360, 1137 kb/s, 25 tbr, 1k tbn, 2k tbc
-    Stream #0.1: Audio: aac, 44100 Hz, stereo, s16, 96 kb/s
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from './original/44':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf53.21.1
+  Duration: 00:00:30.75, start: 0.000000, bitrate: 3081 kb/s
+    Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p, 720x576 [SAR 16:15 DAR 4:3], 3002 kb/s, 12 fps, 12 tbr, 12 tbn, 24 tbc
+    Metadata:
+      handler_name    : VideoHandler
+    Stream #0:1(und): Audio: aac (mp4a / 0x6134706D), 48000 Hz, stereo, s16, 74 kb/s
+    Metadata:
+      handler_name    : SoundHandler
 Output #0, rawvideo, to '/dev/null':
   Metadata:
-    encoder         : Lavf53.21.0
-    Stream #0.0: Video: libx264, yuv420p, 640x360, q=2-31, 1137 kb/s, 90k tbn, 1k tbc
-    Stream #0.1: Audio: libvo_aacenc, 44100 Hz, stereo, 96 kb/s
-    Stream #0.2: Subtitle: srt
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf54.29.104
+    Stream #0:0(und): Video: h264 (avc1 / 0x31637661), yuv420p, 720x576 [SAR 16:15 DAR 4:3], q=2-31, 3002 kb/s, 12 fps, 90k tbn, 12 tbc
+    Metadata:
+      handler_name    : VideoHandler
 Stream mapping:
-  Stream #0.0 -> #0.0
-  Stream #0.1 -> #0.1
-Press ctrl-c to stop encoding
-frame=38712 fps=  0 q=-1.0 Lsize=       0kB time=1548.44 bitrate=   0.0kbits/s    
-video:209891kB audio:17731kB global headers:0kB muxing overhead -100.000000%
+  Stream #0:0 -> #0:0 (copy)
+Press [q] to stop, [?] for help
+frame=  369 fps=0.0 q=-1.0 Lsize=       0kB time=00:00:30.66 bitrate=   0.0kbits/s    
+video:11271kB audio:0kB subtitle:0 global headers:0kB muxing overhead -100.000000%
 
 And also the crop black borders: 
 [cropdetect @ 0x8214800] x1:0 x2:1023 y1:0 y2:575 w:1024 h:576 x:0 y:0 pos:0 pts:13947267 t:13.947267 crop=1024:576:0:0
@@ -83,7 +93,7 @@ when using -vf cropdetect
 	  $attribs["time-estimate"]=$mat[1];
 	  $attribs["bitrate"]=$mat[2];
 	}
-	if (preg_match("|^Stream ([^:]*): ([^:]*): (.*)$|",$line,$mat)) {
+	if (preg_match("|^Stream #[0-9]*:[0-9]([^:]*): ([^:]*): (.*)$|",$line,$mat)) {
 	  $track=array();
 	  // get the comma-separated parameters of the track
 	  $tmp=explode(",",$mat[3]);
@@ -138,7 +148,7 @@ when using -vf cropdetect
 	      $track["DAR1"]=$mat[1];
 	      $track["DAR2"]=$mat[2];
 	    }
-	    if (preg_match("#PAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
+	    if (preg_match("#SAR ([(0-9]*):([0-9]*)#",$params[2],$mat)) {
 	      $track["PAR1"]=$mat[1];
 	      $track["PAR2"]=$mat[2];
 	    }
