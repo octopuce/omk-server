@@ -264,7 +264,7 @@ $settings=array(
 
      "51" => array(
           "id" => "51",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_64k_mp3",
           "name" => "Audio track only, with low quality",
           "technical" => "mp3 container, mp3 audio track at 64Kb/s and 22KHz, stereo",
@@ -277,7 +277,7 @@ $settings=array(
 
      "52" => array(
           "id" => "52",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_128k_mp3",
           "name" => "Audio track only, with standard quality",
           "technical" => "mp3 container, mp3 audio track at 128Kb/s and 44KHz, stereo",
@@ -290,7 +290,7 @@ $settings=array(
 
      "53" => array(
           "id" => "53",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_v0_mp3",
           "name" => "Audio track only, with highest mp3 quality",
           "technical" => "mp3 container, mp3 audio track at V0 quality and 44KHz, stereo",
@@ -303,7 +303,7 @@ $settings=array(
 
      "61" => array(
           "id" => "61",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_64k_vorbis",
           "name" => "Audio track only, with low quality and opensource vorbis codec",
           "technical" => "ogg container, vorbis audio track at 64Kb/s and 22KHz, stereo",
@@ -316,7 +316,7 @@ $settings=array(
 
      "62" => array(
           "id" => "62",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_128k_vorbis",
           "name" => "Audio track only, with standard quality and opensource vorbis codec",
           "technical" => "ogg container, vorbis audio track at 128Kb/s and 44KHz, stereo",
@@ -329,7 +329,7 @@ $settings=array(
 
      "63" => array(
           "id" => "63",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_v0_vorbis",
           "name" => "Audio track only, with highest quality and opensource vorbis codec",
           "technical" => "ogg container, vorbis audio track at V0 quality and 44KHz, stereo",
@@ -342,7 +342,7 @@ $settings=array(
 
      "71" => array(
           "id" => "71",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_64k_aac",
           "name" => "Audio track only, with low quality and aac codec",
           "technical" => "mp4 container, aac audio track at 64kb/s quality and 22KHz, stereo",
@@ -355,7 +355,7 @@ $settings=array(
 
      "72" => array(
           "id" => "72",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_128k_aac",
           "name" => "Audio track only, with standard quality and aac codec",
           "technical" => "mp4 container, aac audio track at 128kb/s quality and 44KHz, stereo",
@@ -368,7 +368,7 @@ $settings=array(
 
      "73" => array(
           "id" => "73",
-          "type" => "audio",
+          "type" => "video",
           "slug" => "audio_192k_aac",
           "name" => "Audio track only, with highest quality and aac codec",
           "technical" => "mp4 container, aac audio track at 192kb/s quality and 44KHz, stereo",
@@ -381,7 +381,7 @@ $settings=array(
 
      "101" => array(
           "id" => "101",
-          "type" => "thumbnails",
+          "type" => "video",
           "slug" => "20_original_and_small_thumbs_jpg",
           "name" => "20 thumbnails at original size and small size in JPEG",
           "technical" => "Up to 20 JPEG images at 60% quality, with at least 1 minute between each, at original WxH and at 100x100px",
