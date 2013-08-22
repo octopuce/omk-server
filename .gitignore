@@ -10,3 +10,4 @@ discovery/config.php
 test/apikey
 test/metadata.txt
 test/transcodes/
+test/transcode_metadata.txt

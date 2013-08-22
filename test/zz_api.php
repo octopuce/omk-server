@@ -40,10 +40,8 @@ case "transcoder_send_metadata":
     exit();
   }
   file_put_contents(__DIR__."/metadata.txt",serialize($metadata));
-  $ok=new StdClass();
-  $ok->code=200;
-  $ok->message=_("OK, metadata received");
-  echo json_encode($ok);
+  $ok=array("result" => array("code" => 200, "message" => _("OK, metadata received")));
+  echo json_encode($ok,JSON_FORCE_OBJECT);
   break;
 
 case "transcoder_send_format":
@@ -53,10 +51,8 @@ case "transcoder_send_format":
     exit();
   }
   file_put_contents(__DIR__."/transcode_metadata.txt",unserialize($_REQUEST["metadata"]));
-  $ok=new StdClass();
-  $ok->code=200;
-  $ok->message=_("OK, url received");
-  echo json_encode($ok);
+  $ok=array("result" => array("code" => 200, "message" => _("OK, url received")));
+  echo json_encode($ok,JSON_FORCE_OBJECT);
   break;
 
 default:

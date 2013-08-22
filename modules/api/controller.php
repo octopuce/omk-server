@@ -71,7 +71,7 @@ class ApiController extends AController {
       $allsettings[]=$setting["id"];
     }
     if (!is_array($this->params["settings_id_list"]) || !count($this->params["settings_id_list"])) {
-      $this->params["settings_id_list"]=@json_decode($this->params["settings_id_list"]);
+      $this->params["settings_id_list"]=@json_decode($this->params["settings_id_list"],true);
       if (!is_array($this->params["settings_id_list"]) || !count($this->params["settings_id_list"])) {
 	$this->api->apiError(API_ERROR_BADPARAM,_("The settings_id_list is incorrect, it must be either a php-style array[] or a json array"));
       }
@@ -136,7 +136,7 @@ class ApiController extends AController {
 
     // Return one code+message for each requested setting
     header("Content-Type: application/json");
-    echo json_encode($settings);
+    echo json_encode($settings,JSON_FORCE_OBJECT);
     exit();
 
   } /* app_request_formatAction */

@@ -122,19 +122,19 @@ while (true) {
     $api->setTaskFailedUnlock($task["id"]);
     continue;    
   } 
-  $jres=@json_decode($res);
-  if (!isset($jres->code)) {
+  $jres=@json_decode($res,true);
+  if (!isset($jres["result"]) || !isset($jres["result"]["code"])) {
     $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned a non-json content or no 'code' element");
     $api->log(LOG_DEBUG, "content was ".$res."");
     $api->setTaskFailedUnlock($task["id"]);
     continue;
   }
-  if ($jres->code==0 || $jres->code==200) { // TODO : use http error code only here 
+  if ($jres["result"]["code"]==0 || $jres["result"]["code"]==200) { // TODO : use http error code only here 
     $api->setTaskProcessedUnlock($task["id"]);
   } else {
-    $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned code ".$jres->code." and message ".$jres->message.", which means fail, will try later");
+    $api->log(LOG_CRIT, "On task '".$task["id"]."' the client returned code ".$jres["result"]["code"]." and message ".$jres["result"]["message"].", which means fail, will try later");
     $api->setTaskFailedUnlock($task["id"]);
     continue;
-  }  
+  }
   
 } // infinite loop...

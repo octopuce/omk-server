@@ -454,9 +454,9 @@ class Api {
     } else {
       header("HTTP/1.0 200 OK");
     }
-    $o=new StdClass();
-    $o->code=$code; $o->message=$msg;
-    echo json_encode($o);
+    echo json_encode(
+		     array("result"=>array("code" => $code, "message" => $msg))
+		     ,JSON_FORCE_OBJECT);
     exit(); // FATAL
   }
 
@@ -467,7 +467,7 @@ class Api {
    */ 
   public function returnValue($val) {
     header("Content-Type: application/json");
-    echo json_encode($val);
+    echo json_encode($val,JSON_FORCE_OBJECT);
     exit(); // FATAL
   }
 
