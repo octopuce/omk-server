@@ -9,55 +9,55 @@ To install the OpenMediaKit Server, you need the following:
 
 If you are using a standard Debian Linux, you will need to use [deb-multimedia](http://www.deb-multimedia.org) repository as follow (add this line in /etc/apt/sources.list.d/deb-multimedia.list )
 
-  deb http://debian.octopuce.fr/debian-multimedia wheezy main contrib non-free
+    deb http://debian.octopuce.fr/debian-multimedia wheezy main contrib non-free
 
 then launch, as root: 
 
-  apt-get update
-  apt-get install deb-multimedia-keyring
-  apt-get install ffmpeg 
+    apt-get update
+    apt-get install deb-multimedia-keyring
+    apt-get install ffmpeg 
 
 other recommended commands to install the omk-server properly (on Debian): 
 
-  apt-get install libapache2-mod-php5 apache2-mpm-prefork php5-curl php-apc mysql-server zip imagemagick git
+    apt-get install libapache2-mod-php5 apache2-mpm-prefork php5-curl php-apc mysql-server zip imagemagick git
 
 then clone this repository:
 
-  cd /var/www && git clone https://github.com/octopuce/omk-server.git omk
+    cd /var/www && git clone https://github.com/octopuce/omk-server.git omk
 
 Then install a vhost pointing to your omk-server public/ folder (in our example with the source code in /var/www/omk). For example, put this in a file named /etc/apache2/sites-available/omk
 
-  <Virtualhost *:80>
-    ServerName <your domain name here>
-    DocumentRoot /var/www/omk/public
+    <Virtualhost *:80>
+      ServerName <your domain name here>
+      DocumentRoot /var/www/omk/public
 
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+      ErrorLog ${APACHE_LOG_DIR}/error.log
+      CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-    <Directory /var/www/omk>
-      Order Allow,deny
-      Allow from all
-      AllowOverride All
-    </Directory>
-  </VirtualHost>	  
+      <Directory /var/www/omk>
+        Order Allow,deny
+        Allow from all
+        AllowOverride All
+      </Directory>
+    </VirtualHost>	  
 
 then
 
-  a2enmod rewrite
-  a2ensite omk
-  /etc/init.d/apache2 restart
+    a2enmod rewrite
+    a2ensite omk
+    /etc/init.d/apache2 restart
 
 Install the database and configure it properly in /var/www/omk/config.php
 
 NOTE: If you want to install a MULTISERVER openmediakit transcoder, you will need to use a *remote mysql* configuration, read [MULTISERVER.md](MULTISERVER.md) for more information.
 
-  mysql -B -e "CREATE DATABASE omk; GRANT ALL ON omk.* TO 'omk'@'localhost' IDENTIFIED BY 'randompassword';"
-  cp /var/www/omk/config.inc.php.sample /var/www/omk/config.inc.php
-  emacs /var/www/omk/config.inc.php
+    mysql -B -e "CREATE DATABASE omk; GRANT ALL ON omk.* TO 'omk'@'localhost' IDENTIFIED BY 'randompassword';"
+    cp /var/www/omk/config.inc.php.sample /var/www/omk/config.inc.php
+    emacs /var/www/omk/config.inc.php
 
 Launch the install script
 
-  /var/www/omk/install
+    /var/www/omk/install
 
 This process initializes the database (it will also UPGRADE the database from one version to the next one.). It also installs and launch all the daemons of the omk-server by copying the init scripts into /etc/init.d/ and ask Debian boot system to launch them at boottime as www-data. It also installs a daily crontab for cleanup purpose.
 

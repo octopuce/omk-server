@@ -36,9 +36,9 @@ To deploy a multiserver instance of the OpenMediaKit-Server, proceeed as follow:
 
 Under Debian Wheezy, do:
 
-  apt-get install nfs-kernel-server
-  echo "/var/www/  10.2.1.0/255.255.255.0(rw,async,no_subtree_check,no_root_squash)" >>/etc/exports
-  /etc/init.d/nfs-kernel-server reload
+    apt-get install nfs-kernel-server
+    echo "/var/www/  10.2.1.0/255.255.255.0(rw,async,no_subtree_check,no_root_squash)" >>/etc/exports
+    /etc/init.d/nfs-kernel-server reload
 
 in our case, all secondary omk instances will be on 10.2.0.X network.
 
@@ -46,19 +46,19 @@ in our case, all secondary omk instances will be on 10.2.0.X network.
 
 4. add the deb-multimedia.org repository, example :
 
-  echo "deb http://debian.octopuce.fr/debian-multimedia wheezy main non-free"  >/etc/apt/sources.list.d/multimedia.list
-  apt-get update
-  apt-get install deb-multimedia-keyring
+    echo "deb http://debian.octopuce.fr/debian-multimedia wheezy main non-free"  >/etc/apt/sources.list.d/multimedia.list
+    apt-get update
+    apt-get install deb-multimedia-keyring
 
 5. install the required packages : 
 
-  apt-get install nfs-client php5-cli php5-mysql ffmpeg
+    apt-get install nfs-client php5-cli php5-mysql ffmpeg
 
 6. mount the /var/www of the main omk into the secondary one : 
 
-  mkdir /var/www
-  echo "10.2.1.41:/var/www /var/www  nfs  auto,rsize=8192,wsize=8192,vers=3	0	0" >>/etc/fstab
-  mount /var/www
+    mkdir /var/www
+    echo "10.2.1.41:/var/www /var/www  nfs  auto,rsize=8192,wsize=8192,vers=3	0	0" >>/etc/fstab
+    mount /var/www
 
 (you may need to allow communication between the hosts in your firewall)
 
@@ -66,7 +66,7 @@ in our case, all secondary omk instances will be on 10.2.0.X network.
 
 If your mysql is LOCAL make it listen into the network (comment the "bind_address" directive in /etc/mysql/my.cnf) and allow connections from all the IP addresses of your OMK-s instances using: 
 
-  mysql -B -e "GRANT ALL ON omk.* TO 'omk'@'%' IDENTIFIED BY 'randompassword';" 
+    mysql -B -e "GRANT ALL ON omk.* TO 'omk'@'%' IDENTIFIED BY 'randompassword';" 
 
 8. launch the metadata daemon and transcode daemon in your omk-2 machine, using the 2 initscripts provided with the OMK.
 
