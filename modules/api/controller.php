@@ -280,9 +280,20 @@ class ApiController extends AController {
     // Send a validation email to the user
     Users::sendValidationEmail($uid);
 
+    $s=$this->api->getAllSettings();
+    foreach($s as $setting) {
+      $settings[$setting["id"]]=array(
+				      "id" => $setting["id"],
+				      "type" => $setting["type"],				      "slug" => $setting["slug"],
+				      "name" => $setting["name"],				      "technical" => $setting["technical"],
+				      "extension" => $setting["extension"],
+				      "size_43" => $setting["size_43"],				      "size_169" => $setting["size_169"],
+				      "cardinality" => $setting["cardinality"],
+				      );
+    }
     $this->api->returnValue(
 			    array("apikey" => $me["apikey"],
-				  "settings" =>$this->api->getAllSettings()
+				  "settings" =>$settings
 				  ));
   }
   
