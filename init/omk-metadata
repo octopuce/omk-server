@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          OpenMediaKit-Server-Metadata
 # Required-Start:    $network $named $remote_fs $syslog
@@ -12,13 +12,13 @@
 #                    This daemon do the Metadata finding on the subscribers videos
 ### END INIT INFO
 
-OMKTROOT=/var/www/omkt
+OMKROOT=/var/www/omk
 CHOWN=www-data
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=$OMKTROOT/modules/api/scripts/metadata.daemon.php
+DAEMON=$OMKROOT/modules/api/scripts/metadata.daemon.php
 DAEMON_OPTS=""
-NAME="omkt-metadata"
+NAME="omk-metadata"
 DESC="OpenMediaKit Server METADATA Computing Service"
 PIDFILE="/var/run/${NAME}.pid"
 

@@ -49,7 +49,7 @@ class Api {
     }
     $db->q("LOCK TABLES queue;");
     $query="SELECT * FROM queue WHERE task IN (".implode(",",$task).") AND status=? AND lockhost='' AND datetry<=NOW() $adapterfilter ORDER BY retry DESC, datequeue ASC LIMIT 1;";
-    $api->log(LOG_DEBUG,"getQueue: $query");
+    //    $api->log(LOG_DEBUG,"getQueue: $query");
     $me=$db->qone( $query, $params, PDO::FETCH_ASSOC );
     if (!$me) {
       $db->q("UNLOCK TABLES;");

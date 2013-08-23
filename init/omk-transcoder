@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          OpenMediaKit-Server-Transcoder
 # Required-Start:    $network $named $remote_fs $syslog
@@ -12,13 +12,13 @@
 #                    This daemon do the Transcodes of the subscribers videos
 ### END INIT INFO
 
-OMKTROOT=/var/www/omkt
+OMKROOT=/var/www/omk
 CHOWN=www-data
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=$OMKTROOT/modules/api/scripts/transcoder.daemon.php
+DAEMON=$OMKROOT/modules/api/scripts/transcoder.daemon.php
 DAEMON_OPTS=""
-NAME="omkt-transcoder"
+NAME="omk-transcoder"
 DESC="OpenMediaKit Server TRANSCODER Computing Service"
 PIDFILE="/var/run/${NAME}.pid"
 
