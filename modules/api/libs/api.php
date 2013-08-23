@@ -18,7 +18,7 @@ class Api {
    * @return array the locked task, or false if no task has been found
    */ 
   public function getQueuedTaskLock($task, $adapter='') {
-    global $db;
+    global $db,$api;
     if (is_array($task)) {
       if (count($task)==1) {
 	$task=$task[0];
@@ -49,6 +49,7 @@ class Api {
     }
     $db->q("LOCK TABLES queue;");
     $query="SELECT * FROM queue WHERE task IN (".implode(",",$task).") AND status=? AND lockhost='' AND datetry<=NOW() $adapterfilter ORDER BY retry DESC, datequeue ASC LIMIT 1;";
+    $api->log(LOG_DEBUG,"getQueue: $query");
     $me=$db->qone( $query, $params, PDO::FETCH_ASSOC );
     if (!$me) {
       $db->q("UNLOCK TABLES;");

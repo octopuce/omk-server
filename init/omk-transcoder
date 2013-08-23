@@ -1,25 +1,25 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          OpenMediaKit-Transcoder-Metadata
+# Provides:          OpenMediaKit-Server-Transcoder
 # Required-Start:    $network $named $remote_fs $syslog
 # Required-Stop:     $network $named $remote_fs $syslog
-# Should-Start:      OpenMediaKit-Transcoder-Metadata
+# Should-Start:      OpenMediaKit-Server-Transcoder
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: OpenMediaKit Transcoder Metadata computing service
-# Description:       The OpenMediaKit Transcoder service is providing
+# Short-Description: OpenMediaKit Server Transcoder computing service
+# Description:       The OpenMediaKit Server service is providing
 #                    its subscribed users with a Video Transcoding service. 
-#                    This daemon do the Metadata finding on the subscribers videos
+#                    This daemon do the Transcodes of the subscribers videos
 ### END INIT INFO
 
 OMKTROOT=/var/www/omkt
 CHOWN=www-data
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=$OMKTROOT/modules/api/scripts/metadata.daemon.php
+DAEMON=$OMKTROOT/modules/api/scripts/transcoder.daemon.php
 DAEMON_OPTS=""
-NAME="omkt-metadata"
-DESC="OpenMediaKit Transcoder METADATA Computing Service"
+NAME="omkt-transcoder"
+DESC="OpenMediaKit Server TRANSCODER Computing Service"
 PIDFILE="/var/run/${NAME}.pid"
 
 test -x $DAEMON || exit 0

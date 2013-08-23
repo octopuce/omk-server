@@ -1,5 +1,5 @@
 
+13 4 * * *  www-data	php /var/www/omkt/modules/api/scripts/cron.daily.php 
 
 
-13 4 * * *   /var/www/omkt/modules/api/scripts/cron.daily.php
 

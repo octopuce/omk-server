@@ -1,20 +1,28 @@
-This is Open-MediaKit-transcoder 2.0
+## Description ##
 
-The OpenMediaKit-Transcoder is a free software to manage your media online.
+This is [Open-MediaKit Server 2.0](http://www.open-mediakit.org/)
 
-This part of the OpenMediaKit project is the TRANSCODER
+The OpenMediaKit Server is a free software to manage your media online.
+
+This part of the OpenMediaKit project is the API Server (video recognition and transcoding)
 
 Its aim is to
 
-* get media files from an OpenMediaKit or any API-compatible application
+* get media files from an [OpenMediaKit-Client](https://github.com/octopuce/omk-client) or any API-compatible application
 * extract the metadata of the media (size, codecs, bitrates ...)
 * transcode them to other formats (thumbnails, web format, mobile ...)
-* send them back to an OpenMediaKit/Other-Application instance.
+* send them back to your OpenMediaKit-aware application.
 
 Go to http://www.open-mediakit.org/ for more information, downloads, documentation...
 
+* Installation instructions are in the [INSTALL.md](INSTALL.md) file
+* for a Multi-server instance of the omk-server, read [MULTISERVER.md](MULTISERVER.md)
+
+
+## License ##
+
 Copyright (C) 2008-2013 Benjamin Sonntag <benjamin@sonntag.fr>
-<other contributors, put your name/email here>
+Copyright (C) 2012-2013 Alban Crommer <alban@octopuce.fr>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
