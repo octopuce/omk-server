@@ -1,6 +1,6 @@
-## Description ##
+## OpenMediaKit Server ##
 
-This is [Open-MediaKit Server 2.0](http://www.open-mediakit.org/)
+This is the [Open-MediaKit Server v2.0](http://www.open-mediakit.org/)
 
 The OpenMediaKit Server is a free software to manage your media online.
 
