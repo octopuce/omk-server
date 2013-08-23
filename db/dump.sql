@@ -156,12 +156,12 @@ CREATE TABLE `users` (
   `lastactivity` datetime NOT NULL,
   `lastcron` datetime NOT NULL,
   `lastcronsuccess` datetime NOT NULL, 
-  `allowedadapters` varchar(255) NOT NULL 
+  `allowedadapters` varchar(255) NOT NULL,
   PRIMARY KEY (`uid`),
   KEY `lastactivity` (`lastactivity`),
   KEY `lastcron` (`lastcron`),
   KEY `lastcronsuccess` (`lastcronsuccess`),
-  KEY `enabled` (`enabled`),
+  KEY `enabled` (`enabled`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The User accounts of people (clients) registered in this omk-server';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
