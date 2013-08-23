@@ -9,17 +9,18 @@ To install the OpenMediaKit Server, you need the following:
 
 If you are using a standard Debian Linux, you will need to use [deb-multimedia](http://www.deb-multimedia.org) repository as follow (add this line in /etc/apt/sources.list.d/deb-multimedia.list )
 
-    deb http://debian.octopuce.fr/debian-multimedia wheezy main contrib non-free
+    deb http://debian.octopuce.fr/debian-multimedia wheezy main non-free
 
 then launch, as root: 
 
     apt-get update
     apt-get install deb-multimedia-keyring
+    apt-get update
     apt-get install ffmpeg 
 
 other recommended commands to install the omk-server properly (on Debian): 
 
-    apt-get install libapache2-mod-php5 apache2-mpm-prefork php5-curl php-apc mysql-server zip imagemagick git
+    apt-get install libapache2-mod-php5 php5-cli apache2-mpm-prefork php5-curl php-apc mysql-server zip imagemagick git
 
 then clone this repository:
 

@@ -29,7 +29,7 @@ CREATE TABLE `apicalls` (
   KEY `calltime` (`calltime`),
   KEY `user` (`user`),
   KEY `call` (`api`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='Log of api calls from users, allow limit enforcment and log ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Log of api calls from users, allow limit enforcment and log';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `appversions` (
   `version` varchar(128) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `application` (`application`,`version`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COMMENT='Applications and Versions using the API Calls';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Applications and Versions using the API Calls';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,9 +74,11 @@ CREATE TABLE `media` (
   `datecreate` datetime NOT NULL,
   `dateupdate` datetime NOT NULL,
   `metadata` text NOT NULL,
+  `adapter` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `owner_2` (`owner`,`remoteid`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='Media and their status';
+  KEY `owner_2` (`owner`,`remoteid`),
+  KEY `adapter` (`adapter`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Media and their status';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,14 +103,38 @@ CREATE TABLE `queue` (
   `params` text NOT NULL,
   `mediaid` bigint(20) unsigned NOT NULL,
   `formatid` int(10) unsigned DEFAULT NULL,
+  `adapter` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `status` (`status`),
   KEY `locked` (`lockhost`),
   KEY `task` (`task`),
   KEY `user` (`user`),
-  KEY `retry` (`retry`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='The Tasks that should be achieved by the transcoder';
+  KEY `retry` (`retry`),
+  KEY `adapter` (`adapter`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The Tasks that should be achieved by the transcoder';
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
+--
+-- Table structure for table `transcodes`
+--
+DROP TABLE IF EXISTS `transcodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transcodes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mediaid` int(10) unsigned NOT NULL,
+  `setting` int(10) unsigned NOT NULL,
+  `subsetting` int(10) unsigned NOT NULL,
+  `status` int(10) unsigned NOT NULL,
+  `datecreate` datetime NOT NULL,
+  `dateupdate` datetime NOT NULL,
+  `metadata` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Transcodes asked by the users';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Table structure for table `users`
@@ -125,9 +151,18 @@ CREATE TABLE `users` (
   `validated` tinyint(4) NOT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT '0',
   `apikey` char(32) NOT NULL,
+  `clientkey` char(32) NOT NULL,
   `url` text NOT NULL COMMENT 'API URL of the client',
-  PRIMARY KEY (`uid`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+  `lastactivity` datetime NOT NULL,
+  `lastcron` datetime NOT NULL,
+  `lastcronsuccess` datetime NOT NULL, 
+  `allowedadapters` varchar(255) NOT NULL 
+  PRIMARY KEY (`uid`),
+  KEY `lastactivity` (`lastactivity`),
+  KEY `lastcron` (`lastcron`),
+  KEY `lastcronsuccess` (`lastcronsuccess`),
+  KEY `enabled` (`enabled`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The User accounts of people (clients) registered in this omk-server';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -136,7 +171,8 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'$5$rounds=1000$Lp6Th0j9iUpTWhcL$0pIPH5EI4TD4AJY4VdSmfk/gauIQvYXj7RSqqT.M6x2','admin@open-mediakit.org',1,0,1,'poipoi','');
+INSERT INTO `users` (`uid`, `pass`, `email`, `enabled`, `validated`, `admin`, `apikey`, `clientkey`, `url`, `lastactivity`, `lastcron`, `lastcronsuccess`, `allowedadapters`) VALUES
+(1, '$5$rounds=1000$Lp6Th0j9iUpTWhcL$0pIPH5EI4TD4AJY4VdSmfk/gauIQvYXj7RSqqT.M6x2', 'admin@open-mediakit.org', 1, 0, 1, 'poipoi', '', '', '2013-07-20 00:45:12', '2013-07-20 00:41:09', '2013-07-20 00:41:09', 'http');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -38,7 +38,7 @@ if (!file_exists(__DIR__ . '/tmp')) {
 @mkdir(STORAGE_PATH."/transcoded");
 
 if (!is_file("/etc/debian_version")) {
-   echo "Now copy the init/* files into /etc/init.d/ and do the appropriate sysV or other daemon boot launcher. (warning, they are from Debian, they may not work on your system)"
+  echo "Now copy the init/* files into /etc/init.d/ and do the appropriate sysV or other daemon boot launcher. (warning, they are from Debian, they may not work on your system)";
 } else {
   $services=array("omk-api","omk-cron","omk-downloader","omk-metadata","omk-transcoder");
   foreach($services as $service) {

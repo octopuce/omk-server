@@ -5,9 +5,9 @@
  */
 $db->type = 'mysql';
 $db->host = '127.0.0.1';
-$db->user = 'omkt';
+$db->user = 'omk';
 $db->pass = 'ieGh8AVa';
-$db->name = 'omkt';
+$db->name = 'omk';
 
 /**
  * Definition of some constants for the URLs
@@ -19,7 +19,7 @@ define('FULL_URL', 'http://omk.local/'); // the root url of the application, end
 
 // Sender and sender's name of all outgoing emails: (PLEASE CHANGE THIS)
 define('MAIL_FROM', 'test@openmediakit.org');
-define('MAIL_FROMNAME', 'unconfigured openmediakit transcoder');
+define('MAIL_FROMNAME', 'unconfigured OpenMediaKit Server');
 
 /* The default number of api call per minute allowed for each user: */
 define('RATE_DEFAULT',100); 
