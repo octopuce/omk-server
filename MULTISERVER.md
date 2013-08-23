@@ -30,9 +30,8 @@ NOTE:
 
 To deploy a multiserver instance of the OpenMediaKit-Server, proceeed as follow:
 
-1. Deploy the OMK in a standard server. Let's say /var/www/omk is your document root. and 10.2.1.41 is our server's private ip address.
-
-2. share /var/www/ using NFS.
+* Deploy the OMK in a standard server. Let's say /var/www/omk is your document root. and 10.2.1.41 is our server's private ip address.
+* share /var/www/ using NFS.
 
 Under Debian Wheezy, do:
 
@@ -42,19 +41,18 @@ Under Debian Wheezy, do:
 
 in our case, all secondary omk instances will be on 10.2.0.X network.
 
-3. deploy a secondary Debian Wheezy machine. Give it a unique hostname (eg: if your main OpenMediaKit-Server instance is named "omk", you can name it "omk2", but NOT "omk" too.)
-
-4. add the deb-multimedia.org repository, example :
+* deploy a secondary Debian Wheezy machine. Give it a unique hostname (eg: if your main OpenMediaKit-Server instance is named "omk", you can name it "omk2", but NOT "omk" too.)
+* add the deb-multimedia.org repository, example :
 
     echo "deb http://debian.octopuce.fr/debian-multimedia wheezy main non-free"  >/etc/apt/sources.list.d/multimedia.list
     apt-get update
     apt-get install deb-multimedia-keyring
 
-5. install the required packages : 
+* install the required packages : 
 
     apt-get install nfs-client php5-cli php5-mysql ffmpeg
 
-6. mount the /var/www of the main omk into the secondary one : 
+* mount the /var/www of the main omk into the secondary one : 
 
     mkdir /var/www
     echo "10.2.1.41:/var/www /var/www  nfs  auto,rsize=8192,wsize=8192,vers=3	0	0" >>/etc/fstab
@@ -62,13 +60,12 @@ in our case, all secondary omk instances will be on 10.2.0.X network.
 
 (you may need to allow communication between the hosts in your firewall)
 
-7. ensure that your OMK MAIN instance has a REMOTE MySQL configuration. (no "localhost" or "127.0.0.1" for your mysql server connection in config.inc.php, but something like "10.2.1.41")
-
+* ensure that your OMK MAIN instance has a REMOTE MySQL configuration. (no "localhost" or "127.0.0.1" for your mysql server connection in config.inc.php, but something like "10.2.1.41")
 If your mysql is LOCAL make it listen into the network (comment the "bind_address" directive in /etc/mysql/my.cnf) and allow connections from all the IP addresses of your OMK-s instances using: 
 
     mysql -B -e "GRANT ALL ON omk.* TO 'omk'@'%' IDENTIFIED BY 'randompassword';" 
 
-8. launch the metadata daemon and transcode daemon in your omk-2 machine, using the 2 initscripts provided with the OMK.
+* launch the metadata daemon and transcode daemon in your omk-2 machine, using the 2 initscripts provided with the OMK.
 
 Under Debian Wheezy:
 
