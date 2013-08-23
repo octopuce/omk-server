@@ -143,11 +143,11 @@ The OpenMediakit Transcoder public instance at
     
     // add additional curl options here
     $std_options = array(CURLOPT_RETURNTRANSFER => true,
-			 CURLOPT_FOLLOWLOCATION => true,
+			 CURLOPT_FOLLOWLOCATION => false,
 			 CURLOPT_CONNECTTIMEOUT => 5,
 			 CURLOPT_TIMEOUT => 240, // 4 minutes
 			 CURLOPT_USERAGENT => "OpenMediaKit-Transcoder/".OMKT_VERSION." (Cron Daemon)",
-			 CURLOPT_MAXREDIRS => 5);
+			 CURLOPT_MAXREDIRS => 0);
 
     if ($GLOBALS["DEBUG"]) $std_options[CURLOPT_VERBOSE]=true;
     $options = ($custom_options) ? ($std_options + $custom_options) : $std_options;

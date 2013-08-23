@@ -286,7 +286,7 @@ class ApiController extends AController {
 				      "id" => $setting["id"],
 				      "type" => $setting["type"],				      "slug" => $setting["slug"],
 				      "name" => $setting["name"],				      "technical" => $setting["technical"],
-				      "extension" => $setting["extension"],
+				      "extension" => $setting["extension"],                           "recommend" => $setting["recommend"],
 				      "size_43" => $setting["size_43"],				      "size_169" => $setting["size_169"],
 				      "cardinality" => $setting["cardinality"],
 				      );

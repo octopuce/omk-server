@@ -110,7 +110,7 @@ CREATE TABLE `queue` (
   KEY `task` (`task`),
   KEY `user` (`user`),
   KEY `retry` (`retry`),
-  KEY `adapter` (`adapter`),
+  KEY `adapter` (`adapter`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The Tasks that should be achieved by the transcoder';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
