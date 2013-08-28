@@ -353,7 +353,7 @@ when using -vf cropdetect
       }
     }
     // multiple cardinality files may require a finalization function call 
-    $adapterObject->filePathTranscodeEnd($media,$metadata,$setting);
+    $adapterObject->filePathTranscodeEnd($media,$metadata,$settings[$setting]);
 
     if (!$metadata) {
       return false;

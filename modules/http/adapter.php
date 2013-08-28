@@ -47,11 +47,11 @@ class HttpAdapter {
   function filePathTranscode($media,$settings) {
     @mkdir(STORAGE_PATH."/transcoded/");
     if ($settings["type"]=="thumbnails") {
-      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings);
+      @mkdir(STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]);
     }
     return array(
 		 STORAGE_PATH."/original/".$media["id"],
-		 STORAGE_PATH."/transcoded/".$media["id"]."-".$settings
+		 STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"]
 		 );
   }
 
@@ -89,7 +89,7 @@ class HttpAdapter {
     global $api;
     if ($this->hastmpdir) {
       $tmpdir="/tmp/http-adapter-".getmypid();
-      $zip=STORAGE_PATH."/transcoded/".$media["id"]."-".$settings.".zip";
+      $zip=STORAGE_PATH."/transcoded/".$media["id"]."-".$settings["id"].".zip";
       chdir($tmpdir);
       $api->log(LOG_DEBUG,"doing the zip $zip in $tmpdir");
       exec( "zip -Z store ".escapeshellarg($zip)." *");

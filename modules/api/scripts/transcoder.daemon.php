@@ -44,6 +44,8 @@ pcntl_signal(SIGHUP,  "sig_handler");
 pcntl_signal(SIGINT, "sig_handler");
 pcntl_signal(SIGQUIT,  "sig_handler");
 
+$all_settings=$api->getAllSettings();
+
 while (true) {
 
   // Cleanup daemons from this host
@@ -89,7 +91,7 @@ while (true) {
     continue;
   }
   
-  list($source,$destination) = $adapterObject->filePathTranscode($media,$params["setting"]);
+  list($source,$destination) = $adapterObject->filePathTranscode($media,$all_settings[$params["setting"]]);
 
   if (!$source || !$destination) {
     $api->log(LOG_CRIT, "Got task '".$task["id"]."' but media '".$task["mediaid"]."' didn't allow to find the file using adapter '".$task["adapter"]."' !!");
