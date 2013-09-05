@@ -29,8 +29,8 @@ class KmotionAdapter {
    */
   function filePathMetadata($media) {
     // we use KMOTION_ADAPTER_SALT constant to know the path 
-    $hash = substr( md5( $media["id"].KMOTION_ADAPTER_SALT ),0,2); 
-    return STORAGE_PATH."/files/video/$hash/".$media["id"]."/original";
+    $hash = substr( md5( $media["remoteid"].KMOTION_ADAPTER_SALT ),0,2); 
+    return STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/original";
   }
 
   
@@ -45,10 +45,10 @@ class KmotionAdapter {
    */
   function filePathTranscode($media,$settings) {
     // we use KMOTION_ADAPTER_SALT constant to know the path 
-    $hash = substr( md5( $media["id"].KMOTION_ADAPTER_SALT ),0,2); 
+    $hash = substr( md5( $media["remoteid"].KMOTION_ADAPTER_SALT ),0,2); 
     return array(
-		 STORAGE_PATH."/files/video/$hash/".$media["id"]."/original",
-		 STORAGE_PATH."/files/video/$hash/".$media["id"]."/".$settings["id"].".".$settings["extension"]
+		 STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/original",
+		 STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/".$settings["id"].".".$settings["extension"]
 		 );
   }
 
@@ -65,8 +65,8 @@ class KmotionAdapter {
    *  the media.
    */
   function filePathTranscodeMultiple($media,$settings,$prefix="",$suffix="") {
-    $hash = substr( md5( $media["id"].KMOTION_ADAPTER_SALT ),0,2); 
-    return STORAGE_PATH."/files/video/$hash/".$media["id"]."/".$settings["id"]."-".$prefix."-".$suffix.".".$settings["extension"];
+    $hash = substr( md5( $media["remoteid"].KMOTION_ADAPTER_SALT ),0,2); 
+    return STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/".$settings["id"]."-".$prefix.$suffix;
   }
 
   

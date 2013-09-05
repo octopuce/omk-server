@@ -294,6 +294,7 @@ when using -vf cropdetect
     // We cd to a temporary folder where we can write (for statistics files)
     $TMP="/tmp/transcode-".getmypid();
     mkdir($TMP); $push=getcwd(); chdir($TMP);
+    $metadata=false;
     foreach($settings[$setting] as $k=>$v) {
       if (substr($k,0,7)=="command") {
 	$api->log(LOG_DEBUG, "[ffmpeg::transcode] exec: $v");
@@ -303,7 +304,7 @@ when using -vf cropdetect
 	    require_once(dirname(__FILE__)."/../transcodes/".$v.".php");
 	  }
 	  $called=substr($v,8);
-	  $result=$called($media,$source,$destination,$setting,$adapterObject);
+	  $result=$called($media,$source,$destination,$settings[$setting],$adapterObject,$metadata);
 	  if ($result) {
 	    $ret=0;
 	  } else {
@@ -334,13 +335,12 @@ when using -vf cropdetect
     }
 
     // Get the metadata of the stored file :
-    $metadata=false;
     if (is_file($destination.".".$settings[$setting]["extension"])) {
       $metadata=$this->getFfmpegMetadata($destination.".".$settings[$setting]["extension"]);
       $metadata["cardinality"]=1;
     } else {
     // multiple files are set as this : 
-      if (is_dir($destination)) {
+      if (is_dir($destination) && !isset($metadata["cardinality"])) {
 	// count the number of files in the folder:
 	$cardinality=0;
 	$d=opendir($destination);

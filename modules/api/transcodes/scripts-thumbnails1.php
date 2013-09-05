@@ -6,10 +6,10 @@
     * Generate up to 20 thumbnails (min 1 per minute) for the video <source>
     * The thumbnails will be generated as 60% quality JPEG at original size AND 100x100
     */
-function thumbnails1($media,$source,$destination,$setting,$adapterObject) {
+function thumbnails1($media,$source,$destination,$setting,$adapterObject,&$metadata) {
   
-  $metadata=@unserialize($media["metadata"]);
-  $duration=intval($metadata["time"]);
+  $srcmeta=@unserialize($media["metadata"]);
+  $duration=intval($srcmeta["time"]);
   
   $ratio="1/60";
   if ($duration>(20*60)) {
@@ -25,10 +25,12 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject) {
   
   // Now we convert them into JPG original size AND 100x100px
   $id=0;
+  $cardinality=0;
   for($i=0;$i<20;$i++) {
     if (!is_file($tmpdir.sprintf("/tmp%02d.png",$i+1))) {
       break;
     }
+    $cardinality++;
     $destfile = $adapterObject->filePathTranscodeMultiple($media,$setting,sprintf("h%02d",$i),".jpg");
     
     exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 60% ".escapeshellarg($destfile),$out,$res);
@@ -44,10 +46,10 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject) {
       $GLOBALS["error"]="Error launching convert for smaller jpeg";
       return false;
     }
-    unlink($tmpdir.sprintf("/tmp%02d.png",$i+1));
+    //    unlink($tmpdir.sprintf("/tmp%02d.png",$i+1));
   }
-  rmdir($tmpdir);
-
+  //  rmdir($tmpdir);
+  $metadata=array( "cardinality" => $cardinality );
   $GLOBALS["error"]="Thumbnails generated ($i)";
   return true;
    }
