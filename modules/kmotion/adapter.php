@@ -48,7 +48,7 @@ class KmotionAdapter {
     $hash = substr( md5( $media["remoteid"].KMOTION_ADAPTER_SALT ),0,2); 
     return array(
 		 STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/original",
-		 STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/".$settings["id"].".".$settings["extension"]
+		 STORAGE_PATH."/files/video/$hash/".$media["remoteid"]."/".$settings["id"]
 		 );
   }
 
