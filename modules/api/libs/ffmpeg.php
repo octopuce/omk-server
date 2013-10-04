@@ -259,21 +259,26 @@ when using -vf cropdetect
 
     switch($params["ratio"]) {
     case "16:9":
+      $api->log(LOG_DEBUG, "[ffmpeg::transcode] ratio is 16:9, size will be $size");
       $size=$settings[$setting]["size_169"];
       break;
     case "4:3":
+      $api->log(LOG_DEBUG, "[ffmpeg::transcode] ratio is 4:3, size will be $size");
       $size=$settings[$setting]["size_43"];
       break;
     case "1:1":
+      $api->log(LOG_DEBUG, "[ffmpeg::transcode] ratio is 1:1, size will be $size");
       $size=$settings[$setting]["size_169"];
-      list($w,$h)=explode($size,"x");
+      list($w,$h)=explode("x",$size);
       $size=$h."x".$h;
       break;
     default:
-      $size=$settings[$setting]["size_169"];
-      list($w,$h)=explode($size,"x");
+      //                [ffmpeg::transcode] ratio is DEFAULT, size will be 0x / 426x240 / x , realratio will be 1.6
+      $sss=$size=$settings[$setting]["size_169"];
+      list($w,$h)=explode("x",$size);
       $size=intval(round( ($h*$params["realratio"]) /4)*4)."x".$h;
       $ratio=$params["realratio"];
+      $api->log(LOG_DEBUG, "[ffmpeg::transcode] ratio is DEFAULT, size will be $size / $sss / $w $h, realratio will be ".$params["realratio"]."");
       break;
     }
     if ($params["invert"]) {
