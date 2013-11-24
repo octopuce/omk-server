@@ -6,7 +6,7 @@ require_once("zz_config.php");
 /**
  * Add a new media to the Transcoder. The given URL is absolute and static in that test-case
  */
-$id=1;
+$id=2;
 $result=call("app_new_media",
 	     array(
 		   "id" => $id,

@@ -28,3 +28,21 @@ function text_cut($text, $length = 80) {
      $text = substr($text, 0, $length - 3) . '...';
    return $text;
 }
+
+function date_my2fr($my,$long=0) {
+  if ($long==1 && $my) {
+    return substr($my,8,2)."/".substr($my,5,2)."/".substr($my,0,4).
+      " ".substr($my,11,5);
+  } 
+  if ($my!=0) {
+    return substr($my,8,2)."/".substr($my,5,2)."/".substr($my,2,2);
+  } else return "";
+}
+
+function red_if($cond, $str) {
+  $s="";
+  if ($cond) $s.="<span class=\"error\">";
+  $s.=$str;
+  if ($cond) $s.="</span>";
+  return $s;
+  }

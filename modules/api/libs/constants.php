@@ -32,7 +32,6 @@ define("TASK_DO_TRANSCODE",4);
 /* The omkt must tell the client that a transcode is available (or failed) */
 define("TASK_SEND_TRANSCODE",5);
 
-
 /* In which status can be a media */
 define("MEDIA_MIN",0); define("MEDIA_MAX",4);  // min/max value of this flag.
 /* The media is available remotely, not yet locally */

@@ -207,7 +207,12 @@ form .input-select-multiple {
 
 div.error {
     color: red;
-    border: 3px double red;
+    padding: 2px;
+    background: #FFE0E0;
+    border: 2px solid red;
+}
+span.error {
+    color: red;
 }
 
 #form_sms_message {
