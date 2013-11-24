@@ -220,6 +220,25 @@ when using -vf cropdetect
     } else {
       $attribs["type"]=TRACK_TYPE_OTHER;
     }
+    if (isset($attribs["mime"]) && isset($attribs["box"])) {
+      if ($attribs["mime"]=="application/octet-stream") {
+	// strange case : we need to find if it's a mp4, avi etc.
+	if ($attribs["box"]=="mov") {
+	  if ($hasvideo) {
+	    $attribs["mime"]="video/mp4";
+	  }
+	  if ($hasaudio && !$hasvideo) {
+	    $attribs["mime"]="audio/mp4";	  
+	  }
+	}
+	if ($attribs["box"]=="flv") {
+	  $attribs["mime"]="video/x-flv";
+	}
+	if ($attribs["box"]=="mp3") {
+	  $attribs["mime"]="audio/mpeg";
+	}
+      }
+    }
     return $attribs;
   } /* getFfmpegMetadata */
 
