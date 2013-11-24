@@ -228,7 +228,7 @@ when using -vf cropdetect
 	    $attribs["mime"]="video/mp4";
 	  }
 	  if ($hasaudio && !$hasvideo) {
-	    $attribs["mime"]="audio/mp4";	  
+	    $attribs["mime"]="audio/mp4";
 	  }
 	}
 	if ($attribs["box"]=="flv") {

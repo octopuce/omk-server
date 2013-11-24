@@ -65,6 +65,57 @@ class StatusController extends AController {
     $this->render('media', array('media' => $media , 'message' => $message));
 
   }
+
+  public function reloadAction($params) {
+    global $db;
+    check_user_identity();
+
+    if (!is_admin()) {
+      not_found();
+    }
+    $db->q("LOCK TABLES queue");
+    $q=$db->qone('SELECT * FROM queue WHERE id=?',array($params[0]),PDO::FETCH_ASSOC);
+    if (!$q) {
+      $this->render('index',array('message'=>_("Queue id not found")));
+      $db->q("UNLOCK TABLES");
+      exit();
+    }
+    if ($q["lockhost"]) {
+      $this->render('index',array('message'=>_("Queue currently processing this task.")));
+      $db->q("UNLOCK TABLES");
+      exit();
+    }
+    $db->q('UPDATE queue SET retry=10, datedone="0000-00-00 00:00:00", datetry=NOW(), status=0 WHERE id=?',array($params[0]));
+    $db->q("UNLOCK TABLES");
+    $this->mediaAction();
+  }
+
+  public function deleteAction($params) {
+    global $db;
+    check_user_identity();
+
+    if (!is_admin()) {
+      not_found();
+    }
+    $db->q("LOCK TABLES queue");
+    $q=$db->qone('SELECT * FROM queue WHERE id=?',array($params[0]),PDO::FETCH_ASSOC);
+    if (!$q) {
+      $this->render('index',array('message'=>_("Queue id not found")));
+      $db->q("UNLOCK TABLES");
+      exit();
+    }
+    if ($q["lockhost"]) {
+      $this->render('index',array('message'=>_("Queue currently processing this task.")));
+      $db->q("UNLOCK TABLES");
+      exit();
+    }
+    $db->q('DELETE FROM queue WHERE id=?',array($params[0]));
+    $db->q("UNLOCK TABLES");
+    $this->mediaAction();
+  }
+
+  
+  
   
   
 }

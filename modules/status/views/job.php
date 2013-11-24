@@ -78,7 +78,7 @@ if (empty($queue)) {
       $done=date_my2fr($q["datedone"],true);
     echo "<td>".(($q["datedone"]=="0000-00-00 00:00:00")?_("Not done yet"):$done);
     echo "</td>";
-    echo "<td>".red_if($q["status"]==2,$a_status[$q["status"]])."</td>";
+    echo "<td><a href=\"/status/reload/".$q["id"]."\" title=\""._("Will relaunch this task")."\">".red_if($q["status"]==2,$a_status[$q["status"]])."</a> <a href=\"/status/delete/".$q["id"]."\" title=\""._("Will delete this task")."\">X</a></td>";
     echo "<td>".(($q["retry"]==1)?"<span class=\"error\">"._("Failed")."</span>":$q["retry"])."</td>";
     echo "<td>";
     $t=unserialize($q["params"]);
