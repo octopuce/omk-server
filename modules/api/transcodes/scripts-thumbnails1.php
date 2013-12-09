@@ -16,6 +16,7 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject,&$metad
     $ratio="1/".floor($duration/20);
   }
   $tmpdir="/tmp/thumbs-".getmypid();
+  exec("rm -rf ".escapeshellarg($tmpdir));
   mkdir($tmpdir);
   exec("ffmpeg -i ".escapeshellarg($source)." -vf fps=fps=".$ratio." -vcodec png -f image2 -an ".escapeshellarg($tmpdir."/tmp%02d.png"),$out,$res);
   if ($res!=0) {
