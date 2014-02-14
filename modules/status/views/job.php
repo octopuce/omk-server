@@ -57,6 +57,7 @@ if (empty($queue)) {
   echo "<th>"._("Remote Media")."</th>";
   echo "<th>"._("Job")."</th>";
   echo "<th>"._("Queued")."</th>";
+  echo "<th>"._("Next Time")."</th>";
   echo "<th>"._("Done")."</th>";
   echo "<th>"._("Status")."</th>";
   echo "<th>"._("Retry")."</th>";
@@ -71,6 +72,7 @@ if (empty($queue)) {
     echo "<td>".$q["remoteid"]."</td>";
     echo "<td>".$a_tasks[$q["task"]]."</td>";
     echo "<td>".red_if( (time()-$q["ts"])>7200 && $q["datedone"]=="0000-00-00 00:00:00" , date_my2fr($q["datequeue"],true) );
+    echo "<td>".red_if( (time()-$q["ts"])>7200 && $q["datedone"]=="0000-00-00 00:00:00" , date_my2fr($q["datetry"],true) );
     echo "</td>";
     if (substr($q["datedone"],0,10)==substr($q["datequeue"],0,10))
       $done=substr($q["datedone"],11,5);
