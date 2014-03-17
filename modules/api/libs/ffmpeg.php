@@ -237,7 +237,32 @@ when using -vf cropdetect
 	if ($attribs["box"]=="mp3") {
 	  $attribs["mime"]="audio/mpeg";
 	}
-      }
+	if ($attribs["box"]=="mpegts") {
+	  $attribs["mime"]="video/mp2t";
+	}
+	if ($attribs["box"]=="matroska") {
+	  if ($hasvideo) {
+	    $attribs["mime"]="video/x-matroska";
+	  }
+	  if ($hasaudio && !$hasvideo) {
+	    $attribs["mime"]="audio/x-matroska";
+	  }
+	}
+	if ($attribs["box"]=="mpeg") {
+	  if ($hasvideo) {
+	    $attribs["mime"]="video/mpeg";
+	  }
+	  if ($hasaudio && !$hasvideo) {
+	    $attribs["mime"]="audio/mpeg";
+	  }
+	}
+	if ($attribs["box"]=="dv") {
+	  if ($hasvideo) {
+	    $attribs["mime"]="video/x-dv";
+	  }
+	}
+	
+      } // /strange mime
     }
     return $attribs;
   } /* getFfmpegMetadata */

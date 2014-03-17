@@ -11,8 +11,8 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject,&$metad
   $srcmeta=@unserialize($media["metadata"]);
   $duration=intval($srcmeta["time"]);
   
-  $ratio="1/60";
-  if ($duration>(20*60)) {
+  $ratio="1";
+  if ($duration>20) {
     $ratio="1/".floor($duration/20);
   }
   $tmpdir="/tmp/thumbs-".getmypid();
