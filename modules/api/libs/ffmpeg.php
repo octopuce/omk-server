@@ -192,9 +192,9 @@ when using -vf cropdetect
 	  // well, avconv is giving ALL the frame= time= lines into ONE line with ^M to show it the nice way ... let's change that...
 	  $out2=explode(chr(13),$line);
 	  foreach($out2 as $line) {
-	    if (preg_match("#frame= *([0-9]*).*time= *([0-9\.]*)#",$line,$mat)) {
+	    if (preg_match("#frame= *([0-9]*).*time= *([0-9]*):([0-9]*):([0-9]*)\.([0-9]*)#",$line,$mat)) {
 	      $attribs["frames"]=$mat[1]; 
-	      $attribs["time"]=$mat[2];
+	      $attribs["time"]=intval($mat[2])*3600+intval($mat[3])*60+intval($mat[4])+doubleval($mat[5])/100;
 	    }	    
 	    if ($cropdetect && preg_match("#crop=([0-9]*):([0-9]*):([0-9]*):([0-9]*)#",$line,$mat)) {
 	      $attribs["cropw"]=$mat[1]; 

@@ -34,7 +34,7 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject,&$metad
     $cardinality++;
     $destfile = $adapterObject->filePathTranscodeMultiple($media,$setting,sprintf("h%02d",$i),".jpg");
     
-    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 60% ".escapeshellarg($destfile),$out,$res);
+    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 80% ".escapeshellarg($destfile),$out,$res);
     if ($res!=0) {
       $GLOBALS["error"]="Error launching convert for original jpeg";
       return false;
@@ -42,7 +42,7 @@ function thumbnails1($media,$source,$destination,$setting,$adapterObject,&$metad
     
     $destfile = $adapterObject->filePathTranscodeMultiple($media,$setting,sprintf("l%02d",$i),".jpg");
     
-    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 60% -resize 100x100 ".escapeshellarg($destfile),$out,$res);
+    exec("convert ".escapeshellarg($tmpdir.sprintf("/tmp%02d.png",$i+1))." -quality 80% -resize 166x166 ".escapeshellarg($destfile),$out,$res);
     if ($res!=0) {
       $GLOBALS["error"]="Error launching convert for smaller jpeg";
       return false;
