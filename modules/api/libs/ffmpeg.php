@@ -320,7 +320,7 @@ when using -vf cropdetect
       //                [ffmpeg::transcode] ratio is DEFAULT, size will be 0x / 426x240 / x , realratio will be 1.6
       $sss=$size=$settings[$setting]["size_169"];
       list($w,$h)=explode("x",$size);
-      $size=intval(round( ($h*$params["realratio"]) /4)*4)."x".$h;
+      $size=intval(round($w/4)*4)."x".intval(round($h/4)*4);
       $ratio=$params["realratio"];
       $api->log(LOG_DEBUG, "[ffmpeg::transcode] ratio is DEFAULT, size will be $size / $sss / $w $h, realratio will be ".$params["realratio"]."");
       break;
