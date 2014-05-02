@@ -115,7 +115,7 @@ The OpenMediakit Transcoder public instance service at
   /** Returns a hash for the crypt password hashing function.
    * as of now, we use php5.3 almost best hashing function: SHA-256 with 1000 rounds and a random 16 chars salt.
    */
-  private static function getSalt() {
+  public static function getSalt() {
     $salt = substr(str_replace('+', '.', base64_encode(pack('N4', mt_rand(), mt_rand(), mt_rand(), mt_rand()))), 0, 16);
     return '$5$rounds=1000$'.$salt.'$';
   }
