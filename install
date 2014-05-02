@@ -13,7 +13,7 @@ define('LIBS', ROOT . '/libs');
 require_once LIBS . '/Db.php';
 $db=new StdClass();
 require_once __DIR__ . '/config.inc.php';
-
+/*
 try {
   $db = new Db($db);    
 } catch(Exception $e) {
@@ -34,7 +34,7 @@ foreach ($sql_queries as $sql) {
   $db->q($sql);
 }
 echo ".. done\n";
-
+*/
 if (!file_exists(__DIR__ . '/tmp')) {
   mkdir(__DIR__ . '/tmp');
   chmod(__DIR__ . '/tmp',755);
