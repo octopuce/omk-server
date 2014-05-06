@@ -9,10 +9,11 @@ class Ffmpeg {
    * @return array a complex array (see the doc)
    * of associative array with the metadata of each track.
    */
+  public $DEBUG=0;
+    
   public function getFfmpegMetadata($file,$cropdetect=false) {
     global $api;
     // This code is for the WHEEZY version of deb-multimedia ffmpeg version
-    $DEBUG=0;
 
     $attribs=array();
     $hasvideo=false;
@@ -81,7 +82,7 @@ when using -vf cropdetect
 
     foreach($out as $line) {
       if ($mode==1) {
-	if ($DEBUG) echo "mode1: $line\n";
+	if ($this->DEBUG) echo "mode1: $line\n";
 	$line=trim($line);
 	if (preg_match("|^Output |",$line,$mat)) {
 	  $mode=2; // second part = output & cropdetect
@@ -187,7 +188,7 @@ when using -vf cropdetect
       // parsing that line : 
       // frame=13130 fps=12900 q=-1.0 Lsize=       0kB time=438.10 bitrate=   0.0kbits/s
       if ($mode==2) {
-	if ($DEBUG) echo "mode2: $line\n";
+	if ($this->DEBUG) echo "mode2: $line\n";
 	if (preg_match("#frame= *([0-9]*).*time= *([0-9\.]*)#",$line)) {
 	  // well, avconv is giving ALL the frame= time= lines into ONE line with ^M to show it the nice way ... let's change that...
 	  $out2=explode(chr(13),$line);
