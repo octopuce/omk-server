@@ -7,6 +7,7 @@ do
     echo "$i..."
     ./$i stop
 done
+sleep 1 
 echo "Starting everything : "
 for i in omk-* 
 do
