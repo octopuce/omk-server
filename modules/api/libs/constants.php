@@ -20,7 +20,7 @@ define("STATUS_DONE",3);
 
 
 /* Which tasks are defined */
-define("TASK_MIN",1); define("TASK_MAX",5); // min/max value of this flag.
+define("TASK_MIN",1); define("TASK_MAX",6); // min/max value of this flag.
 /* The omkt must download a media */
 define("TASK_DOWNLOAD",1);
 /* The omkt must process a media to know its metadata */
@@ -31,6 +31,8 @@ define("TASK_SEND_METADATA",3);
 define("TASK_DO_TRANSCODE",4);
 /* The omkt must tell the client that a transcode is available (or failed) */
 define("TASK_SEND_TRANSCODE",5);
+/* The omkt must send an error message on metadata to the client */
+define("TASK_SEND_METADATAERROR",6);
 
 /* In which status can be a media */
 define("MEDIA_MIN",0); define("MEDIA_MAX",4);  // min/max value of this flag.

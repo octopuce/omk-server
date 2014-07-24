@@ -98,14 +98,23 @@ while (true) {
   $metadata=$ffmpeg->getFfmpegMetadata($filename);
   
   if ($metadata) {
-    // Store the metadata in the media object: 
-    $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_OK, "metadata" => serialize($metadata) ));
-    // Queue the task to tell the client that we have the metadata
-    $api->queueAdd(TASK_SEND_METADATA,$task["mediaid"],API_RETRY);
-    // ok, transfer finished, let's mark it done
-    $api->setTaskProcessedUnlock($task["id"]);
-    $api->log(LOG_DEBUG, "Successully processed task '".$task["id"]."', metadata for media '".$task["mediaid"]."'");
-
+    if (count($metadata["tracks"])==0) {
+      // Store the metadata in the media object: 
+      $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_FAILED, "metadata" => serialize($metadata) ));
+      // Queue the task to tell the client that we had an error getting the metadata
+      $api->queueAdd(TASK_SEND_METADATAERROR,$task["mediaid"],API_RETRY);
+      // ok, transfer finished, let's mark it done
+      $api->setTaskProcessedUnlock($task["id"]);
+      $api->log(LOG_DEBUG, "Failed (properly) while processing task '".$task["id"]."', metadata for media '".$task["mediaid"]."'");
+    } else {
+      // Store the metadata in the media object: 
+      $api->mediaUpdate($task["mediaid"],array("status"=>MEDIA_METADATA_OK, "metadata" => serialize($metadata) ));
+      // Queue the task to tell the client that we have the metadata
+      $api->queueAdd(TASK_SEND_METADATA,$task["mediaid"],API_RETRY);
+      // ok, transfer finished, let's mark it done
+      $api->setTaskProcessedUnlock($task["id"]);
+      $api->log(LOG_DEBUG, "Successully processed task '".$task["id"]."', metadata for media '".$task["mediaid"]."'");
+    }
   } else {
     // if we failed, we just mark it as failed, this will retry 5 min from now ...
     $api->setTaskFailedUnlock($task["id"]);

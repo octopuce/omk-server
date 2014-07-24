@@ -57,7 +57,7 @@ while (true) {
   $api->cleanupQueueLocks();
   
   // Search for a task 
-  $task=$api->getQueuedTaskLock( array(TASK_SEND_METADATA,TASK_SEND_TRANSCODE) );
+  $task=$api->getQueuedTaskLock( array(TASK_SEND_METADATA,TASK_SEND_TRANSCODE,TASK_SEND_METADATAERROR) );
 
   if (!$task) { 
     // we sleep for a little while, thanks to that, we can launch that process as soon as we want: 
@@ -87,6 +87,12 @@ while (true) {
     $url.="&action=transcoder_send_metadata";
     $url.="&id=".$media["remoteid"];
     $url.="&metadata=".urlencode(json_encode(unserialize($media["metadata"])));
+    $ok=true;
+    break;
+  case TASK_SEND_METADATAERROR:
+    $url.="&action=transcoder_send_alert";
+    $url.="&id=".$media["remoteid"];
+    $url.="&status=1&message=".urlencode("No track found while reading metadata");
     $ok=true;
     break;
   case TASK_SEND_TRANSCODE:
